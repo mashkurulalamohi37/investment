@@ -37,8 +37,11 @@ class ShareCertificateWidget extends StatelessWidget {
       backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
-          isBangla ? 'অংশীদারি মালিকানা সনদ' : 'Share Ownership Certificate',
-          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla),
+          isBangla ? 'মালিকানা সনদপত্র' : 'Ownership Certificate',
+          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
           IconButton(
@@ -294,14 +297,30 @@ class ShareCertificateWidget extends StatelessWidget {
   Widget _certDataRow(String label, String value, AppPalette palette, bool isDark, {bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.caption(isDark: isDark).copyWith(color: palette.inkSecondary, fontSize: 11.5)),
-        Text(
-          value,
-          style: AppTypography.bodyStrong(isDark: isDark).copyWith(
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-            fontSize: 12.5,
-            color: palette.ink,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 105),
+          child: Text(
+            label,
+            style: AppTypography.caption(isDark: isDark).copyWith(
+              color: palette.inkSecondary,
+              fontSize: 11,
+              height: 1.3,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: AppTypography.bodyStrong(isDark: isDark).copyWith(
+              fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
+              fontSize: 11.5,
+              color: palette.ink,
+              height: 1.3,
+            ),
           ),
         ),
       ],
