@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
@@ -36,6 +37,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _sendOtp() {
+    HapticFeedback.selectionClick();
     setState(() => _isLoading = true);
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
@@ -48,6 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _verifyOtp(AppState state, {bool asAdmin = false}) {
+    HapticFeedback.selectionClick();
     setState(() => _isLoading = true);
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
@@ -78,31 +81,112 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: palette.canvas,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, size: 20, color: palette.ink),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
-          TextButton(
-            onPressed: () => setState(() => _isBangla = !_isBangla),
-            child: Text(
-              _isBangla ? 'EN' : 'বাং',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: palette.pine),
+          // Language Switcher Chip
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() => _isBangla = !_isBangla);
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.ruleStrong, width: 1.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.language_rounded, size: 13, color: palette.pine),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isBangla ? 'English' : 'বাংলা',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: palette.pine,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // Brand Crest & Header
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: palette.pine,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: palette.brass, width: 1.5),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'স্ব',
+                      style: TextStyle(
+                        fontFamily: 'serif',
+                        color: palette.brass,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _isBangla ? 'স্বপ্নযাত্রী ইনভেস্টমেন্ট' : 'SWAPNOJATRI',
+                        style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        _isBangla ? 'সুরক্ষিত ভূমি পোর্টফোলিও হিসাব' : 'Institutional Land Portfolio',
+                        style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
+                          color: palette.inkSecondary,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Title Section
               Text(
-                _isBangla ? 'বিনিয়োগকারী হিসাব প্রবেশ' : 'Sign In to Your Portfolio',
+                _isBangla ? 'পোর্টফোলিওতে প্রবেশ করুন' : 'Sign In to Your Portfolio',
                 style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
                   fontSize: 22,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 _isBangla
                     ? 'আপনার নিবন্ধিত মোবাইল নম্বরে ওটিপি যাচাইকরণ কোড পাঠানো হবে।'
@@ -112,7 +196,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   fontSize: 13.5,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               // Phone Field with +880 Prefix in a Sunken Well
               Text(
@@ -144,7 +228,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         '+880',
                         style: TextStyle(
                           fontFamily: 'monospace',
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: palette.inkSecondary,
                           fontSize: 13,
                         ),
@@ -157,9 +241,10 @@ class _AuthScreenState extends State<AuthScreen> {
                         keyboardType: TextInputType.phone,
                         enabled: !_isOtpSent,
                         style: AppTypography.bodyStrong(isDark: isDark).copyWith(letterSpacing: 0.5),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: '1XXXXXXXXX',
+                          hintStyle: TextStyle(color: palette.inkTertiary),
                           isDense: true,
                         ),
                       ),
@@ -178,7 +263,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   onPressed: _sendOtp,
                 ),
               ] else ...[
-                // OTP as 6 Ruled Boxes at Radius 2 (§10)
+                // OTP as 6 Ruled Boxes
                 Text(
                   _isBangla ? '৬ সংখ্যার ওটিপি কোড' : '6-Digit OTP Code',
                   style: AppTypography.sectionLabel(isDark: isDark, isBangla: _isBangla).copyWith(
@@ -195,7 +280,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         color: palette.surface,
-                        borderRadius: AppRadius.borderChip, // Radius 2
+                        borderRadius: AppRadius.borderChip,
                         border: Border.all(color: palette.ruleStrong, width: 1.0),
                       ),
                       child: Center(
@@ -239,44 +324,123 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: TextButton(
                     onPressed: () => setState(() => _isOtpSent = false),
                     child: Text(
-                      _isBangla ? 'নম্বর পরিবর্তন করুন' : 'Change Phone Number',
+                      _isBangla ? 'মোবাইল নম্বর পরিবর্তন করুন' : 'Change Phone Number',
                       style: TextStyle(color: palette.inkSecondary, fontSize: 12),
                     ),
                   ),
                 ),
               ],
 
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
               const Divider(height: 1),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Sample Data Entry (Quiet Button, not a glowing AI demo button)
+              // Instant Sandbox Mode Quick Selectors
               Center(
                 child: Column(
                   children: [
-                    Text(
-                      _isBangla ? 'পরীক্ষামূলক নমুনা তথ্য দিয়ে দেখুন' : 'Developer & Sandbox Access',
-                      style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
-                        color: palette.inkTertiary,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.shield_outlined, size: 14, color: palette.pine),
+                        const SizedBox(width: 6),
+                        Text(
+                          _isBangla ? 'নমুনা পরিবেশ অ্যাক্সেস' : 'Instant Sandbox Access',
+                          style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
+                            color: palette.inkSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () => _verifyOtp(state, asAdmin: false),
+                      borderRadius: AppRadius.borderControl,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: palette.surface,
+                          borderRadius: AppRadius.borderControl,
+                          border: Border.all(color: palette.ruleStrong, width: 1.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(color: palette.pine, shape: BoxShape.circle),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _isBangla ? 'বিনিয়োগকারী পোর্টাল (রহিম চৌধুরী)' : 'Investor Portal (Rahim Chowdhury)',
+                                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: palette.ink),
+                                    ),
+                                    Text(
+                                      _isBangla ? '৪টি অংশ • ৳ ১,০২,০০০ বিনিয়োগ' : '4 Shares • ৳ 1,02,000 Invested',
+                                      style: TextStyle(fontSize: 11, color: palette.inkSecondary),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Icon(Icons.chevron_right_rounded, size: 18, color: palette.inkSecondary),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    AppButton(
-                      label: _isBangla ? 'বিনিয়োগকারী নমুনা পোর্টফোলিও' : 'Explore with Sample Investor Data',
-                      variant: AppButtonVariant.quiet,
-                      isBangla: _isBangla,
-                      onPressed: () => _verifyOtp(state, asAdmin: false),
-                    ),
-                    const SizedBox(height: 4),
-                    AppButton(
-                      label: _isBangla ? 'প্রশাসক ব্যবস্থাপনা কনসোল' : 'Open Admin Management Console',
-                      variant: AppButtonVariant.quiet,
-                      isBangla: _isBangla,
-                      onPressed: () => _verifyOtp(state, asAdmin: true),
+                    InkWell(
+                      onTap: () => _verifyOtp(state, asAdmin: true),
+                      borderRadius: AppRadius.borderControl,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: palette.surface,
+                          borderRadius: AppRadius.borderControl,
+                          border: Border.all(color: palette.ruleStrong, width: 1.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(color: palette.brass, shape: BoxShape.circle),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _isBangla ? 'প্রশাসক কনসোল (তানভীর আহমেদ)' : 'Admin Console (Tanvir Ahmed)',
+                                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: palette.ink),
+                                    ),
+                                    Text(
+                                      _isBangla ? 'তহবিল ও ব্যয় ভাউচার অনুমোদন' : 'Fund & Expense Approval',
+                                      style: TextStyle(fontSize: 11, color: palette.inkSecondary),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Icon(Icons.chevron_right_rounded, size: 18, color: palette.inkSecondary),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

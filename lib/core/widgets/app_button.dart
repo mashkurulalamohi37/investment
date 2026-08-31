@@ -162,8 +162,8 @@ class _AppButtonState extends State<AppButton> {
     switch (widget.variant) {
       case AppButtonVariant.primary:
         bg = _isPressed ? palette.pineDeep : (isEnabled ? palette.pine : palette.surfaceSunken);
-        border = Colors.transparent;
-        text = isEnabled ? palette.canvas : palette.inkTertiary;
+        border = isEnabled ? palette.pineDeep.withValues(alpha: 0.3) : Colors.transparent;
+        text = isEnabled ? Colors.white : palette.inkTertiary;
         break;
       case AppButtonVariant.secondary:
         bg = _isPressed ? palette.surfaceSunken : palette.surface;

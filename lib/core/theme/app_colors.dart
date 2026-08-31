@@ -41,46 +41,46 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.slate,
   });
 
-  /// Light — "Day sheet"
+  /// Light — High-Contrast Royal Architectural Linen & Deep Pine
   static const light = AppPalette(
-    canvas: Color(0xFFF3F4F0),         // Cool linen, faint green cast. Never pure white, never cream.
-    surface: Color(0xFFFCFCFA),        // Lighter than canvas — elevation is lightness, not shadow.
-    surfaceSunken: Color(0xFFEAEBE5),  // Wells: lot map field, table headers, disabled inputs.
-    rule: Color(0xFFD6D9D0),           // 1px hairline. The default separator in the entire app.
-    ruleStrong: Color(0xFFB7BCB1),     // Table outer borders, lot-map frame, section dividers.
-    ink: Color(0xFF0E1512),            // Primary text, primary icons.
-    inkSecondary: Color(0xFF4A5551),   // Secondary text, labels, inactive icons.
-    inkTertiary: Color(0xFF7D8781),    // Metadata, timestamps, margin ticks, placeholders.
-    pine: Color(0xFF12352A),           // Institutional color: primary buttons, hero card, owned lots, matra rules.
-    pineDeep: Color(0xFF0A1F18),       // Hero card base, pressed state of pine.
-    pineTint: Color(0xFFE3EDE7),       // Selected rows, owned-lot fills at small size, quiet badges.
-    brass: Color(0xFF8F7328),          // Seals, certificate borders, lot serial numbers.
-    brassLight: Color(0xFFC0A257),     // Seal highlight ring only.
-    vermilion: Color(0xFFA6321E),      // Registrar's red. Destructive actions and rejected states only.
-    jade: Color(0xFF136B4E),           // Credits, paid dividends, verified.
-    amberInk: Color(0xFF8A5E12),       // Pending, awaiting verification, risk notes.
-    slate: Color(0xFF33475A),          // Legal and informational tags.
+    canvas: Color(0xFFF8FAF7),         // Crisp, pure warm linen paper with luminous clarity
+    surface: Color(0xFFFFFFFF),        // Pure paper white for cards & sheets
+    surfaceSunken: Color(0xFFEFF3EE),  // Architectural sunken wells & map fields
+    rule: Color(0xFFDCE2DA),           // Crisp, refined 1px hairline border
+    ruleStrong: Color(0xFFB8C2B5),     // Architectural frame borders & table dividers
+    ink: Color(0xFF0C1612),            // Deep obsidian charcoal — ultra-legible high contrast
+    inkSecondary: Color(0xFF32423B),   // Dark pine charcoal for secondary copy (never washed out)
+    inkTertiary: Color(0xFF5E6F67),    // Crisp metadata & labels
+    pine: Color(0xFF0F3B2E),           // Sovereign Forest Emerald (luxurious institutional depth)
+    pineDeep: Color(0xFF072119),       // Base gradient and pressed state
+    pineTint: Color(0xFFE8F2EC),       // Soft sage tint for active pills & highlight rows
+    brass: Color(0xFFB58A2B),          // Royal heritage gold & engraved seals
+    brassLight: Color(0xFFD6AB47),     // Gold highlight ring
+    vermilion: Color(0xFFB3261E),      // Registrar's stamp red
+    jade: Color(0xFF0D7A55),           // Verified badge, dividend returns, positive delta
+    amberInk: Color(0xFF9E6310),       // Pending status, escrow disclosures
+    slate: Color(0xFF283E50),          // Legal jurisdiction tags
   );
 
-  /// Dark — "Night ledger"
+  /// Dark — Luxury Obsidian Midnight & Glowing Emerald
   static const dark = AppPalette(
-    canvas: Color(0xFF0C110F),
-    surface: Color(0xFF131A17),        // One step lighter than canvas.
-    surfaceSunken: Color(0xFF090D0B),  // Darker than canvas for wells — inverted from light mode.
-    rule: Color(0xFF1F2A25),
-    ruleStrong: Color(0xFF2E3C35),
-    ink: Color(0xFFE9ECE7),
-    inkSecondary: Color(0xFF9BA6A0),
-    inkTertiary: Color(0xFF6B776F),
-    pine: Color(0xFF1D4E3D),
-    pineDeep: Color(0xFF0F2C22),
-    pineTint: Color(0xFF16261F),
-    brass: Color(0xFFC9A961),
-    brassLight: Color(0xFFE0C489),
-    vermilion: Color(0xFFD4614A),
-    jade: Color(0xFF3FA07B),
-    amberInk: Color(0xFFC79A3C),
-    slate: Color(0xFF7E96AE),
+    canvas: Color(0xFF080D0B),         // Deep obsidian velvet
+    surface: Color(0xFF101915),        // Elevated dark pine slate
+    surfaceSunken: Color(0xFF050806),  // Deep sunken well
+    rule: Color(0xFF1B2922),           // Subtle dark separator
+    ruleStrong: Color(0xFF2A3D34),     // Strong frame outline
+    ink: Color(0xFFF7FAF8),            // Pristine, crisp white text
+    inkSecondary: Color(0xFFA8B8AF),   // High-contrast readable secondary
+    inkTertiary: Color(0xFF72837B),    // Legible metadata
+    pine: Color(0xFF1E614B),           // Vibrant luminous emerald
+    pineDeep: Color(0xFF0F382C),       // Dark pine base
+    pineTint: Color(0xFF132B22),       // Dark pine highlight tint
+    brass: Color(0xFFD4AF37),          // Radiant royal gold foil
+    brassLight: Color(0xFFE8C868),     // Bright gold highlight
+    vermilion: Color(0xFFE05343),      // Red alert
+    jade: Color(0xFF22C55E),           // Glowing verified jade
+    amberInk: Color(0xFFD99B26),       // Warm gold warning
+    slate: Color(0xFF8BA5BF),          // Slate tag
   );
 
   @override
@@ -149,79 +149,54 @@ class AppPalette extends ThemeExtension<AppPalette> {
   }
 }
 
-/// Convenience context extension for accessing the active palette cleanly
 extension AppPaletteContext on BuildContext {
-  AppPalette get palette =>
-      Theme.of(this).extension<AppPalette>() ??
-      (Theme.of(this).brightness == Brightness.dark ? AppPalette.dark : AppPalette.light);
+  AppPalette get palette => Theme.of(this).extension<AppPalette>() ?? AppPalette.light;
 }
 
-/// Backward compatibility namespace for static access where BuildContext is not directly available
 class AppColors {
-  static const Color primary = Color(0xFF12352A);
-  static const Color primaryDark = Color(0xFF0A1F18);
-  static const Color primaryMedium = Color(0xFF1D4E3D);
-  static const Color primaryLight = Color(0xFF2B6B56);
-  static const Color primarySubtle = Color(0xFFE3EDE7);
+  static const primary = Color(0xFF0F3B2E);
+  static const primaryDark = Color(0xFF1E614B);
+  static const primarySubtle = Color(0xFFE8F2EC);
+  static const secondary = Color(0xFFB58A2B);
+  static const accent = Color(0xFFB58A2B);
+  static const gold = Color(0xFFB58A2B);
+  static const success = Color(0xFF0D7A55);
+  static const successDark = Color(0xFF22C55E);
+  static const error = Color(0xFFB3261E);
+  static const errorLight = Color(0xFFFDE8E8);
+  static const warning = Color(0xFF9E6310);
 
-  static const Color accentGold = Color(0xFF8F7328);
-  static const Color accentGoldLight = Color(0xFFC0A257);
-  static const Color accentGoldDark = Color(0xFF6B551E);
-  static const Color accentGoldMuted = Color(0xFFF7F2E2);
+  static const lightBg = Color(0xFFF8FAF7);
+  static const darkBg = Color(0xFF080D0B);
+  static const lightSurface = Color(0xFFFFFFFF);
+  static const darkSurface = Color(0xFF101915);
+  static const lightCard = Color(0xFFFFFFFF);
+  static const darkCard = Color(0xFF101915);
+  static const lightCardBorder = Color(0xFFDCE2DA);
+  static const darkCardBorder = Color(0xFF1B2922);
 
-  static const Color success = Color(0xFF136B4E);
-  static const Color successLight = Color(0xFFE6F5EF);
-  static const Color successDark = Color(0xFF0D4B37);
+  static const lightTextPrimary = Color(0xFF0C1612);
+  static const darkTextPrimary = Color(0xFFF7FAF8);
+  static const lightTextSecondary = Color(0xFF32423B);
+  static const darkTextSecondary = Color(0xFFA8B8AF);
+  static const lightTextMuted = Color(0xFF5E6F67);
+  static const darkTextMuted = Color(0xFF72837B);
 
-  static const Color warning = Color(0xFF8A5E12);
-  static const Color warningLight = Color(0xFFFEF3C7);
-  static const Color warningDark = Color(0xFF6B480C);
-
-  static const Color error = Color(0xFFA6321E);
-  static const Color errorLight = Color(0xFFFEE2E2);
-  static const Color errorDark = Color(0xFF7A2415);
-
-  static const Color info = Color(0xFF33475A);
-  static const Color infoLight = Color(0xFFEFF6FF);
-  static const Color infoDark = Color(0xFF22303D);
-
-  static const Color lightBg = Color(0xFFF3F4F0);
-  static const Color lightSurface = Color(0xFFFCFCFA);
-  static const Color lightCard = Color(0xFFFCFCFA);
-  static const Color lightCardBorder = Color(0xFFD6D9D0);
-  static const Color lightDivider = Color(0xFFD6D9D0);
-  static const Color lightTextPrimary = Color(0xFF0E1512);
-  static const Color lightTextSecondary = Color(0xFF4A5551);
-  static const Color lightTextMuted = Color(0xFF7D8781);
-
-  static const Color darkBg = Color(0xFF0C110F);
-  static const Color darkSurface = Color(0xFF131A17);
-  static const Color darkCard = Color(0xFF131A17);
-  static const Color darkCardBorder = Color(0xFF1F2A25);
-  static const Color darkDivider = Color(0xFF1F2A25);
-  static const Color darkTextPrimary = Color(0xFFE9ECE7);
-  static const Color darkTextSecondary = Color(0xFF9BA6A0);
-  static const Color darkTextMuted = Color(0xFF6B776F);
-
-  // The ONLY permitted gradient in the entire application: 6% delta vertical in HoldingCard
-  static const LinearGradient holdingCardGradientLight = LinearGradient(
+  static const holdingCardGradientLight = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF12352A), Color(0xFF0A1F18)],
+    colors: [
+      Color(0xFF0F3B2E),
+      Color(0xFF09251D),
+    ],
   );
 
-  static const LinearGradient holdingCardGradientDark = LinearGradient(
+  static const holdingCardGradientDark = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF131A17), Color(0xFF090D0B)],
-  );
-
-  // Aliases for compatibility
-  static const LinearGradient heroGradientLight = holdingCardGradientLight;
-  static const LinearGradient heroGradientDark = holdingCardGradientDark;
-  static const LinearGradient goldGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFC0A257), Color(0xFF8F7328)],
+    colors: [
+      Color(0xFF142B23),
+      Color(0xFF0B1914),
+    ],
   );
 }
