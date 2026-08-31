@@ -30,12 +30,45 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
       child: ListenableBuilder(
         listenable: _appState,
         builder: (context, child) {
+          final isDark = _appState.themeMode == ThemeMode.dark;
+
           return MaterialApp(
             title: 'Swapnojatri Investment Platform',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
             themeMode: _appState.themeMode,
+            builder: (context, child) {
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  // Desktop / Large screen frame wrapper
+                  if (constraints.maxWidth > 500) {
+                    return Scaffold(
+                      backgroundColor: isDark ? const Color(0xFF070A08) : const Color(0xFFE5E7E2),
+                      body: Center(
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 440, maxHeight: 920),
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                                blurRadius: 32,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: ClipRect(
+                            child: child ?? const SizedBox.shrink(),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  // Mobile viewport fills 100%
+                  return child ?? const SizedBox.shrink();
+                },
+              );
+            },
             home: const SplashScreen(),
           );
         },

@@ -89,11 +89,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ],
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
 
               // Middle Slides
-              SizedBox(
-                height: 380,
+              Expanded(
                 child: PageView(
                   controller: _pageController,
                   onPageChanged: (idx) => setState(() => _currentPage = idx),
@@ -133,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 16),
 
               // Bottom Actions
               AppButton(
