@@ -48,7 +48,7 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
                     final targetHeight = math.min(constraints.maxHeight - 32, 820.0);
 
                     return Container(
-                      color: isDark ? const Color(0xFF080604) : const Color(0xFFDFD6C2),
+                      color: isDark ? const Color(0xFF070A08) : const Color(0xFFEFF2EE),
                       alignment: Alignment.center,
                       child: Container(
                         width: 412,
