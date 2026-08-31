@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Institutional Banking & Land Registry Palette ("The Khatian Concept")
-/// Exposes strictly typed tokens via [ThemeExtension<AppPalette>]
+/// Sovereign Private Wealth & Land Registry Palette
+/// Replaces generic AI-green with Majestic Obsidian Navy & Champagne Gold
 class AppPalette extends ThemeExtension<AppPalette> {
   final Color canvas;
   final Color surface;
@@ -11,10 +11,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color ink;
   final Color inkSecondary;
   final Color inkTertiary;
-  final Color pine;
+  final Color pine; // Sovereign Obsidian Navy (Primary Brand Token)
   final Color pineDeep;
   final Color pineTint;
-  final Color brass;
+  final Color brass; // Warm Champagne Gold (Heritage Accent Token)
   final Color brassLight;
   final Color vermilion;
   final Color jade;
@@ -41,46 +41,46 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.slate,
   });
 
-  /// Light — High-Contrast Royal Architectural Linen & Deep Pine
+  /// Light — Royal Silk Ivory & Sovereign Obsidian Navy
   static const light = AppPalette(
-    canvas: Color(0xFFF8FAF7),         // Crisp, pure warm linen paper with luminous clarity
-    surface: Color(0xFFFFFFFF),        // Pure paper white for cards & sheets
-    surfaceSunken: Color(0xFFEFF3EE),  // Architectural sunken wells & map fields
-    rule: Color(0xFFDCE2DA),           // Crisp, refined 1px hairline border
-    ruleStrong: Color(0xFFB8C2B5),     // Architectural frame borders & table dividers
-    ink: Color(0xFF0C1612),            // Deep obsidian charcoal — ultra-legible high contrast
-    inkSecondary: Color(0xFF32423B),   // Dark pine charcoal for secondary copy (never washed out)
-    inkTertiary: Color(0xFF5E6F67),    // Crisp metadata & labels
-    pine: Color(0xFF0F3B2E),           // Sovereign Forest Emerald (luxurious institutional depth)
-    pineDeep: Color(0xFF072119),       // Base gradient and pressed state
-    pineTint: Color(0xFFE8F2EC),       // Soft sage tint for active pills & highlight rows
-    brass: Color(0xFFB58A2B),          // Royal heritage gold & engraved seals
-    brassLight: Color(0xFFD6AB47),     // Gold highlight ring
-    vermilion: Color(0xFFB3261E),      // Registrar's stamp red
-    jade: Color(0xFF0D7A55),           // Verified badge, dividend returns, positive delta
-    amberInk: Color(0xFF9E6310),       // Pending status, escrow disclosures
-    slate: Color(0xFF283E50),          // Legal jurisdiction tags
+    canvas: Color(0xFFF7F9FC),         // Luminous warm porcelain silk
+    surface: Color(0xFFFFFFFF),        // Crisp pure porcelain surface
+    surfaceSunken: Color(0xFFEEF2F6),  // Architectural sunken well
+    rule: Color(0xFFE2E8F0),           // Crisp 1px hairline border
+    ruleStrong: Color(0xFFCBD5E1),     // Definitive frame border
+    ink: Color(0xFF0F172A),            // Deep Obsidian Charcoal — 100% legibility
+    inkSecondary: Color(0xFF334155),   // Slate Charcoal for secondary copy
+    inkTertiary: Color(0xFF64748B),    // Cool Slate for metadata & timestamps
+    pine: Color(0xFF0C192C),           // Sovereign Obsidian Navy (Royal Authority)
+    pineDeep: Color(0xFF050D18),       // Deep obsidian base
+    pineTint: Color(0xFFEFF4FA),       // Soft porcelain navy tint
+    brass: Color(0xFFC59B3F),          // Warm Brushed Champagne Gold
+    brassLight: Color(0xFFE4BD68),     // Radiant gold highlight
+    vermilion: Color(0xFFDC2626),      // Red alert & rejection
+    jade: Color(0xFF059669),           // Verified badge, dividend returns, positive delta
+    amberInk: Color(0xFFD97706),       // Warm amber for escrow disclosures
+    slate: Color(0xFF475569),          // Legal jurisdiction tags
   );
 
-  /// Dark — Luxury Obsidian Midnight & Glowing Emerald
+  /// Dark — Luxury Midnight Obsidian & Radiant Champagne Gold
   static const dark = AppPalette(
-    canvas: Color(0xFF080D0B),         // Deep obsidian velvet
-    surface: Color(0xFF101915),        // Elevated dark pine slate
-    surfaceSunken: Color(0xFF050806),  // Deep sunken well
-    rule: Color(0xFF1B2922),           // Subtle dark separator
-    ruleStrong: Color(0xFF2A3D34),     // Strong frame outline
-    ink: Color(0xFFF7FAF8),            // Pristine, crisp white text
-    inkSecondary: Color(0xFFA8B8AF),   // High-contrast readable secondary
-    inkTertiary: Color(0xFF72837B),    // Legible metadata
-    pine: Color(0xFF1E614B),           // Vibrant luminous emerald
-    pineDeep: Color(0xFF0F382C),       // Dark pine base
-    pineTint: Color(0xFF132B22),       // Dark pine highlight tint
-    brass: Color(0xFFD4AF37),          // Radiant royal gold foil
-    brassLight: Color(0xFFE8C868),     // Bright gold highlight
-    vermilion: Color(0xFFE05343),      // Red alert
-    jade: Color(0xFF22C55E),           // Glowing verified jade
-    amberInk: Color(0xFFD99B26),       // Warm gold warning
-    slate: Color(0xFF8BA5BF),          // Slate tag
+    canvas: Color(0xFF070B12),         // Midnight Obsidian Velvet
+    surface: Color(0xFF0F1726),        // Elevated Deep Navy Slate
+    surfaceSunken: Color(0xFF05080E),  // Sunken dark well
+    rule: Color(0xFF1E293B),           // Dark hairline divider
+    ruleStrong: Color(0xFF334155),     // Dark strong frame outline
+    ink: Color(0xFFF8FAFC),            // Pristine crisp white text
+    inkSecondary: Color(0xFF94A3B8),   // High-contrast readable secondary
+    inkTertiary: Color(0xFF64748B),    // Legible metadata
+    pine: Color(0xFF1E3A5F),           // Radiant Royal Navy / Cobalt
+    pineDeep: Color(0xFF0F2238),       // Base navy
+    pineTint: Color(0xFF132238),       // Dark navy highlight tint
+    brass: Color(0xFFE5B85C),          // Radiant champagne gold
+    brassLight: Color(0xFFF2D186),     // Bright gold highlight
+    vermilion: Color(0xFFEF4444),      // Red alert
+    jade: Color(0xFF10B981),           // Glowing verified jade
+    amberInk: Color(0xFFF59E0B),       // Warm gold warning
+    slate: Color(0xFF94A3B8),          // Slate tag
   );
 
   @override
@@ -154,49 +154,49 @@ extension AppPaletteContext on BuildContext {
 }
 
 class AppColors {
-  static const primary = Color(0xFF0F3B2E);
-  static const primaryDark = Color(0xFF1E614B);
-  static const primarySubtle = Color(0xFFE8F2EC);
-  static const secondary = Color(0xFFB58A2B);
-  static const accent = Color(0xFFB58A2B);
-  static const gold = Color(0xFFB58A2B);
-  static const success = Color(0xFF0D7A55);
-  static const successDark = Color(0xFF22C55E);
-  static const error = Color(0xFFB3261E);
-  static const errorLight = Color(0xFFFDE8E8);
-  static const warning = Color(0xFF9E6310);
+  static const primary = Color(0xFF0C192C);
+  static const primaryDark = Color(0xFF1E3A5F);
+  static const primarySubtle = Color(0xFFEFF4FA);
+  static const secondary = Color(0xFFC59B3F);
+  static const accent = Color(0xFFC59B3F);
+  static const gold = Color(0xFFC59B3F);
+  static const success = Color(0xFF059669);
+  static const successDark = Color(0xFF10B981);
+  static const error = Color(0xFFDC2626);
+  static const errorLight = Color(0xFFFEE2E2);
+  static const warning = Color(0xFFD97706);
 
-  static const lightBg = Color(0xFFF8FAF7);
-  static const darkBg = Color(0xFF080D0B);
+  static const lightBg = Color(0xFFF7F9FC);
+  static const darkBg = Color(0xFF070B12);
   static const lightSurface = Color(0xFFFFFFFF);
-  static const darkSurface = Color(0xFF101915);
+  static const darkSurface = Color(0xFF0F1726);
   static const lightCard = Color(0xFFFFFFFF);
-  static const darkCard = Color(0xFF101915);
-  static const lightCardBorder = Color(0xFFDCE2DA);
-  static const darkCardBorder = Color(0xFF1B2922);
+  static const darkCard = Color(0xFF0F1726);
+  static const lightCardBorder = Color(0xFFE2E8F0);
+  static const darkCardBorder = Color(0xFF1E293B);
 
-  static const lightTextPrimary = Color(0xFF0C1612);
-  static const darkTextPrimary = Color(0xFFF7FAF8);
-  static const lightTextSecondary = Color(0xFF32423B);
-  static const darkTextSecondary = Color(0xFFA8B8AF);
-  static const lightTextMuted = Color(0xFF5E6F67);
-  static const darkTextMuted = Color(0xFF72837B);
+  static const lightTextPrimary = Color(0xFF0F172A);
+  static const darkTextPrimary = Color(0xFFF8FAFC);
+  static const lightTextSecondary = Color(0xFF334155);
+  static const darkTextSecondary = Color(0xFF94A3B8);
+  static const lightTextMuted = Color(0xFF64748B);
+  static const darkTextMuted = Color(0xFF64748B);
 
   static const holdingCardGradientLight = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
     colors: [
-      Color(0xFF0F3B2E),
-      Color(0xFF09251D),
+      Color(0xFF0C192C),
+      Color(0xFF162740),
     ],
   );
 
   static const holdingCardGradientDark = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
     colors: [
-      Color(0xFF142B23),
-      Color(0xFF0B1914),
+      Color(0xFF0D1829),
+      Color(0xFF17283F),
     ],
   );
 }

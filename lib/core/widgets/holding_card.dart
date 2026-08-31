@@ -4,6 +4,7 @@ import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/amount_text.dart';
+import 'package:swapnojatri/core/widgets/seal_painter.dart';
 
 class HoldingCard extends StatelessWidget {
   final double totalInvested;
@@ -31,77 +32,90 @@ class HoldingCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        // The one permitted vertical 6% gradient in the entire application (§4)
         gradient: isDark ? AppColors.holdingCardGradientDark : AppColors.holdingCardGradientLight,
         borderRadius: AppRadius.borderHero,
         border: Border.all(
-          color: isDark ? const Color(0xFF1E3A30) : const Color(0xFF1B4838),
-          width: 1.0,
+          color: palette.brass.withValues(alpha: isDark ? 0.35 : 0.25),
+          width: 1.2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: palette.pine.withValues(alpha: isDark ? 0.5 : 0.15),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(22.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Top 1.5px Matra Rule in canvas (brass is reserved for seals and
-          // serial numbers only — §4: gold appears at most twice in the whole
-          // app. Pine-on-pine-gradient would be invisible here, so this one
-          // rule uses canvas at low opacity for contrast instead of a third
-          // accent colour.)
-          Container(
-            width: 32,
-            height: 1.5,
-            color: palette.canvas.withValues(alpha: 0.55),
+          // 1. Top Row: Gold Matra Line + Official Stamp Seal
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 38,
+                height: 2.0,
+                decoration: BoxDecoration(
+                  color: palette.brass,
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              ),
+              SealWidget(size: 26, isBangla: isBangla),
+            ],
           ),
           const SizedBox(height: 12),
 
           // 2. Section Label
           Text(
-            isBangla ? 'আপনার মোট বিনিয়োগ' : 'Your total holding',
+            isBangla ? 'আপনার মোট জমি বিনিয়োগ' : 'Total Asset-Backed Holding',
             style: AppTypography.caption(isBangla: isBangla).copyWith(
-              color: palette.canvas.withValues(alpha: 0.70),
+              color: Colors.white.withValues(alpha: 0.72),
               fontSize: 12,
+              letterSpacing: 0.4,
             ),
           ),
           const SizedBox(height: 4),
 
-          // 3. Amount in AmountHero (Rolls once per session)
+          // 3. Amount in AmountHero with Champagne Gold accent
           AmountText(
             amount: totalInvested,
             isBangla: isBangla,
             animate: true,
-            style: AppTypography.amountHero(isBangla: isBangla, color: palette.canvas).copyWith(
+            style: AppTypography.amountHero(isBangla: isBangla, color: Colors.white).copyWith(
               fontSize: 34,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 18),
 
-          // 4. Hairline Rule at 14% Opacity
+          // 4. Hairline Divider at 12% Opacity
           Divider(
-            color: palette.canvas.withValues(alpha: 0.14),
+            color: Colors.white.withValues(alpha: 0.12),
             height: 1.0,
           ),
           const SizedBox(height: 16),
 
-          // 5. Two-Column Ruled Table (Aligned on shared vertical axis)
+          // 5. Two-Column Ruled Table
           _tableRow(
-            label1: isBangla ? 'মালিকানা অংশ' : 'Shares',
+            label1: isBangla ? 'মালিকানা অংশ' : 'Shares Allocated',
             val1: isBangla
                 ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())}/১০০ অংশ'
-                : '$totalShares of 100',
-            label2: isBangla ? 'লট রেফারেন্স' : 'Lots',
+                : '$totalShares of 100 Shares',
+            label2: isBangla ? 'নির্দিষ্ট লট নং' : 'Cadastral Lots',
             val2: 'LOT-041..044',
             palette: palette,
             isBangla: isBangla,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           _tableRow(
-            label1: isBangla ? 'এসক্রো ব্যাংক' : 'Escrow Bank',
-            val1: isBangla ? 'সিটি ব্যাংক (গুলশান)' : 'City Bank PLC',
-            label2: isBangla ? 'বিতরণকৃত মুনাফা' : 'Dividends received',
+            label1: isBangla ? 'হেফাজতকারী ব্যাংক' : 'Custody Escrow',
+            val1: isBangla ? 'সিটি ব্যাংক পিএলসি' : 'City Bank PLC',
+            label2: isBangla ? 'অর্জিত লভ্যাংশ' : 'Dividends Paid',
             val2: CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
-            val2Color: palette.canvas,
+            val2Color: palette.brassLight,
             palette: palette,
             isBangla: isBangla,
           ),
@@ -127,18 +141,19 @@ class HoldingCard extends StatelessWidget {
             children: [
               Text(
                 label1,
-                style: AppTypography.caption(isBangla: isBangla).copyWith(
-                  color: palette.canvas.withValues(alpha: 0.70),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 val1,
-                style: AppTypography.bodyStrong(isBangla: isBangla).copyWith(
-                  color: palette.canvas,
+                style: TextStyle(
+                  color: Colors.white,
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -151,18 +166,19 @@ class HoldingCard extends StatelessWidget {
             children: [
               Text(
                 label2,
-                style: AppTypography.caption(isBangla: isBangla).copyWith(
-                  color: palette.canvas.withValues(alpha: 0.70),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 val2,
-                style: AppTypography.bodyStrong(isBangla: isBangla).copyWith(
-                  color: val2Color ?? palette.canvas,
+                style: TextStyle(
+                  color: val2Color ?? Colors.white,
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

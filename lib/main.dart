@@ -44,20 +44,26 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
                   // Desktop / Large screen frame wrapper
                   if (constraints.maxWidth > 500) {
                     return Scaffold(
-                      backgroundColor: isDark ? const Color(0xFF070A08) : const Color(0xFFE5E7E2),
-                      body: Center(
-                        child: Container(
-                          constraints: const BoxConstraints(maxWidth: 440, maxHeight: 920),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
-                                blurRadius: 32,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: ClipRect(
+                      backgroundColor: isDark ? const Color(0xFF070B12) : const Color(0xFFE8ECEF),
+                      body: SafeArea(
+                        child: Center(
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: 440,
+                              maxHeight: constraints.maxHeight.clamp(0.0, 920.0),
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF070B12) : const Color(0xFFF7F9FC),
+                              borderRadius: constraints.maxHeight > 700 ? BorderRadius.circular(16) : BorderRadius.zero,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
+                                  blurRadius: 28,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            clipBehavior: Clip.antiAlias,
                             child: child ?? const SizedBox.shrink(),
                           ),
                         ),

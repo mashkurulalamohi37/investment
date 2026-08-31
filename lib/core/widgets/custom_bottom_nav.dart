@@ -47,7 +47,7 @@ class CustomBottomNav extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(items.length, (index) {
@@ -62,10 +62,20 @@ class CustomBottomNav extends StatelessWidget {
                   onTap: () => onTap(index),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Active Gold Indicator Bar
+                        Container(
+                          width: 16,
+                          height: 2,
+                          margin: const EdgeInsets.only(bottom: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected ? palette.brass : Colors.transparent,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
                         Stack(
                           clipBehavior: Clip.none,
                           children: [
@@ -121,3 +131,6 @@ class CustomBottomNav extends StatelessWidget {
     );
   }
 }
+
+// Backward compatibility alias for BottomNavBar
+typedef BottomNavBar = CustomBottomNav;
