@@ -171,9 +171,9 @@ class _CelebratorySuccessWidgetState extends State<CelebratorySuccessWidget> wit
 
           const SizedBox(height: 28),
           AppButton(
-            text: widget.buttonText,
+            label: widget.buttonText,
             onPressed: widget.onButtonPressed,
-            variant: ButtonVariant.primary,
+            variant: AppButtonVariant.primary,
             isBangla: widget.isBangla,
           ),
         ],

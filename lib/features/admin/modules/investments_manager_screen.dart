@@ -132,7 +132,7 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
                       if (inv.status == InvestmentStatus.pending) ...[
                         const SizedBox(height: 14),
                         AppButton(
-                          text: isBangla ? 'পেমেন্ট যাচাই ও শেয়ার বরাদ্দ করুন' : 'Verify Payment & Allocate Lots',
+                          label: isBangla ? 'পেমেন্ট যাচাই ও শেয়ার বরাদ্দ করুন' : 'Verify Payment & Allocate Lots',
                           onPressed: () {
                             state.adminVerifyAndAllocateShare(inv.id);
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -147,8 +147,7 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
                             );
                           },
                           icon: Icons.task_alt_rounded,
-                          variant: ButtonVariant.gold,
-                          height: 42,
+                          variant: AppButtonVariant.primary,
                           isBangla: isBangla,
                         ),
                       ],

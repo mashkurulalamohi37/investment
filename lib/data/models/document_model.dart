@@ -29,6 +29,7 @@ class DocumentModel {
   final String checksumSha256;
   final DateTime uploadedAt;
   final String uploadedBy;
+  final String? downloadUrl;
 
   const DocumentModel({
     required this.id,
@@ -45,5 +46,10 @@ class DocumentModel {
     required this.checksumSha256,
     required this.uploadedAt,
     required this.uploadedBy,
+    this.downloadUrl,
   });
+
+  String get sha256Hash => checksumSha256;
+  String get verifiedBy => uploadedBy;
+  String get fileType => fileName.contains('.') ? fileName.split('.').last.toUpperCase() : 'PDF';
 }

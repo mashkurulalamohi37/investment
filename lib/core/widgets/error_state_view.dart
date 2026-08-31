@@ -52,9 +52,9 @@ class ErrorStateView extends StatelessWidget {
             SizedBox(
               width: 160,
               child: AppButton(
-                text: isBangla ? 'আবার চেষ্টা করুন' : 'Retry',
+                label: isBangla ? 'আবার চেষ্টা করুন' : 'Retry',
                 onPressed: onRetry,
-                variant: ButtonVariant.primary,
+                variant: AppButtonVariant.primary,
                 isBangla: isBangla,
               ),
             ),

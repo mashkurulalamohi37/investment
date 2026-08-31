@@ -81,7 +81,7 @@ class AdminKycApprovalsScreen extends StatelessWidget {
                   if (kyc.status != KycStatus.verified) ...[
                     const SizedBox(height: 16),
                     AppButton(
-                      text: isBangla ? 'কেওয়াইসি অনুমোদন করুন (Verify Investor)' : 'Approve & Verify Investor',
+                      label: isBangla ? 'কেওয়াইসি অনুমোদন করুন (Verify Investor)' : 'Approve & Verify Investor',
                       onPressed: () {
                         state.adminApproveKyc();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,8 +94,7 @@ class AdminKycApprovalsScreen extends StatelessWidget {
                         );
                       },
                       icon: Icons.verified_user_rounded,
-                      variant: ButtonVariant.gold,
-                      height: 42,
+                      variant: AppButtonVariant.primary,
                       isBangla: isBangla,
                     ),
                   ],

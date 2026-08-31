@@ -1,80 +1,30 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/widgets/app_button.dart';
-import 'package:swapnojatri/data/models/user_model.dart';
+import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/investor/main_layout.dart';
+import 'package:swapnojatri/features/admin/admin_layout.dart';
 
 class AuthScreen extends StatefulWidget {
-  final Function(UserRole role) onAuthSuccess;
-  final bool isBangla;
-
-  const AuthScreen({
-    super.key,
-    required this.onAuthSuccess,
-    this.isBangla = true,
-  });
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final TextEditingController _phoneController = TextEditingController(text: '01712-345678');
-  final List<TextEditingController> _otpControllers = List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _otpFocusNodes = List.generate(4, (_) => FocusNode());
+  final TextEditingController _phoneController = TextEditingController(text: '1712345678');
+  final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController(text: '${index + 1}'));
+  final List<FocusNode> _otpFocusNodes = List.generate(6, (index) => FocusNode());
 
-  bool _isOtpStep = false;
-  int _resendTimerSeconds = 59;
-  Timer? _timer;
+  bool _isOtpSent = false;
   bool _isLoading = false;
-
-  void _startTimer() {
-    _resendTimerSeconds = 59;
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_resendTimerSeconds > 0) {
-        setState(() => _resendTimerSeconds--);
-      } else {
-        _timer?.cancel();
-      }
-    });
-  }
-
-  void _requestOtp() {
-    if (_phoneController.text.trim().isEmpty) return;
-    setState(() => _isLoading = true);
-
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isOtpStep = true;
-        });
-        _startTimer();
-        // Prefill demo OTP
-        _otpControllers[0].text = '7';
-        _otpControllers[1].text = '4';
-        _otpControllers[2].text = '9';
-        _otpControllers[3].text = '1';
-      }
-    });
-  }
-
-  void _verifyOtp() {
-    setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 700), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        widget.onAuthSuccess(UserRole.investor);
-      }
-    });
-  }
+  bool _isBangla = true;
 
   @override
   void dispose() {
-    _timer?.cancel();
     _phoneController.dispose();
     for (var c in _otpControllers) {
       c.dispose();
@@ -85,162 +35,168 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
+  void _sendOtp() {
+    setState(() => _isLoading = true);
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isOtpSent = true;
+        });
+      }
+    });
+  }
+
+  void _verifyOtp(AppState state, {bool asAdmin = false}) {
+    setState(() => _isLoading = true);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (asAdmin) {
+          state.switchUser('usr-002'); // Admin
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AdminLayout(state: state)),
+          );
+        } else {
+          state.switchUser('usr-001'); // Rahim
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainLayout(state: state)),
+          );
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final state = AppStateScope.of(context);
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
+      appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () => setState(() => _isBangla = !_isBangla),
+            child: Text(
+              _isBangla ? 'EN' : 'বাং',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: palette.pine),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
+              // Header
+              Text(
+                _isBangla ? 'বিনিয়োগকারী হিসাব প্রবেশ' : 'Sign In to Your Portfolio',
+                style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _isBangla
+                    ? 'আপনার নিবন্ধিত মোবাইল নম্বরে ওটিপি যাচাইকরণ কোড পাঠানো হবে।'
+                    : 'A 6-digit verification code will be sent to your registered mobile number.',
+                style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
+                  color: palette.inkSecondary,
+                  fontSize: 13.5,
+                ),
+              ),
+              const SizedBox(height: 32),
 
-              // Back button if in OTP step
-              if (_isOtpStep)
-                IconButton(
-                  onPressed: () {
-                    _timer?.cancel();
-                    setState(() => _isOtpStep = false);
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded),
-                  color: isDark ? Colors.white : AppColors.lightTextPrimary,
-                )
-              else
-                const SizedBox(height: 48),
-
-              // Brand Emblem
+              // Phone Field with +880 Prefix in a Sunken Well
+              Text(
+                _isBangla ? 'মোবাইল নম্বর' : 'Mobile Number',
+                style: AppTypography.sectionLabel(isDark: isDark, isBangla: _isBangla).copyWith(
+                  fontSize: 12.5,
+                ),
+              ),
+              const SizedBox(height: 6),
               Container(
-                width: 54,
-                height: 54,
+                height: 48,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: AppColors.goldGradient,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accentGold.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+                  color: palette.surface,
+                  borderRadius: AppRadius.borderControl,
+                  border: Border.all(color: palette.ruleStrong, width: 1.0),
+                ),
+                child: Row(
+                  children: [
+                    // Sunken +880 Prefix
+                    Container(
+                      width: 64,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: palette.surfaceSunken,
+                        border: Border(right: BorderSide(color: palette.rule, width: 1.0)),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '+880',
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
+                          color: palette.inkSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        enabled: !_isOtpSent,
+                        style: AppTypography.bodyStrong(isDark: isDark).copyWith(letterSpacing: 0.5),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '1XXXXXXXXX',
+                          isDense: true,
+                        ),
+                      ),
                     ),
                   ],
-                ),
-                child: const Center(
-                  child: Icon(Icons.account_balance_rounded, color: AppColors.primaryDark, size: 28),
                 ),
               ),
               const SizedBox(height: 24),
 
-              // Title
-              Text(
-                _isOtpStep
-                    ? (widget.isBangla ? 'ওটিপি কোড যাচাই' : 'Verify OTP Code')
-                    : (widget.isBangla ? 'স্বপ্নযাত্রীতে স্বাগতম' : 'Welcome to Swapnojatri'),
-                style: AppTypography.displayMedium(isDark: isDark, isBangla: widget.isBangla),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _isOtpStep
-                    ? (widget.isBangla
-                        ? '${_phoneController.text} নম্বরে প্রেরিত ৪-সংখ্যার কোডটি লিখুন'
-                        : 'Enter the 4-digit code sent to ${_phoneController.text}')
-                    : (widget.isBangla
-                        ? 'আপনার মোবাইল নম্বর দিয়ে বিনিয়োগ অ্যাকাউন্টে প্রবেশ করুন'
-                        : 'Enter your mobile number to access verified opportunities'),
-                style: AppTypography.bodyMedium(isDark: isDark, isBangla: widget.isBangla),
-              ),
-
-              const SizedBox(height: 36),
-
-              if (!_isOtpStep) ...[
-                // Phone Input Field
+              if (!_isOtpSent) ...[
+                AppButton(
+                  label: _isBangla ? 'যাচাইকরণ কোড পাঠান' : 'Send Verification Code',
+                  variant: AppButtonVariant.primary,
+                  isLoading: _isLoading,
+                  isBangla: _isBangla,
+                  onPressed: _sendOtp,
+                ),
+              ] else ...[
+                // OTP as 6 Ruled Boxes at Radius 2 (§10)
                 Text(
-                  widget.isBangla ? 'মোবাইল নম্বর' : 'Mobile Number',
-                  style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                    fontWeight: FontWeight.w600,
+                  _isBangla ? '৬ সংখ্যার ওটিপি কোড' : '6-Digit OTP Code',
+                  style: AppTypography.sectionLabel(isDark: isDark, isBangla: _isBangla).copyWith(
+                    fontSize: 12.5,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    borderRadius: AppRadius.borderMd,
-                    border: Border.all(
-                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
-                      width: 1.2,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Text('🇧🇩', style: TextStyle(fontSize: 18)),
-                            const SizedBox(width: 6),
-                            Text(
-                              '+880',
-                              style: AppTypography.headingSmall(isDark: isDark).copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          style: AppTypography.headingSmall(isDark: isDark).copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '1712-345678',
-                            hintStyle: TextStyle(
-                              color: isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
 
-                AppButton(
-                  text: widget.isBangla ? 'ওটিপি কোড পাঠান' : 'Send OTP Code',
-                  onPressed: _requestOtp,
-                  isLoading: _isLoading,
-                  isBangla: widget.isBangla,
-                ),
-              ] else ...[
-                // OTP Input Field
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(4, (index) {
+                  children: List.generate(6, (index) {
                     return Container(
-                      width: 68,
-                      height: 64,
+                      width: 44,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                        borderRadius: AppRadius.borderMd,
-                        border: Border.all(
-                          color: _otpControllers[index].text.isNotEmpty
-                              ? (isDark ? AppColors.accentGold : AppColors.primary)
-                              : (isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder),
-                          width: 1.5,
-                        ),
+                        color: palette.surface,
+                        borderRadius: AppRadius.borderChip, // Radius 2
+                        border: Border.all(color: palette.ruleStrong, width: 1.0),
                       ),
                       child: Center(
                         child: TextField(
@@ -249,16 +205,17 @@ class _AuthScreenState extends State<AuthScreen> {
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           maxLength: 1,
-                          style: AppTypography.displayMedium(isDark: isDark).copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: isDark ? AppColors.accentGoldLight : AppColors.primary,
+                          style: AppTypography.amountMedium(isDark: isDark).copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
                           ),
                           decoration: const InputDecoration(
                             counterText: '',
                             border: InputBorder.none,
+                            isDense: true,
                           ),
                           onChanged: (val) {
-                            if (val.isNotEmpty && index < 3) {
+                            if (val.isNotEmpty && index < 5) {
                               _otpFocusNodes[index + 1].requestFocus();
                             }
                           },
@@ -267,152 +224,57 @@ class _AuthScreenState extends State<AuthScreen> {
                     );
                   }),
                 ),
-
-                const SizedBox(height: 20),
-
-                // Resend Countdown
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.isBangla
-                          ? (_resendTimerSeconds > 0
-                              ? 'পুনরায় ওটিপি কোড: $_resendTimerSeconds সেকেন্ড'
-                              : 'ওটিপি মেয়াদ শেষ হয়েছে')
-                          : (_resendTimerSeconds > 0
-                              ? 'Resend OTP in $_resendTimerSeconds s'
-                              : 'OTP expired'),
-                      style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla),
-                    ),
-                    if (_resendTimerSeconds == 0)
-                      TextButton(
-                        onPressed: _startTimer,
-                        child: Text(
-                          widget.isBangla ? 'আবার পাঠান' : 'Resend Code',
-                          style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                            color: isDark ? AppColors.accentGoldLight : AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
                 AppButton(
-                  text: widget.isBangla ? 'যাচাই ও প্রবেশ করুন' : 'Verify & Continue',
-                  onPressed: _verifyOtp,
+                  label: _isBangla ? 'যাচাই করে প্রবেশ করুন' : 'Verify & Continue',
+                  variant: AppButtonVariant.primary,
                   isLoading: _isLoading,
-                  isBangla: widget.isBangla,
+                  isBangla: _isBangla,
+                  onPressed: () => _verifyOtp(state),
+                ),
+                const SizedBox(height: 8),
+
+                Center(
+                  child: TextButton(
+                    onPressed: () => setState(() => _isOtpSent = false),
+                    child: Text(
+                      _isBangla ? 'নম্বর পরিবর্তন করুন' : 'Change Phone Number',
+                      style: TextStyle(color: palette.inkSecondary, fontSize: 12),
+                    ),
+                  ),
                 ),
               ],
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 36),
+              const Divider(height: 1),
+              const SizedBox(height: 24),
 
-              // Demo Mode Quick Login Cards (For Evaluator & User testing)
+              // Sample Data Entry (Quiet Button, not a glowing AI demo button)
               Center(
-                child: Text(
-                  widget.isBangla ? '— তাৎক্ষণিক ডেমো লগইন —' : '— QUICK DEMO LOGIN —',
-                  style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Investor Demo Login Card
-              InkWell(
-                onTap: () => widget.onAuthSuccess(UserRole.investor),
-                borderRadius: AppRadius.borderMd,
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderMd,
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      width: 1,
+                child: Column(
+                  children: [
+                    Text(
+                      _isBangla ? 'পরীক্ষামূলক নমুনা তথ্য দিয়ে দেখুন' : 'Developer & Sandbox Access',
+                      style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
+                        color: palette.inkTertiary,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.primarySubtle,
-                        child: Icon(Icons.person_rounded, color: AppColors.primaryDark),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.isBangla ? 'বিনিয়োগকারী হিসেবে প্রবেশ (ওহী)' : 'Login as Investor (Ohi)',
-                              style: AppTypography.headingSmall(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              widget.isBangla ? '৪টি শেয়ার সাবস্ক্রাইবড • ল্যান্ডভেস্ট ১০০' : '4 Shares • LandVest 100 Portfolio',
-                              style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.primary),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // Admin Demo Login Card
-              InkWell(
-                onTap: () => widget.onAuthSuccess(UserRole.admin),
-                borderRadius: AppRadius.borderMd,
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderMd,
-                    border: Border.all(
-                      color: AppColors.accentGold.withValues(alpha: 0.5),
-                      width: 1,
+                    const SizedBox(height: 8),
+                    AppButton(
+                      label: _isBangla ? 'বিনিয়োগকারী নমুনা পোর্টফোলিও' : 'Explore with Sample Investor Data',
+                      variant: AppButtonVariant.quiet,
+                      isBangla: _isBangla,
+                      onPressed: () => _verifyOtp(state, asAdmin: false),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.accentGoldMuted,
-                        child: Icon(Icons.admin_panel_settings_rounded, color: AppColors.accentGoldDark),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.isBangla ? 'অ্যাডমিন কনসোলে প্রবেশ (তানভীর)' : 'Login as Super Admin & Finance',
-                              style: AppTypography.headingSmall(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              widget.isBangla ? 'পেমেন্ট যাচাই, শেয়ার বরাদ্দ ও ভাউচার নিয়ন্ত্রণ' : 'Reconciliation, Allocation, Audit & Ledger',
-                              style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.accentGoldDark),
-                    ],
-                  ),
+                    const SizedBox(height: 4),
+                    AppButton(
+                      label: _isBangla ? 'প্রশাসক ব্যবস্থাপনা কনসোল' : 'Open Admin Management Console',
+                      variant: AppButtonVariant.quiet,
+                      isBangla: _isBangla,
+                      onPressed: () => _verifyOtp(state, asAdmin: true),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/widgets/app_button.dart';
+import 'package:swapnojatri/core/widgets/matra_rule_widget.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 
 class SupportScreen extends StatelessWidget {
@@ -15,6 +14,7 @@ class SupportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
 
@@ -34,8 +34,8 @@ class SupportScreen extends StatelessWidget {
       {
         'qEn': 'How are profit distributions calculated and paid?',
         'qBn': 'লভ্যাংশ কীভাবে হিসাব ও প্রদান করা হয়?',
-        'aEn': 'Distributions are calculated on audited realized profits using the formula: (Pool × Your Shares) ÷ 100. Payouts are sent directly to your verified bank or bKash account.',
-        'aBn': 'অর্জিত প্রকৃত মুনাফার ওপর লভ্যাংশ হিসাব করা হয়: (মোট লভ্যাংশ পুল × আপনার শেয়ার) ÷ ১০০। অনুমোদনের পর অর্থ সরাসরি আপনার ব্যাংক বা বিকাশ অ্যাকাউন্টে পরিশোধ করা হয়।',
+        'aEn': 'Distributions are calculated on audited realized profits using the formula: (Pool × Your Shares) ÷ 100. Payouts are sent directly to your verified bank account.',
+        'aBn': 'অর্জিত প্রকৃত মুনাফার ওপর লভ্যাংশ হিসাব করা হয়: (মোট লভ্যাংশ পুল × আপনার শেয়ার) ÷ ১০০। অনুমোদনের পর অর্থ সরাসরি আপনার ব্যাংক অ্যাকাউন্টে পরিশোধ করা হয়।',
       },
       {
         'qEn': 'Where can I inspect the legal title deed and AC Land mutation?',
@@ -46,137 +46,123 @@ class SupportScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
-          isBangla ? 'সহায়তা ও হেল্প সেন্টার' : 'Help & Support Center',
-          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+          isBangla ? 'সহায়তা ও প্রাতিষ্ঠানিক হেল্পডেস্ক' : 'Support & Investor Desk',
+          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Direct Contact Card
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: isDark ? AppColors.heroGradientDark : AppColors.heroGradientLight,
-                borderRadius: AppRadius.borderXl,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentGold.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.support_agent_rounded, color: AppColors.accentGoldLight, size: 24),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isBangla ? 'বিনিয়োগকারী হেল্পডেস্ক' : 'Investor Dedicated Support',
-                            style: AppTypography.headingSmall().copyWith(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            isBangla ? 'শনিবার-বৃহস্পতিবার (সকাল ৯টা - রাত ৮টা)' : 'Sat-Thu (9:00 AM - 8:00 PM)',
-                            style: AppTypography.caption().copyWith(color: Colors.white70),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppButton(
-                          text: isBangla ? 'হটলাইনে কল' : 'Call Desk',
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Dialing Swapnojatri Helpdesk: +880 9612-000000')),
-                            );
-                          },
-                          icon: Icons.phone_rounded,
-                          variant: ButtonVariant.gold,
-                          height: 42,
-                          isBangla: isBangla,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: AppButton(
-                          text: isBangla ? 'ইমেইল সাপোর্ট' : 'Email Us',
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Email: support@swapnojatri.com')),
-                            );
-                          },
-                          icon: Icons.email_outlined,
-                          variant: ButtonVariant.outline,
-                          height: 42,
-                          isBangla: isBangla,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // FAQ Section
-            Text(
-              isBangla ? 'সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)' : 'Frequently Asked Questions',
-              style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
-            ),
-            const SizedBox(height: 12),
-
-            ...faqs.map((faq) => Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderMd,
-                    border: Border.all(
-                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
-                    ),
-                  ),
-                  child: ExpansionTile(
-                    title: Text(
-                      isBangla ? faq['qBn']! : faq['qEn']!,
-                      style: AppTypography.headingSmall(isDark: isDark, isBangla: isBangla).copyWith(
-                        fontSize: 14,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Contact Card (Solid surface, 1px rule)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'বিনিয়োগকারী অফিসিয়াল হেল্পডেস্ক' : 'Official Investor Support Desk',
+                      style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Text(
-                          isBangla ? faq['aBn']! : faq['aEn']!,
-                          style: AppTypography.bodySmall(isDark: isDark, isBangla: isBangla).copyWith(
-                            height: 1.5,
-                          ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isBangla ? 'শনিবার-বৃহস্পতিবার (সকাল ৯টা - রাত ৮টা)' : 'Saturday - Thursday (9:00 AM - 8:00 PM)',
+                      style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                        color: palette.inkSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(height: 1),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.phone_in_talk_outlined, size: 16, color: palette.pine),
+                            const SizedBox(width: 8),
+                            Text('+880 9612-882200', style: TextStyle(fontFamily: 'monospace', fontSize: 13, fontWeight: FontWeight.w600, color: palette.ink)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.email_outlined, size: 16, color: palette.pine),
+                            const SizedBox(width: 8),
+                            Text('trust@swapnojatri.com', style: TextStyle(fontSize: 12, color: palette.inkSecondary)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // FAQ Accordion List
+              MatraRuleWidget(width: 32, color: palette.pine),
+              const SizedBox(height: 8),
+              Text(
+                isBangla ? 'সাধারণ প্রশ্নোত্তর (FAQ)' : 'Frequently Asked Questions',
+                style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  children: faqs.map((faq) {
+                    return ExpansionTile(
+                      shape: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
+                      collapsedShape: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
+                      title: Text(
+                        isBangla ? faq['qBn']! : faq['qEn']!,
+                        style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                )),
-
-            const SizedBox(height: 40),
-          ],
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: Text(
+                            isBangla ? faq['aBn']! : faq['aEn']!,
+                            style: AppTypography.body(isDark: isDark, isBangla: isBangla).copyWith(
+                              color: palette.inkSecondary,
+                              fontSize: 12.5,
+                              height: 1.6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

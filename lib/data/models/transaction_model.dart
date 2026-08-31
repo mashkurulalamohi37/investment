@@ -1,6 +1,6 @@
-enum TransactionType { investment, profitDistribution, refund, fee, withdrawal }
+enum TransactionType { investment, sharePurchase, profitDistribution, dividend, refund, fee, withdrawal }
 enum TransactionDirection { debit, credit }
-enum TransactionStatus { pending, completed, failed, reversed }
+enum TransactionStatus { pending, completed, failed, reversed, refunded }
 
 class TransactionModel {
   final String id;
@@ -13,7 +13,7 @@ class TransactionModel {
   final double amount;
   final double balanceAfter;
   final String reference;
-  final String paymentMethod;
+  final String? paymentMethod;
   final TransactionStatus status;
   final DateTime createdAt;
   final String description;
@@ -22,16 +22,24 @@ class TransactionModel {
     required this.id,
     this.investmentId,
     this.projectId,
-    required this.projectName,
-    required this.userId,
+    this.projectName = 'LandVest 100',
+    this.userId = 'usr-001',
     required this.type,
-    required this.direction,
+    this.direction = TransactionDirection.debit,
     required this.amount,
-    required this.balanceAfter,
-    required this.reference,
-    required this.paymentMethod,
+    this.balanceAfter = 0.0,
+    this.reference = 'TRX-DEFAULT',
+    this.paymentMethod = 'City Bank PLC',
     required this.status,
     required this.createdAt,
-    required this.description,
+    this.description = 'LandVest 100 Transaction',
+    String? title,
+    String? referenceId,
+    DateTime? timestamp,
   });
+
+  // Convenience getters
+  String get title => description.isNotEmpty ? description : projectName;
+  String get referenceId => reference;
+  DateTime get timestamp => createdAt;
 }

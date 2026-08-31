@@ -2,248 +2,198 @@ import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/theme/app_shadows.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
-import 'status_chip.dart';
+import 'package:swapnojatri/core/widgets/lot_map_widget.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
 
 class ProjectCard extends StatelessWidget {
   final ProjectModel project;
   final bool isBangla;
-  final VoidCallback onTap;
-  final bool isCompact;
+  final VoidCallback? onTap;
 
   const ProjectCard({
     super.key,
     required this.project,
-    required this.isBangla,
-    required this.onTap,
-    this.isCompact = false,
+    this.isBangla = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final progress = project.fundingProgress;
-    final percent = (progress * 100).toInt();
+    final progress = (project.allocatedShares / project.totalShares).clamp(0.0, 1.0);
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.borderXl,
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : AppColors.lightCard,
-            borderRadius: AppRadius.borderXl,
-            border: Border.all(
-              color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
-              width: 1,
-            ),
-            boxShadow: isDark ? AppShadows.darkCard : AppShadows.lightCard,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Banner & Image with Badges
-              Stack(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppRadius.borderCard,
+      child: Container(
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: AppRadius.borderCard,
+          border: Border.all(color: palette.rule, width: 1.0),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 96px-tall miniature lot map thumbnail
+            SizedBox(
+              height: 96,
+              width: double.infinity,
+              child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
-                    child: SizedBox(
-                      height: isCompact ? 140 : 175,
-                      width: double.infinity,
-                      child: Image.network(
-                        project.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: isDark ? AppColors.darkSurface : AppColors.primarySubtle,
-                          child: Center(
-                            child: Icon(
-                              Icons.terrain_rounded,
-                              size: 48,
-                              color: isDark ? AppColors.accentGold : AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Dark Vignette overlay
                   Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.4),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.6),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Top Row badges
-                  Positioned(
-                    top: 14,
-                    left: 14,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.65),
-                        borderRadius: AppRadius.borderFull,
-                        border: Border.all(color: Colors.white24, width: 0.8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.location_on_outlined, size: 12, color: AppColors.accentGoldLight),
-                          const SizedBox(width: 4),
-                          Text(
-                            project.location,
-                            style: AppTypography.caption().copyWith(color: Colors.white, fontSize: 11),
-                          ),
-                        ],
-                      ),
+                    child: LotMapWidget(
+                      allocatedShares: project.allocatedShares,
+                      userLots: const ['LOT-041', 'LOT-042', 'LOT-043', 'LOT-044'],
+                      isBangla: isBangla,
+                      isInteractive: false,
+                      isCompact: true,
                     ),
                   ),
                   Positioned(
-                    top: 14,
-                    right: 14,
-                    child: StatusChip.project(project.status, isBangla: isBangla),
-                  ),
-                  // Bottom Code label
-                  Positioned(
-                    bottom: 12,
-                    left: 14,
+                    top: 8,
+                    right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryDark.withValues(alpha: 0.85),
-                        borderRadius: AppRadius.borderXs,
-                        border: Border.all(color: AppColors.accentGold.withValues(alpha: 0.5), width: 0.8),
+                        color: palette.surface,
+                        borderRadius: AppRadius.borderChip,
+                        border: Border.all(color: palette.rule, width: 1.0),
                       ),
                       child: Text(
-                        project.code,
-                        style: AppTypography.caption().copyWith(
-                          color: AppColors.accentGoldLight,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
+                        isBangla ? 'প্লট ৪১৮ • সাভার' : 'Plot 418 • Savar',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w600,
+                          color: palette.inkSecondary,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              // Content Area
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isBangla ? project.nameBn : project.name,
-                      style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title & Location
+                  Text(
+                    isBangla ? project.titleBn : project.title,
+                    style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      isBangla ? project.descriptionBn : project.description,
-                      style: AppTypography.bodySmall(isDark: isDark, isBangla: isBangla),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isBangla
+                        ? '${project.locationBn} • দলিল নং ৪৯৮২/২৬'
+                        : '${project.location} • Deed #4982/26',
+                    style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                      color: palette.inkSecondary,
                     ),
+                  ),
+                  const SizedBox(height: 14),
 
-                    const SizedBox(height: 16),
-
-                    // Progress Bar & Percentage
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // Ruled 2-Column Stat Table
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: palette.surfaceSunken,
+                      borderRadius: AppRadius.borderChip,
+                      border: Border.all(color: palette.rule, width: 1.0),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          isBangla ? 'তহবিল সংগ্রহ অগ্রগতি' : 'Funding Progress',
-                          style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isBangla ? 'প্রতি অংশ মূল্য' : 'Price per share',
+                                style: AppTypography.micro(isDark: isDark, isBangla: isBangla),
+                              ),
+                              const SizedBox(height: 1),
+                              Text(
+                                CurrencyFormatter.format(project.pricePerShare, isBangla: isBangla),
+                                style: AppTypography.amountSmall(isDark: isDark, isBangla: isBangla).copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          isBangla
-                              ? '${CurrencyFormatter.toBanglaDigits(percent.toString())}% (${CurrencyFormatter.toBanglaDigits(project.allocatedShares.toString())}/${CurrencyFormatter.toBanglaDigits(project.totalShares.toString())} শেয়ার)'
-                              : '$percent% (${project.allocatedShares}/${project.totalShares} Shares)',
-                          style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                            color: isDark ? AppColors.accentGoldLight : AppColors.primary,
-                            fontWeight: FontWeight.w700,
+                        Container(width: 1, height: 24, color: palette.rule),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isBangla ? 'উপলব্ধ অংশ' : 'Shares available',
+                                style: AppTypography.micro(isDark: isDark, isBangla: isBangla),
+                              ),
+                              const SizedBox(height: 1),
+                              Text(
+                                isBangla
+                                    ? '${CurrencyFormatter.toBanglaDigits((project.totalShares - project.allocatedShares).toString())} টি'
+                                    : '${project.totalShares - project.allocatedShares} of ${project.totalShares}',
+                                style: AppTypography.amountSmall(isDark: isDark, isBangla: isBangla).copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: palette.pine,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    ClipRRect(
-                      borderRadius: AppRadius.borderFull,
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 7,
-                        backgroundColor: isDark ? AppColors.darkDivider : const Color(0xFFE2E8F0),
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Funding Progress Bar (4px track in surfaceSunken, fill in pine)
+                  ClipRRect(
+                    borderRadius: AppRadius.borderFull,
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 4,
+                      backgroundColor: palette.surfaceSunken,
+                      valueColor: AlwaysStoppedAnimation<Color>(palette.pine),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isBangla
+                            ? '${CurrencyFormatter.toBanglaDigits(project.allocatedShares.toString())}/১০০ অংশ বরাদ্দ সম্পন্ন'
+                            : '${project.allocatedShares} of 100 shares allocated',
+                        style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                          fontSize: 11.5,
+                          color: palette.inkSecondary,
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
-                    const Divider(height: 1),
-                    const SizedBox(height: 14),
-
-                    // Financial Parameters Strip
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isBangla ? 'প্রতি শেয়ার' : 'Per Share',
-                              style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              CurrencyFormatter.format(project.pricePerShare, isBangla: isBangla),
-                              style: AppTypography.financialAmountSmall(isDark: isDark),
-                            ),
-                          ],
+                      Text(
+                        isBangla
+                            ? 'লক্ষ্য: ${CurrencyFormatter.format(project.targetFund, isBangla: true, compact: true)}'
+                            : 'Target: ${CurrencyFormatter.format(project.targetFund, compact: true)}',
+                        style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+                          color: palette.inkTertiary,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              isBangla ? 'অবশিষ্ট শেয়ার' : 'Available',
-                              style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.accentGold.withValues(alpha: isDark ? 0.2 : 0.15),
-                                borderRadius: AppRadius.borderSm,
-                              ),
-                              child: Text(
-                                isBangla
-                                    ? '${CurrencyFormatter.toBanglaDigits(project.availableShares.toString())} টি শেয়ার'
-                                    : '${project.availableShares} Shares left',
-                                style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                                  color: isDark ? AppColors.accentGoldLight : AppColors.accentGoldDark,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -31,6 +31,8 @@ class NotificationModel {
     this.actionRoute,
   });
 
+  DateTime get timestamp => createdAt;
+
   NotificationModel copyWith({bool? isRead}) {
     return NotificationModel(
       id: id,

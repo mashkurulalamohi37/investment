@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/theme/app_shadows.dart';
 
 class CustomBottomNavItem {
   final IconData icon;
@@ -34,44 +32,37 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        color: palette.surface,
         border: Border(
           top: BorderSide(
-            color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
-            width: 1,
+            color: palette.rule,
+            width: 1.0,
           ),
         ),
-        boxShadow: isDark ? AppShadows.darkHero : AppShadows.lightCard,
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(items.length, (index) {
               final item = items[index];
               final isSelected = index == currentIndex;
 
-              final activeColor = isDark ? AppColors.accentGoldLight : AppColors.primary;
-              final inactiveColor = isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
+              final activeColor = palette.pine;
+              final inactiveColor = palette.inkTertiary;
 
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTap(index),
                   behavior: HitTestBehavior.opaque,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (isDark ? AppColors.primaryDark : AppColors.primarySubtle)
-                          : Colors.transparent,
-                      borderRadius: AppRadius.borderMd,
-                    ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -81,7 +72,7 @@ class CustomBottomNav extends StatelessWidget {
                             Icon(
                               isSelected ? item.activeIcon : item.icon,
                               color: isSelected ? activeColor : inactiveColor,
-                              size: 22,
+                              size: 21,
                             ),
                             if (item.badgeCount != null && item.badgeCount! > 0)
                               Positioned(
@@ -89,17 +80,17 @@ class CustomBottomNav extends StatelessWidget {
                                 top: -3,
                                 child: Container(
                                   padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.error,
+                                  decoration: BoxDecoration(
+                                    color: palette.vermilion,
                                     shape: BoxShape.circle,
                                   ),
-                                  constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                                  constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
                                   child: Text(
                                     '${item.badgeCount}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                    style: TextStyle(
+                                      color: palette.canvas,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -110,10 +101,10 @@ class CustomBottomNav extends StatelessWidget {
                         const SizedBox(height: 3),
                         Text(
                           item.label,
-                          style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                            fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                             color: isSelected ? activeColor : inactiveColor,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontSize: 10.5,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

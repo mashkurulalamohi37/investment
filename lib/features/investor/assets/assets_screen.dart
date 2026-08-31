@@ -77,9 +77,8 @@ class AssetsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 StatusChip(
-                                  label: isBangla ? 'নিবন্ধিত স্বত্ব' : 'Title Deed Verified',
-                                  textColor: AppColors.successDark,
-                                  bgColor: AppColors.successLight,
+                                  rawStatus: 'Verified',
+                                  isBangla: isBangla,
                                 ),
                               ],
                             ),

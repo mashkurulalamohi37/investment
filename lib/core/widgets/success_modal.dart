@@ -114,17 +114,17 @@ class SuccessModal extends StatelessWidget {
 
           const SizedBox(height: 28),
           AppButton(
-            text: primaryButtonText,
+            label: primaryButtonText,
             onPressed: onPrimaryPressed,
-            variant: ButtonVariant.primary,
+            variant: AppButtonVariant.primary,
             isBangla: isBangla,
           ),
           if (secondaryButtonText != null && onSecondaryPressed != null) ...[
             const SizedBox(height: 10),
             AppButton(
-              text: secondaryButtonText!,
+              label: secondaryButtonText!,
               onPressed: onSecondaryPressed,
-              variant: ButtonVariant.ghost,
+              variant: AppButtonVariant.quiet,
               isBangla: isBangla,
             ),
           ],

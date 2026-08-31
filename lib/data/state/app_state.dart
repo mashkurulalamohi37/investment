@@ -135,6 +135,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void switchUser(String userId) {
+    if (userId == 'usr-002') {
+      _activeRole = UserRole.admin;
+    } else {
+      _activeRole = UserRole.investor;
+    }
+    notifyListeners();
+  }
+
   // Investment Actions
   bool submitInvestmentRequest({
     required int shares,
@@ -227,7 +236,10 @@ class AppState extends ChangeNotifier {
     if (index == -1) return;
 
     final inv = _investments[index];
-    if (inv.status != InvestmentStatus.pending) return;
+    if (inv.status != InvestmentStatus.pending &&
+        inv.status != InvestmentStatus.pendingPaymentVerification) {
+      return;
+    }
 
     final currentAllocated = _landVest100.allocatedShares;
     final newAllocated = currentAllocated + inv.shares;
@@ -474,7 +486,6 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Notification Actions
   void markNotificationAsRead(String id) {
     final index = _notifications.indexWhere((n) => n.id == id);
     if (index != -1) {
@@ -488,5 +499,27 @@ class AppState extends ChangeNotifier {
       _notifications[i] = _notifications[i].copyWith(isRead: true);
     }
     notifyListeners();
+  }
+
+  // Direct investment submission helper
+  void submitInvestment(InvestmentModel investment, [TransactionModel? txn]) {
+    _investments.insert(0, investment);
+    if (txn != null) {
+      _transactions.insert(0, txn);
+    }
+    notifyListeners();
+  }
+}
+
+class AppStateScope extends InheritedNotifier<AppState> {
+  const AppStateScope({
+    super.key,
+    required AppState super.notifier,
+    required super.child,
+  });
+
+  static AppState of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<AppStateScope>();
+    return scope?.notifier ?? AppState();
   }
 }

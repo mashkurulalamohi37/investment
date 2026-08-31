@@ -61,9 +61,9 @@ class EmptyStateView extends StatelessWidget {
               SizedBox(
                 width: 200,
                 child: AppButton(
-                  text: buttonText!,
+                  label: buttonText!,
                   onPressed: onButtonPressed,
-                  variant: ButtonVariant.primary,
+                  variant: AppButtonVariant.primary,
                   isBangla: isBangla,
                 ),
               ),

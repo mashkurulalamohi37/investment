@@ -65,15 +65,19 @@ class ProjectModel {
     required this.imageUrl,
   });
 
-  int get availableShares => (totalShares - allocatedShares).clamp(0, totalShares);
+  // Convenience getters
+  String get title => name;
+  String get titleBn => nameBn;
+  String get locationBn => location;
+  double get fundingProgress => totalShares > 0 ? allocatedShares / totalShares : 0.0;
   double get collectedFund => allocatedShares * pricePerShare;
-  double get remainingFund => (targetFund - collectedFund).clamp(0.0, targetFund);
-  double get fundingProgress => totalShares > 0 ? (allocatedShares / totalShares).clamp(0.0, 1.0) : 0.0;
+  double get remainingFund => targetFund - collectedFund;
+  int get availableShares => totalShares - allocatedShares;
 
   ProjectModel copyWith({
     int? allocatedShares,
     ProjectStatus? status,
-    List<Milestone>? milestones,
+    DateTime? targetEndDate,
   }) {
     return ProjectModel(
       id: id,
@@ -92,8 +96,8 @@ class ProjectModel {
       allocatedShares: allocatedShares ?? this.allocatedShares,
       status: status ?? this.status,
       startDate: startDate,
-      targetEndDate: targetEndDate,
-      milestones: milestones ?? this.milestones,
+      targetEndDate: targetEndDate ?? this.targetEndDate,
+      milestones: milestones,
       highlights: highlights,
       imageUrl: imageUrl,
     );

@@ -58,7 +58,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
 
             const SizedBox(height: 20),
             AppButton(
-              text: isBangla ? 'ভাউচার অনুমোদন ও পোস্ট করুন' : 'Approve & Post to Ledger',
+              label: isBangla ? 'ভাউচার অনুমোদন ও পোস্ট করুন' : 'Approve & Post to Ledger',
               onPressed: () {
                 final amount = double.tryParse(_amountController.text) ?? 0.0;
                 if (amount <= 0) return;
@@ -82,7 +82,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
                   ),
                 );
               },
-              variant: ButtonVariant.primary,
+              variant: AppButtonVariant.primary,
               isBangla: isBangla,
             ),
           ],
@@ -172,9 +172,9 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
                     ],
                   ),
                   AppButton(
-                    text: isBangla ? '+ খরচ যুক্ত করুন' : '+ Add Voucher',
+                    label: isBangla ? '+ খরচ যুক্ত করুন' : '+ Add Voucher',
                     onPressed: () => _showAddExpenseModal(isDark, isBangla),
-                    variant: ButtonVariant.gold,
+                    variant: AppButtonVariant.primary,
                     height: 38,
                     isFullWidth: false,
                     isBangla: isBangla,

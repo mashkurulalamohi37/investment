@@ -2,202 +2,129 @@ import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/data/models/investment_model.dart';
-import 'package:swapnojatri/data/models/project_model.dart';
-import 'package:swapnojatri/data/models/distribution_model.dart';
-import 'package:swapnojatri/data/models/kyc_model.dart';
+
+enum StatusType {
+  pending,
+  verified,
+  allocated,
+  rejected,
+  paid,
+  escrowed,
+  kycIncomplete,
+  closed,
+}
 
 class StatusChip extends StatelessWidget {
-  final String label;
-  final Color textColor;
-  final Color bgColor;
-  final IconData? icon;
+  final StatusType? statusType;
+  final String? rawStatus;
+  final bool isBangla;
 
   const StatusChip({
     super.key,
-    required this.label,
-    required this.textColor,
-    required this.bgColor,
-    this.icon,
+    this.statusType,
+    this.rawStatus,
+    this.isBangla = false,
   });
 
-  factory StatusChip.investment(InvestmentStatus status, {bool isBangla = false}) {
-    switch (status) {
-      case InvestmentStatus.allocated:
-        return StatusChip(
-          label: isBangla ? 'বরাদ্দকৃত' : 'Allocated',
-          textColor: AppColors.successDark,
-          bgColor: AppColors.successLight,
-          icon: Icons.check_circle_outline_rounded,
-        );
-      case InvestmentStatus.verified:
-        return StatusChip(
-          label: isBangla ? 'যাচাইকৃত' : 'Verified',
-          textColor: AppColors.infoDark,
-          bgColor: AppColors.infoLight,
-          icon: Icons.verified_outlined,
-        );
-      case InvestmentStatus.pending:
-        return StatusChip(
-          label: isBangla ? 'যাচাই প্রক্রিয়াধীন' : 'Pending Review',
-          textColor: AppColors.warningDark,
-          bgColor: AppColors.warningLight,
-          icon: Icons.hourglass_top_rounded,
-        );
-      case InvestmentStatus.refunded:
-        return StatusChip(
-          label: isBangla ? 'রিফান্ডকৃত' : 'Refunded',
-          textColor: AppColors.errorDark,
-          bgColor: AppColors.errorLight,
-          icon: Icons.replay_rounded,
-        );
-      case InvestmentStatus.cancelled:
-        return StatusChip(
-          label: isBangla ? 'বাতিল' : 'Cancelled',
-          textColor: AppColors.errorDark,
-          bgColor: AppColors.errorLight,
-          icon: Icons.cancel_outlined,
-        );
-    }
-  }
+  factory StatusChip.kyc(dynamic status, {bool isBangla = false}) =>
+      StatusChip(rawStatus: status.toString(), isBangla: isBangla);
 
-  factory StatusChip.project(ProjectStatus status, {bool isBangla = false}) {
-    switch (status) {
-      case ProjectStatus.active:
-        return StatusChip(
-          label: isBangla ? 'চলমান বিনিয়োগ' : 'Live Opportunity',
-          textColor: AppColors.successDark,
-          bgColor: AppColors.successLight,
-          icon: Icons.fiber_manual_record_rounded,
-        );
-      case ProjectStatus.funded:
-        return StatusChip(
-          label: isBangla ? 'তহবিল সম্পন্ন' : 'Fully Funded',
-          textColor: AppColors.infoDark,
-          bgColor: AppColors.infoLight,
-          icon: Icons.lock_outline_rounded,
-        );
-      case ProjectStatus.completed:
-        return StatusChip(
-          label: isBangla ? 'সম্পন্ন' : 'Completed',
-          textColor: AppColors.accentGoldDark,
-          bgColor: AppColors.accentGoldMuted,
-          icon: Icons.stars_rounded,
-        );
-      case ProjectStatus.closed:
-        return StatusChip(
-          label: isBangla ? 'বন্ধ' : 'Closed',
-          textColor: AppColors.errorDark,
-          bgColor: AppColors.errorLight,
-        );
-      case ProjectStatus.draft:
-        return StatusChip(
-          label: isBangla ? 'খসড়া' : 'Draft',
-          textColor: AppColors.warningDark,
-          bgColor: AppColors.warningLight,
-        );
-    }
-  }
+  factory StatusChip.distribution(dynamic status, {bool isBangla = false}) =>
+      StatusChip(rawStatus: status.toString(), isBangla: isBangla);
 
-  factory StatusChip.distribution(DistributionStatus status, {bool isBangla = false}) {
-    switch (status) {
-      case DistributionStatus.paid:
-        return StatusChip(
-          label: isBangla ? 'বিতরণ সম্পন্ন' : 'Paid',
-          textColor: AppColors.successDark,
-          bgColor: AppColors.successLight,
-          icon: Icons.check_circle_rounded,
-        );
-      case DistributionStatus.approved:
-        return StatusChip(
-          label: isBangla ? 'অনুমোদিত' : 'Approved',
-          textColor: AppColors.infoDark,
-          bgColor: AppColors.infoLight,
-          icon: Icons.task_alt_rounded,
-        );
-      case DistributionStatus.processing:
-        return StatusChip(
-          label: isBangla ? 'প্রক্রিয়াধীন' : 'Processing',
-          textColor: AppColors.warningDark,
-          bgColor: AppColors.warningLight,
-          icon: Icons.sync_rounded,
-        );
-      case DistributionStatus.draft:
-        return StatusChip(
-          label: isBangla ? 'খসড়া' : 'Draft',
-          textColor: const Color(0xFF475569),
-          bgColor: const Color(0xFFF1F5F9),
-        );
-      case DistributionStatus.failed:
-        return StatusChip(
-          label: isBangla ? 'ব্যর্থ' : 'Failed',
-          textColor: AppColors.errorDark,
-          bgColor: AppColors.errorLight,
-        );
-    }
-  }
+  factory StatusChip.project(dynamic status, {bool isBangla = false}) =>
+      StatusChip(rawStatus: status.toString(), isBangla: isBangla);
 
-  factory StatusChip.kyc(KycStatus status, {bool isBangla = false}) {
-    switch (status) {
-      case KycStatus.verified:
-        return StatusChip(
-          label: isBangla ? 'যাচাইকৃত কেওয়াইসি' : 'KYC Verified',
-          textColor: AppColors.successDark,
-          bgColor: AppColors.successLight,
-          icon: Icons.verified_rounded,
-        );
-      case KycStatus.underReview:
-      case KycStatus.pending:
-        return StatusChip(
-          label: isBangla ? 'কেওয়াইসি যাচাইধীন' : 'KYC Under Review',
-          textColor: AppColors.warningDark,
-          bgColor: AppColors.warningLight,
-          icon: Icons.hourglass_empty_rounded,
-        );
-      case KycStatus.rejected:
-        return StatusChip(
-          label: isBangla ? 'প্রত্যাখ্যাত' : 'KYC Rejected',
-          textColor: AppColors.errorDark,
-          bgColor: AppColors.errorLight,
-          icon: Icons.error_outline_rounded,
-        );
-      case KycStatus.notStarted:
-        return StatusChip(
-          label: isBangla ? 'কেওয়াইসি বাকি' : 'KYC Pending',
-          textColor: const Color(0xFF64748B),
-          bgColor: const Color(0xFFF1F5F9),
-        );
-    }
-  }
+  factory StatusChip.investment(dynamic status, {bool isBangla = false}) =>
+      StatusChip(rawStatus: status.toString(), isBangla: isBangla);
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final effectiveBg = isDark ? bgColor.withValues(alpha: 0.18) : bgColor;
+
+    final resolved = _resolveStatus();
+    final color = _getColor(resolved, palette);
+    final label = _getLabel(resolved, isBangla);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+      constraints: const BoxConstraints(minHeight: 22),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: effectiveBg,
-        borderRadius: AppRadius.borderFull,
+        color: Colors.transparent,
+        borderRadius: AppRadius.borderChip,
+        border: Border.all(color: color, width: 1.0),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 13, color: textColor),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: AppTypography.caption().copyWith(
-              color: textColor,
-              fontWeight: FontWeight.w700,
-              fontSize: 11.5,
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 10.5,
+          height: 1.2,
+        ),
       ),
     );
+  }
+
+  StatusType _resolveStatus() {
+    if (statusType != null) return statusType!;
+    final s = (rawStatus ?? '').toLowerCase().trim();
+    if (s.contains('pending') || s.contains('under_review') || s.contains('অপেক্ষমাণ')) {
+      return StatusType.pending;
+    } else if (s.contains('verified') || s.contains('approved') || s.contains('যাচাইকৃত')) {
+      return StatusType.verified;
+    } else if (s.contains('allocated') || s.contains('বরাদ্দ')) {
+      return StatusType.allocated;
+    } else if (s.contains('rejected') || s.contains('প্রত্যাখ্যাত')) {
+      return StatusType.rejected;
+    } else if (s.contains('paid') || s.contains('পরিশোধিত')) {
+      return StatusType.paid;
+    } else if (s.contains('escrow') || s.contains('এসক্রো')) {
+      return StatusType.escrowed;
+    } else if (s.contains('kyc') || s.contains('unverified')) {
+      return StatusType.kycIncomplete;
+    }
+    return StatusType.closed;
+  }
+
+  Color _getColor(StatusType type, AppPalette palette) {
+    switch (type) {
+      case StatusType.pending:
+      case StatusType.kycIncomplete:
+        return palette.amberInk;
+      case StatusType.verified:
+      case StatusType.paid:
+        return palette.jade;
+      case StatusType.allocated:
+        return palette.pine;
+      case StatusType.rejected:
+        return palette.vermilion;
+      case StatusType.escrowed:
+        return palette.slate;
+      case StatusType.closed:
+        return palette.inkTertiary;
+    }
+  }
+
+  String _getLabel(StatusType type, bool isBangla) {
+    switch (type) {
+      case StatusType.pending:
+        return isBangla ? 'যাচাই অপেক্ষমাণ' : 'Pending verification';
+      case StatusType.verified:
+        return isBangla ? 'যাচাইকৃত' : 'Verified';
+      case StatusType.allocated:
+        return isBangla ? 'বরাদ্দকৃত' : 'Allocated';
+      case StatusType.rejected:
+        return isBangla ? 'প্রত্যাখ্যাত' : 'Rejected';
+      case StatusType.paid:
+        return isBangla ? 'পরিশোধিত' : 'Paid';
+      case StatusType.escrowed:
+        return isBangla ? 'এসক্রোতে' : 'Escrowed';
+      case StatusType.kycIncomplete:
+        return isBangla ? 'কেওয়াইসি অসম্পূর্ণ' : 'KYC incomplete';
+      case StatusType.closed:
+        return isBangla ? 'সমাপ্ত' : 'Closed';
+    }
   }
 }

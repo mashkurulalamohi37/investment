@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/widgets/custom_bottom_nav.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/auth/auth_screen.dart';
 import 'home/home_screen.dart';
 import 'projects/projects_screen.dart';
 import 'portfolio/portfolio_screen.dart';
 import 'transactions/transactions_screen.dart';
 import 'profile/profile_screen.dart';
 
-class InvestorMainLayout extends StatefulWidget {
+class MainLayout extends StatefulWidget {
   final AppState state;
-  final VoidCallback onLogout;
+  final VoidCallback? onLogout;
 
-  const InvestorMainLayout({
+  const MainLayout({
     super.key,
     required this.state,
-    required this.onLogout,
+    this.onLogout,
   });
 
   @override
-  State<InvestorMainLayout> createState() => _InvestorMainLayoutState();
+  State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _InvestorMainLayoutState extends State<InvestorMainLayout> {
+class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
 
   void _onTabSelected(int index) {
     setState(() => _currentIndex = index);
+  }
+
+  void _handleLogout() {
+    if (widget.onLogout != null) {
+      widget.onLogout!();
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+      );
+    }
   }
 
   @override
@@ -51,7 +63,7 @@ class _InvestorMainLayoutState extends State<InvestorMainLayout> {
       CustomBottomNavItem(
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        label: isBangla ? 'লেনদেন' : 'Activity',
+        label: isBangla ? 'লেজার' : 'Ledger',
       ),
       CustomBottomNavItem(
         icon: Icons.person_outline_rounded,
@@ -63,9 +75,9 @@ class _InvestorMainLayoutState extends State<InvestorMainLayout> {
     final screens = [
       HomeScreen(state: widget.state, onNavigateTab: _onTabSelected),
       ProjectsScreen(state: widget.state),
-      PortfolioScreen(state: widget.state, onExploreTap: _onTabSelected),
+      PortfolioScreen(state: widget.state),
       TransactionsScreen(state: widget.state),
-      ProfileScreen(state: widget.state, onLogout: widget.onLogout),
+      ProfileScreen(state: widget.state, onLogout: _handleLogout),
     ];
 
     return Scaffold(
@@ -82,3 +94,6 @@ class _InvestorMainLayoutState extends State<InvestorMainLayout> {
     );
   }
 }
+
+// Backward compatibility alias for InvestorMainLayout
+typedef InvestorMainLayout = MainLayout;

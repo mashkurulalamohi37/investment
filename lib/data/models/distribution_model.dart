@@ -31,6 +31,9 @@ class DistributionModel {
     this.bankMfsAccount,
   });
 
+  String get periodNameBn => periodName;
+  double get investorAmount => amount;
+
   DistributionModel copyWith({
     DistributionStatus? status,
     DateTime? paidAt,

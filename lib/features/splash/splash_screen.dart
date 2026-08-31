@@ -1,189 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_typography.dart';
+import 'package:swapnojatri/core/widgets/matra_rule_widget.dart';
+import 'package:swapnojatri/features/onboarding/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  final VoidCallback onFinish;
-  final bool isBangla;
-
-  const SplashScreen({
-    super.key,
-    required this.onFinish,
-    this.isBangla = true,
-  });
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1600),
+      duration: const Duration(milliseconds: 400),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
-      ),
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeIn,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.65, curve: Curves.easeOutCubic),
-      ),
-    );
+    // Matra rule draws, then title fades in, 900ms total before navigation (§10)
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _fadeController.forward();
+    });
 
-    _controller.forward();
-
-    Future.delayed(const Duration(milliseconds: 2200), () {
+    Future.delayed(const Duration(milliseconds: 1100), () {
       if (mounted) {
-        widget.onFinish();
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, anim, secondaryAnim) => const OnboardingScreen(),
+            transitionDuration: const Duration(milliseconds: 240),
+            transitionsBuilder: (context, anim, secondaryAnim, child) {
+              return FadeTransition(opacity: anim, child: child);
+            },
+          ),
+        );
       }
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      body: Stack(
-        children: [
-          // Subtle background gradient glow
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 0.8,
-                  colors: [
-                    Color(0xFF0D3B2E),
-                    AppColors.primaryDark,
-                  ],
-                ),
-              ),
-            ),
-          ),
+      backgroundColor: palette.canvas,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 1. Matra Rule draws
+            MatraRuleWidget(width: 80, color: palette.pine, animate: true),
+            const SizedBox(height: 8),
 
-          Center(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Opacity(
-                  opacity: _fadeAnimation.value,
-                  child: Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // App Logo emblem
-                        Container(
-                          width: 84,
-                          height: 84,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: AppColors.goldGradient,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.accentGold.withValues(alpha: 0.35),
-                                blurRadius: 30,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 76,
-                              height: 76,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.primaryDark,
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.account_balance_rounded,
-                                  size: 40,
-                                  color: AppColors.accentGoldLight,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Title
-                        Text(
-                          'SWAPNOJATRI',
-                          style: AppTypography.displayLarge(isDark: true).copyWith(
-                            letterSpacing: 4.0,
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.isBangla ? 'স্বপ্নযাত্রী ইনভেস্টমেন্ট প্ল্যাটফর্ম' : 'INVESTMENT PLATFORM',
-                          style: AppTypography.caption(isDark: true, isBangla: widget.isBangla).copyWith(
-                            color: AppColors.accentGoldLight,
-                            letterSpacing: 1.5,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 36),
-
-                        // Subtle spinner
-                        SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.accentGold.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ),
-                      ],
+            // 2. Title sets in Noto Serif Bengali
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  Text(
+                    'স্বপ্নযাত্রী',
+                    style: GoogleFonts.notoSerifBengali(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                      color: palette.pine,
+                      height: 1.2,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-
-          // Bottom compliance tagline
-          Positioned(
-            bottom: 30,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'LandVest 100 • Verified Asset Backed Investments',
-                style: AppTypography.caption(isDark: true).copyWith(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  letterSpacing: 0.8,
-                  fontSize: 10.5,
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ইনভেস্টমেন্ট প্ল্যাটফর্ম • প্লট ৪১৮',
+                    style: GoogleFonts.anekBangla(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                      color: palette.inkSecondary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

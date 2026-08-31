@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
+import 'package:swapnojatri/core/widgets/seal_painter.dart';
 import 'package:swapnojatri/core/widgets/app_button.dart';
+import 'package:swapnojatri/features/auth/auth_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  final VoidCallback onComplete;
-  final bool isBangla;
-
-  const OnboardingScreen({
-    super.key,
-    required this.onComplete,
-    this.isBangla = true,
-  });
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -21,38 +15,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-
-  List<Map<String, dynamic>> _getSlides(bool isBangla) {
-    return [
-      {
-        'icon': Icons.account_balance_wallet_rounded,
-        'titleEn': 'Invest with Transparency',
-        'titleBn': 'স্বচ্ছতার সাথে নিরাপদ বিনিয়োগ',
-        'descEn': 'Access verified, asset-backed land opportunities starting with LandVest 100 in strategic Dhaka locations.',
-        'descBn': 'ঢাকার কৌশলগত এলাকায় ল্যান্ডভেস্ট ১০০ এর মাধ্যমে সম্পূর্ণ যাচাইকৃত ও দলিলভিত্তিক নিরাপদ জমিতে যৌথ বিনিয়োগ।',
-        'badgeEn': 'LANDVEST 100 OPPORTUNITY',
-        'badgeBn': 'ল্যান্ডভেস্ট ১০০ প্রকল্প',
-      },
-      {
-        'icon': Icons.query_stats_rounded,
-        'titleEn': 'Track Every Single Movement',
-        'titleBn': 'তহবিলের প্রতি পয়সার স্বচ্ছ হিসাব',
-        'descEn': 'Monitor real-time fund collection, vetted legal expenses, and land demarcation milestones directly from your phone.',
-        'descBn': 'রিয়েল-টাইম তহবিল সংগ্রহ, সরকারি রেজিস্ট্রেশন ফি এবং জমির উন্নয়ন সংক্রান্ত প্রতিটি খরচের ভাউচার সরাসরি দেখুন।',
-        'badgeEn': 'REAL-TIME FUND TRANSPARENCY',
-        'badgeBn': 'লাইভ তহবিল স্বচ্ছতা',
-      },
-      {
-        'icon': Icons.folder_shared_rounded,
-        'titleEn': 'Verified Deeds & Payouts',
-        'titleBn': 'ডিজিটাল দলিল ও সরাসরি লভ্যাংশ',
-        'descEn': 'Instant access to Sub-Registry title deeds, AC land mutation khatians, and automated profit distributions.',
-        'descBn': 'সাব-রেজিস্ট্রি মূল দলিল, এসিল্যান্ড নামজারি খতিয়ান এবং ব্যাংক/বিকাশে স্বয়ংক্রিয় লভ্যাংশ বণ্টন সুবিধা।',
-        'badgeEn': 'VERIFIED DEED & DIVIDENDS',
-        'badgeBn': 'যাচাইকৃত দলিল ও লভ্যাংশ',
-      },
-    ];
-  }
+  bool _isBangla = true;
 
   @override
   void dispose() {
@@ -60,212 +23,300 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
+  void _nextPage() {
+    if (_currentPage < 2) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _navigateToAuth();
+    }
+  }
+
+  void _navigateToAuth() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const AuthScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final slides = _getSlides(widget.isBangla);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Top Bar (Logo & Skip)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Row(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            children: [
+              // Top Bar: 3-Segment Segmented Progress Rule + Language Toggle
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // 3-Segment Progress Rule
                   Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.primarySubtle,
-                          borderRadius: AppRadius.borderSm,
-                        ),
-                        child: const Icon(
-                          Icons.account_balance_rounded,
-                          size: 18,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'SWAPNOJATRI',
-                        style: AppTypography.headingSmall(isDark: isDark).copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_currentPage < slides.length - 1)
-                    TextButton(
-                      onPressed: widget.onComplete,
-                      child: Text(
-                        widget.isBangla ? 'স্কিপ করুন' : 'Skip',
-                        style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                          color: isDark ? AppColors.darkTextMuted : AppColors.lightTextSecondary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-            // Middle Carousel Slides
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: slides.length,
-                onPageChanged: (index) {
-                  setState(() => _currentPage = index);
-                },
-                itemBuilder: (context, index) {
-                  final slide = slides[index];
-
-                  return Center(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Institutional Emblem Container
-                          Container(
-                            width: 110,
-                            height: 110,
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF132A22) : const Color(0xFF0B281E),
-                              borderRadius: AppRadius.borderXl,
-                              border: Border.all(
-                                color: isDark ? const Color(0xFF234B3D) : const Color(0xFF1B4D3C),
-                                width: 1.2,
-                              ),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                slide['icon'] as IconData,
-                                size: 48,
-                                color: AppColors.accentGoldLight,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Pill Badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isDark ? AppColors.primaryDark : AppColors.primarySubtle,
-                              borderRadius: AppRadius.borderFull,
-                              border: Border.all(
-                                color: AppColors.primaryLight.withValues(alpha: 0.2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              widget.isBangla ? slide['badgeBn'] : slide['badgeEn'],
-                              style: AppTypography.caption(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                                color: isDark ? AppColors.accentGoldLight : AppColors.primaryDark,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.6,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Title
-                          Text(
-                            widget.isBangla ? slide['titleBn'] : slide['titleEn'],
-                            style: AppTypography.headingLarge(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Description
-                          Text(
-                            widget.isBangla ? slide['descBn'] : slide['descEn'],
-                            style: AppTypography.bodyMedium(isDark: isDark, isBangla: widget.isBangla).copyWith(
-                              fontSize: 14,
-                              height: 1.45,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Bottom Navigation & Controls
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-              child: Column(
-                children: [
-                  // Smooth Page Indicator Dots
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(slides.length, (index) {
-                      final isSelected = index == _currentPage;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: isSelected ? 24 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? (isDark ? AppColors.accentGold : AppColors.primary)
-                              : (isDark ? AppColors.darkDivider : const Color(0xFFCBD5E1)),
-                          borderRadius: AppRadius.borderFull,
-                        ),
+                    children: List.generate(3, (index) {
+                      final isActive = index <= _currentPage;
+                      return Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        width: 28,
+                        height: 2,
+                        color: isActive ? palette.pine : palette.rule,
                       );
                     }),
                   ),
-                  const SizedBox(height: 28),
 
-                  // Main Button CTA
-                  if (_currentPage == slides.length - 1) ...[
-                    AppButton(
-                      text: widget.isBangla ? 'বিনিয়োগ শুরু করুন' : 'Get Started',
-                      onPressed: widget.onComplete,
-                      variant: ButtonVariant.primary,
-                      isBangla: widget.isBangla,
+                  // Language Toggle
+                  TextButton(
+                    onPressed: () => setState(() => _isBangla = !_isBangla),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    const SizedBox(height: 10),
-                    AppButton(
-                      text: widget.isBangla ? 'আমার অ্যাকাউন্ট আছে' : 'I already have an account',
-                      onPressed: widget.onComplete,
-                      variant: ButtonVariant.ghost,
-                      isBangla: widget.isBangla,
+                    child: Text(
+                      _isBangla ? 'EN' : 'বাং',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: palette.pine,
+                      ),
                     ),
-                  ] else ...[
-                    AppButton(
-                      text: widget.isBangla ? 'পরবর্তী' : 'Continue',
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      variant: ButtonVariant.primary,
-                      isBangla: widget.isBangla,
-                    ),
-                  ],
+                  ),
                 ],
               ),
-            ),
-          ],
+              const Spacer(),
+
+              // Middle Slides
+              SizedBox(
+                height: 380,
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (idx) => setState(() => _currentPage = idx),
+                  children: [
+                    // Step 1: Cadastral Survey Sheet Diagram
+                    _buildSlide(
+                      diagram: _buildLotMapDiagram(palette),
+                      title: _isBangla ? '১০০টি সুনির্দিষ্ট অংশে জমির মালিকানা' : 'Fractional Ownership in 100 Surveyed Lots',
+                      body: _isBangla
+                          ? 'সাভার মৌজার প্লট নং ৪১৮-এর প্রতিটি অংশ সাব-রেজিস্ট্রি দলিল ও খতিয়ান দ্বারা চিহ্নিত।'
+                          : 'Each lot of Plot #418 is legally demarcated by registered title deeds and official mutation records.',
+                      palette: palette,
+                      isDark: isDark,
+                    ),
+
+                    // Step 2: Ruled Voucher Ledger Diagram
+                    _buildSlide(
+                      diagram: _buildVoucherLedgerDiagram(palette),
+                      title: _isBangla ? 'প্রতিটি টাকার স্বচ্ছ পাবলিক লেজার' : 'Public Ledger for Every Single Taka',
+                      body: _isBangla
+                          ? 'জমি ক্রয়, রেজিস্ট্রেশন ট্যাক্স ও সীমানা প্রাচীরের প্রতিটি ভাউচার অডিট রিপোর্টসহ উন্মুক্ত।'
+                          : 'All land purchase, tax, and survey expenses are backed by audited vouchers in the public ledger.',
+                      palette: palette,
+                      isDark: isDark,
+                    ),
+
+                    // Step 3: Sealed Certificate Diagram
+                    _buildSlide(
+                      diagram: _buildCertificateDiagram(palette),
+                      title: _isBangla ? 'অফিসিয়াল সিলমোহরযুক্ত সনদপত্র' : 'Legally Sealed Ownership Certificate',
+                      body: _isBangla
+                          ? 'বিনিয়োগ সম্পন্ন হওয়ামাত্র আপনার নামে ক্রিপ্টোগ্রাফিক ভেরিফায়েড শেয়ার সনদ ইস্যু হয়।'
+                          : 'Instantly receive a verifiable share certificate with registered deed reference upon confirmation.',
+                      palette: palette,
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+
+              // Bottom Actions
+              AppButton(
+                label: _currentPage == 2
+                    ? (_isBangla ? 'শুরু করুন' : 'Begin')
+                    : (_isBangla ? 'পরবর্তী' : 'Continue'),
+                variant: AppButtonVariant.primary,
+                isBangla: _isBangla,
+                onPressed: _nextPage,
+              ),
+              const SizedBox(height: 8),
+
+              if (_currentPage < 2)
+                AppButton(
+                  label: _isBangla ? 'এড়িয়ে যান' : 'Skip',
+                  variant: AppButtonVariant.quiet,
+                  isBangla: _isBangla,
+                  onPressed: _navigateToAuth,
+                ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSlide({
+    required Widget diagram,
+    required String title,
+    required String body,
+    required AppPalette palette,
+    required bool isDark,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(height: 140, child: Center(child: diagram)),
+        const SizedBox(height: 32),
+        Text(
+          title,
+          style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          body,
+          style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
+            color: palette.inkSecondary,
+            fontSize: 13.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLotMapDiagram(AppPalette palette) {
+    return Container(
+      width: 140,
+      height: 140,
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
+      ),
+      child: Stack(
+        children: [
+          // 4x4 Sample Mini Grid
+          GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 16,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+            itemBuilder: (context, idx) {
+              final isUserCell = idx == 5;
+              final isAllocated = idx < 8 && !isUserCell;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: isUserCell ? palette.pine : (isAllocated ? palette.surfaceSunken : palette.surface),
+                  border: Border.all(color: palette.rule, width: 0.6),
+                ),
+                child: isUserCell
+                    ? Center(
+                        child: Container(
+                          width: 4,
+                          height: 4,
+                          decoration: BoxDecoration(color: palette.brass, shape: BoxShape.circle),
+                        ),
+                      )
+                    : null,
+              );
+            },
+          ),
+          Positioned(
+            bottom: 4,
+            right: 6,
+            child: Text(
+              'PLOT 418',
+              style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.inkTertiary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVoucherLedgerDiagram(AppPalette palette) {
+    return Container(
+      width: 170,
+      height: 120,
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
+      ),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('LEDGER #2026', style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, color: palette.inkTertiary)),
+              Container(width: 8, height: 8, decoration: BoxDecoration(color: palette.jade, shape: BoxShape.circle)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Divider(height: 1),
+          const SizedBox(height: 6),
+          _miniVoucherRow('VCH-001', '৳ 15,50,000', palette),
+          const SizedBox(height: 4),
+          _miniVoucherRow('VCH-002', '৳ 2,85,000', palette),
+          const SizedBox(height: 4),
+          _miniVoucherRow('VCH-003', '৳ 1,25,000', palette),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniVoucherRow(String no, String amount, AppPalette palette) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(no, style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.inkSecondary)),
+        Text(amount, style: TextStyle(fontFamily: 'monospace', fontSize: 8, fontWeight: FontWeight.w600, color: palette.ink)),
+      ],
+    );
+  }
+
+  Widget _buildCertificateDiagram(AppPalette palette) {
+    return Container(
+      width: 140,
+      height: 140,
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border.all(color: palette.brass, width: 1.0),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: palette.brass.withValues(alpha: 0.5), width: 0.6)),
+            padding: const EdgeInsets.all(6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text('CERTIFICATE', style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w700, color: palette.brass)),
+                const SizedBox(height: 6),
+                Container(width: double.infinity, height: 1, color: palette.rule),
+                const SizedBox(height: 8),
+                Container(width: 50, height: 2, color: palette.inkTertiary),
+                const SizedBox(height: 4),
+                Container(width: 70, height: 2, color: palette.inkTertiary),
+              ],
+            ),
+          ),
+          Positioned(
+            right: 4,
+            bottom: 4,
+            child: SealWidget(size: 28, isBangla: _isBangla),
+          ),
+        ],
       ),
     );
   }

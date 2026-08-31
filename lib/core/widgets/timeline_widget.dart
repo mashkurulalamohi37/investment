@@ -4,61 +4,60 @@ import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
+import 'package:swapnojatri/core/constants/project_seeds.dart';
 
 class MilestoneTimelineWidget extends StatelessWidget {
-  final List<Milestone> milestones;
+  final List<Milestone>? milestones;
   final bool isBangla;
   final Function(Milestone)? onMilestoneTap;
 
   const MilestoneTimelineWidget({
     super.key,
-    required this.milestones,
+    this.milestones,
     required this.isBangla,
     this.onMilestoneTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final items = milestones ?? ProjectSeeds.landVest100.milestones;
 
     return Column(
-      children: List.generate(milestones.length, (index) {
-        final item = milestones[index];
-        final isLast = index == milestones.length - 1;
+      children: List.generate(items.length, (index) {
+        final item = items[index];
+        final isLast = index == items.length - 1;
 
         return IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Timeline Icon & Line
+              // Timeline Icon & Rule
               SizedBox(
-                width: 32,
+                width: 28,
                 child: Column(
                   children: [
                     Container(
-                      width: 24,
-                      height: 24,
+                      width: 18,
+                      height: 18,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: item.isCompleted
-                            ? AppColors.success
-                            : (isDark ? AppColors.darkSurface : const Color(0xFFE2E8F0)),
+                        color: item.isCompleted ? palette.pine : palette.surfaceSunken,
                         border: Border.all(
-                          color: item.isCompleted
-                              ? AppColors.success
-                              : (isDark ? AppColors.darkCardBorder : const Color(0xFFCBD5E1)),
-                          width: 2,
+                          color: item.isCompleted ? palette.pine : palette.ruleStrong,
+                          width: 1.5,
                         ),
                       ),
                       child: Center(
                         child: item.isCompleted
-                            ? const Icon(Icons.check, size: 14, color: Colors.white)
+                            ? Icon(Icons.check, size: 11, color: palette.canvas)
                             : Container(
-                                width: 8,
-                                height: 8,
+                                width: 5,
+                                height: 5,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isDark ? AppColors.darkTextMuted : const Color(0xFF94A3B8),
+                                  color: palette.inkTertiary,
                                 ),
                               ),
                       ),
@@ -66,32 +65,27 @@ class MilestoneTimelineWidget extends StatelessWidget {
                     if (!isLast)
                       Expanded(
                         child: Container(
-                          width: 2,
-                          color: item.isCompleted
-                              ? AppColors.success.withValues(alpha: 0.5)
-                              : (isDark ? AppColors.darkDivider : const Color(0xFFE2E8F0)),
+                          width: 1.5,
+                          color: item.isCompleted ? palette.pine : palette.rule,
                         ),
                       ),
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
 
-              const SizedBox(width: 14),
-
-              // Content Block
+              // Content Block (0 radius, 1px rule)
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: isLast ? 0 : 20.0),
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
                   child: Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                      borderRadius: AppRadius.borderMd,
+                      color: palette.surface,
+                      borderRadius: AppRadius.borderZero,
                       border: Border.all(
-                        color: item.isCompleted
-                            ? AppColors.success.withValues(alpha: isDark ? 0.3 : 0.2)
-                            : (isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder),
-                        width: 1,
+                        color: item.isCompleted ? palette.pine.withValues(alpha: 0.3) : palette.rule,
+                        width: 1.0,
                       ),
                     ),
                     child: Column(
@@ -100,60 +94,33 @@ class MilestoneTimelineWidget extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              CurrencyFormatter.formatDate(item.date, isBangla: isBangla),
-                              style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                                color: item.isCompleted ? AppColors.successDark : AppColors.lightTextMuted,
-                                fontWeight: FontWeight.w600,
+                            Expanded(
+                              child: Text(
+                                isBangla ? item.titleBn : item.title,
+                                style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                            if (item.isCompleted)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.successLight,
-                                  borderRadius: AppRadius.borderXs,
-                                ),
-                                child: Text(
-                                  isBangla ? 'সম্পন্ন' : 'Completed',
-                                  style: AppTypography.caption().copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.successDark,
-                                  ),
-                                ),
+                            Text(
+                              CurrencyFormatter.formatDate(item.date, isBangla: isBangla),
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 10.5,
+                                color: palette.inkSecondary,
                               ),
+                            ),
                           ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          isBangla ? item.titleBn : item.title,
-                          style: AppTypography.headingSmall(isDark: isDark, isBangla: isBangla).copyWith(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
-                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           item.description,
-                          style: AppTypography.bodySmall(isDark: isDark, isBangla: isBangla),
-                        ),
-                        if (item.documentRef != null) ...[
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.attach_file_rounded, size: 13, color: AppColors.accentGoldDark),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${isBangla ? 'সংযুক্ত দলিল:' : 'Attached Deed:'} ${item.documentRef}',
-                                style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                                  color: isDark ? AppColors.accentGoldLight : AppColors.accentGoldDark,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                          style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                            color: palette.inkSecondary,
+                            fontSize: 11.5,
                           ),
-                        ],
+                        ),
                       ],
                     ),
                   ),
@@ -166,3 +133,5 @@ class MilestoneTimelineWidget extends StatelessWidget {
     );
   }
 }
+
+typedef TimelineWidget = MilestoneTimelineWidget;

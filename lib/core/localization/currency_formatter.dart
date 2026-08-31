@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
-/// Formatter for Bangladeshi Taka (BDT ৳) with South Asian Lakh/Crore comma formatting
+/// Formatter for Bangladeshi Taka (BDT ৳) with South Asian Lakh/Crore grouping
+/// and thin space (৳\u2009) separation (§5 of Khatian Specification)
 class CurrencyFormatter {
   CurrencyFormatter._();
 
@@ -48,7 +49,7 @@ class CurrencyFormatter {
       formatted = toBanglaDigits(formatted);
     }
 
-    final symbol = includeSymbol ? '৳ ' : '';
+    final symbol = includeSymbol ? '৳\u2009' : '';
     final sign = isNegative ? '-' : '';
     return '$sign$symbol$formatted';
   }
@@ -56,7 +57,7 @@ class CurrencyFormatter {
   /// Compact representation e.g. ৳ 25.5L or ৳ ১.৫ কোটি
   static String formatCompact(num amount, {bool isBangla = false, bool includeSymbol = true}) {
     final abs = amount.abs();
-    final symbol = includeSymbol ? '৳ ' : '';
+    final symbol = includeSymbol ? '৳\u2009' : '';
 
     if (abs >= 10000000) {
       final crore = (amount / 10000000).toStringAsFixed(2);
