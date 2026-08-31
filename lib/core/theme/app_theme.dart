@@ -15,7 +15,7 @@ class AppTheme {
     }
   }
 
-  static ThemeData light({AppPaletteFlavor flavor = AppPaletteFlavor.paddyField}) {
+  static ThemeData light({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
     final palette = getPalette(flavor, false);
 
     return ThemeData(
@@ -56,7 +56,7 @@ class AppTheme {
     );
   }
 
-  static ThemeData dark({AppPaletteFlavor flavor = AppPaletteFlavor.paddyField}) {
+  static ThemeData dark({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
     final palette = getPalette(flavor, true);
 
     return ThemeData(

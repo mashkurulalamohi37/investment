@@ -19,7 +19,7 @@ class AppState extends ChangeNotifier {
   // App Configuration
   bool _isBangla = true; // Bangla-first by default
   ThemeMode _themeMode = ThemeMode.light;
-  AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.paddyField; // "Paddy Field" (Wise-inspired)
+  AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.ledgerRed; // "Ledger Paper & Registrar's Red"
   UserRole _activeRole = UserRole.investor;
 
   // Active Users
