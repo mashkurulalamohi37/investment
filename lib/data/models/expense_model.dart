@@ -6,6 +6,7 @@ class ExpenseModel {
   final String projectName;
   final String category;
   final String description;
+  final String? _descriptionBn;
   final String payee;
   final double amount;
   final DateTime expenseDate;
@@ -20,6 +21,7 @@ class ExpenseModel {
     required this.projectName,
     required this.category,
     required this.description,
+    String? descriptionBn,
     required this.payee,
     required this.amount,
     required this.expenseDate,
@@ -27,7 +29,10 @@ class ExpenseModel {
     required this.approvedBy,
     this.documentRef,
     required this.voucherNo,
-  });
+  }) : _descriptionBn = descriptionBn;
+
+  String get descriptionBn => _descriptionBn ?? description;
+  DateTime get incurredAt => expenseDate;
 
   ExpenseModel copyWith({
     ExpenseStatus? status,
@@ -39,6 +44,7 @@ class ExpenseModel {
       projectName: projectName,
       category: category,
       description: description,
+      descriptionBn: _descriptionBn,
       payee: payee,
       amount: amount,
       expenseDate: expenseDate,

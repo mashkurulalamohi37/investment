@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
@@ -7,6 +8,7 @@ import 'package:swapnojatri/core/widgets/app_button.dart';
 import 'package:swapnojatri/core/widgets/lot_map_widget.dart';
 import 'package:swapnojatri/core/widgets/document_card.dart';
 import 'package:swapnojatri/core/widgets/timeline_widget.dart';
+import 'package:swapnojatri/core/widgets/amount_text.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/investor/investment_flow/investment_flow_dialog.dart';
@@ -111,7 +113,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. HERO ELEMENT: Full-Width LotMapWidget (§10)
+                    // 1. HERO ELEMENT: Full-Width Cadastral LotMapWidget (§10)
                     LotMapWidget(
                       totalShares: project.totalShares,
                       allocatedShares: project.allocatedShares,
@@ -157,9 +159,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+
+                    // 3. Interactive ROI & Land Projection Calculator
+                    _buildCalculatorPanel(palette, isDark, isBangla, project),
                     const SizedBox(height: 24),
 
-                    // 3. Tab Bar with Matra Active Indicator
+                    // 4. Tab Bar with Matra Active Indicator
                     TabBar(
                       controller: _tabController,
                       isScrollable: true,
@@ -173,7 +179,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                     ),
                     const SizedBox(height: 16),
 
-                    // 4. Tab Content Views
+                    // 5. Tab Content Views
                     SizedBox(
                       height: 380,
                       child: TabBarView(
@@ -220,13 +226,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
               ),
             ),
 
-            // 5. STICKY BOTTOM BAR (§10)
+            // 5. Sticky Bottom Action Bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
                 color: palette.surface,
                 border: Border(top: BorderSide(color: palette.rule, width: 1.0)),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
                   Column(
@@ -234,27 +240,27 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        isBangla
-                            ? '${CurrencyFormatter.toBanglaDigits(_selectedShares.toString())}টি শেয়ারের মূল্য'
-                            : 'Price for $_selectedShares shares',
+                        isBangla ? 'নির্বাচিত অংশ ($_selectedShares টি)' : 'Selected ($_selectedShares shares)',
                         style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                           color: palette.inkSecondary,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        CurrencyFormatter.format(calculatedTotal, isBangla: isBangla),
-                        style: AppTypography.amountMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 19,
+                      AmountText(
+                        amount: calculatedTotal,
+                        isBangla: isBangla,
+                        style: AppTypography.amountLarge(isDark: isDark, isBangla: isBangla).copyWith(
+                          fontSize: 18,
+                          color: palette.pine,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
+                  const Spacer(),
+                  SizedBox(
+                    width: 170,
                     child: AppButton(
-                      label: isBangla ? 'অংশ সংরক্ষণ করুন' : 'Reserve Shares',
+                      label: isBangla ? 'অংশ সাবস্ক্রাইব' : 'Subscribe Share',
                       variant: AppButtonVariant.primary,
                       isBangla: isBangla,
                       onPressed: () {
@@ -280,70 +286,278 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
     );
   }
 
-  Widget _buildSpecificationTab(AppPalette palette, bool isDark, bool isBangla) {
+  // Interactive ROI & Land Projection Calculator
+  Widget _buildCalculatorPanel(AppPalette palette, bool isDark, bool isBangla, ProjectModel project) {
+    final landDecimals = (_selectedShares * 0.225);
+    final landKatha = (landDecimals / 1.65);
+    final totalCapital = _selectedShares * project.pricePerShare;
+    final annualDividend = totalCapital * 0.16; // 16% expected annual lease & agribusiness dividend
+    final threeYearCapitalGain = totalCapital * 0.50; // 50% 3-year projected land appreciation
+
     return Container(
       decoration: BoxDecoration(
         color: palette.surface,
-        border: Border.all(color: palette.rule, width: 1.0),
+        borderRadius: AppRadius.borderCard,
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
       ),
-      child: ListView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _specRow(isBangla ? 'মৌজা ও জেলা' : 'Mouza & District', isBangla ? 'বিরুলিয়া, সাভার, ঢাকা' : 'Birulia, Savar, Dhaka', palette, isDark),
-          _specRow(isBangla ? 'আরএস দাগ নং' : 'RS Plot (Daag)', '৪১৮ (Plot 418)', palette, isDark),
-          _specRow(isBangla ? 'নামজারি খতিয়ান নং' : 'Mutation Khatian', '৯০২ (Khatian #902)', palette, isDark),
-          _specRow(isBangla ? 'জমির মোট পরিমাপ' : 'Total Area', isBangla ? '২২.৫ শতাংশ (১৩.৬৩ কাঠা)' : '22.5 Decimals (13.63 Katha)', palette, isDark),
-          _specRow(isBangla ? 'প্রতি অংশের মাপ' : 'Area per Share', isBangla ? '০.২২৫ শতাংশ (১/১০০ অংশ)' : '0.225 Decimals (1/100 Share)', palette, isDark),
-          _specRow(isBangla ? 'সাব-রেজিস্ট্রি দলিল' : 'Sub-Registry Deed', '#4982/2026 (Savar)', palette, isDark),
-          _specRow(isBangla ? 'এসক্রো ব্যাংক হেফাজত' : 'Escrow Custody', isBangla ? 'সিটি ব্যাংক পিএলসি (গুলশান কর্পোরেট)' : 'City Bank PLC (Gulshan Branch)', palette, isDark),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isBangla ? 'বিনিয়োগ ও মুনাফা প্রজেকশন' : 'Investment & ROI Projection',
+                style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: palette.pineTint,
+                  borderRadius: AppRadius.borderChip,
+                ),
+                child: Text(
+                  '$_selectedShares% OWNERSHIP',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w700,
+                    color: palette.pine,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Stepper Selector
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isBangla ? 'শেয়ার সংখ্যা (১-৪ টি অনুমোদিত):' : 'Number of shares (1-4 max):',
+                style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+              ),
+              Row(
+                children: [1, 2, 3, 4].map((count) {
+                  final isSel = _selectedShares == count;
+                  return InkWell(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _selectedShares = count);
+                    },
+                    borderRadius: AppRadius.borderChip,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 6),
+                      width: 34,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: isSel ? palette.pine : palette.surfaceSunken,
+                        border: Border.all(
+                          color: isSel ? palette.pine : palette.rule,
+                          width: 1.0,
+                        ),
+                        borderRadius: AppRadius.borderChip,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        isBangla ? CurrencyFormatter.toBanglaDigits(count.toString()) : '$count',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: isSel ? Colors.white : palette.ink,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // 2x2 Projection Grid
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'জমির অনুপাত' : 'Land Demarcation',
+                      style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(color: palette.inkSecondary),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isBangla
+                          ? '${CurrencyFormatter.toBanglaDigits(landDecimals.toStringAsFixed(3))} শতাংশ (${CurrencyFormatter.toBanglaDigits(landKatha.toStringAsFixed(3))} কাঠা)'
+                          : '${landDecimals.toStringAsFixed(3)} dec (${landKatha.toStringAsFixed(3)} katha)',
+                      style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 12.5),
+                    ),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 28, color: palette.rule),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'বার্ষিক সম্ভাব্য লভ্যাংশ (১৬%)' : 'Est. Annual Dividend (16%)',
+                      style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(color: palette.inkSecondary),
+                    ),
+                    const SizedBox(height: 2),
+                    AmountText(
+                      amount: annualDividend,
+                      isBangla: isBangla,
+                      style: AppTypography.bodyStrong(isDark: isDark).copyWith(
+                        fontSize: 12.5,
+                        color: palette.pine,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'মোট বিনিয়োগকৃত মূলধন' : 'Total Capital',
+                      style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(color: palette.inkSecondary),
+                    ),
+                    const SizedBox(height: 2),
+                    AmountText(
+                      amount: totalCapital,
+                      isBangla: isBangla,
+                      style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 12.5),
+                    ),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 28, color: palette.rule),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? '৩ বছরের মূলধন বৃদ্ধি (+৫০%)' : '3-Yr Land Growth (+50%)',
+                      style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(color: palette.inkSecondary),
+                    ),
+                    const SizedBox(height: 2),
+                    AmountText(
+                      amount: threeYearCapitalGain,
+                      isBangla: isBangla,
+                      style: AppTypography.bodyStrong(isDark: isDark).copyWith(
+                        fontSize: 12.5,
+                        color: palette.pine,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  // Tab 1: Ruled Specification Table (§10)
+  Widget _buildSpecificationTab(AppPalette palette, bool isDark, bool isBangla) {
+    return SingleChildScrollView(
+      child: Container(
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: AppRadius.borderCard,
+          border: Border.all(color: palette.ruleStrong, width: 1.0),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _specRow(isBangla ? 'মৌজার নাম' : 'Mouza', isBangla ? 'বিরুলিয়া, সাভার' : 'Birulia, Savar', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'সিএস / আরএস দাগ' : 'CS / RS Plot', 'Plot 418', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'খতিয়ান নম্বর' : 'Khatian Ref', 'RS Khatian 902', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'মোট জমির আয়তন' : 'Total Land Size', isBangla ? '২২.৫ শতাংশ (১৩.৬ কাঠা)' : '22.5 Decimals (13.6 Katha)', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'প্রতি অংশের আয়তন' : 'Area per Share', isBangla ? '০.২২৫ শতাংশ' : '0.225 Decimals (1/100th)', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'রাস্তা সংযোগ' : 'Road Access', isBangla ? '২০ ফুট প্রশস্ত অভ্যন্তরীণ রাস্তা' : '20ft Front Access Road', palette, isDark),
+            const Divider(height: 16),
+            _specRow(isBangla ? 'এসক্রো হেফাজত' : 'Escrow Bank', isBangla ? 'সিটি ব্যাংক পিএলসি' : 'City Bank PLC', palette, isDark),
+          ],
+        ),
       ),
     );
   }
 
   Widget _specRow(String label, String value, AppPalette palette, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: AppTypography.caption(isDark: isDark).copyWith(color: palette.inkSecondary, fontSize: 12)),
-          Text(value, style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 12.5, fontWeight: FontWeight.w600)),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: AppTypography.caption(isDark: isDark).copyWith(
+            color: palette.inkSecondary,
+            fontSize: 12.5,
+          ),
+        ),
+        Text(
+          value,
+          style: AppTypography.bodyStrong(isDark: isDark).copyWith(
+            fontSize: 12.5,
+          ),
+        ),
+      ],
     );
   }
 
+  // Tab 4: Risk & Escrow Tab (§10)
   Widget _buildRiskTab(AppPalette palette, bool isDark, bool isBangla) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: palette.surface,
-        border: Border.all(color: palette.rule, width: 1.0),
-      ),
+    return SingleChildScrollView(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            isBangla ? 'আইনি ও এসক্রো ঝুঁকি নীতিমালা' : 'Legal & Risk Disclosures',
-            style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: palette.surface,
+              borderRadius: AppRadius.borderCard,
+              border: Border.all(color: palette.ruleStrong, width: 1.0),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            isBangla
-                ? '১. ভূমির মূল্য পরিবর্তনশীল। বিনিয়োগে কোনো প্রকার নিশ্চিত মুনাফার প্রতিশ্রুতি দেওয়া হয় না।\n\n২. সংগৃহীত অর্থ সিটি ব্যাংক পিএলসির ডেডিকেটেড এসক্রো হিসাবে জমা থাকে এবং কেবলমাত্র অনুমোদিত ভাউচারের বিপরীতে ছাড় করা হয়।\n\n৩. হস্তান্তরযোগ্য শেয়ার সনদের মাধ্যমে মালিকানা নিশ্চিত করা হয়।'
-                : '1. Land values can fluctuate. Returns are asset-backed and not guaranteed.\n\n2. All investor capital is held in escrow at City Bank PLC and released only against audited expense vouchers.\n\n3. Ownership is formalized via registered fractional certificates.',
-            style: AppTypography.body(isDark: isDark, isBangla: isBangla).copyWith(
-              color: palette.inkSecondary,
-              fontSize: 12.5,
-              height: 1.6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isBangla ? 'প্রাতিষ্ঠানিক এসক্রো ও সুরক্ষা' : 'Institutional Escrow & Custody',
+                  style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  isBangla
+                      ? '• সমস্ত বিনিয়োগের অর্থ সিটি ব্যাংক পিএলসি পরিচালিত বিশেষ এসক্রো হিসাবে জমা থাকে।\n\n• জমি রেজিস্ট্রি ও সীমানা নির্ধারণের অডিটকৃত বিল ব্যতিরেকে কোনো অর্থ ছাড় করা হয় না।\n\n• প্রতিটি লট সাব-রেজিস্ট্রি দলিল ও রেজিস্টার্ড শেয়ার সনদ দ্বারা আইনত সংরক্ষিত।'
+                      : '• Investor capital is held exclusively in a dedicated escrow account at City Bank PLC.\n\n• Funds are disbursed strictly against audited vouchers for land purchase and survey.\n\n• Every lot is legally demarcated by registered mutation records and tamper-evident share certificates.',
+                  style: AppTypography.body(isDark: isDark, isBangla: isBangla).copyWith(
+                    color: palette.inkSecondary,
+                    fontSize: 13,
+                    height: 1.6,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -30,6 +30,8 @@ class DocumentModel {
   final DateTime uploadedAt;
   final String uploadedBy;
   final String? downloadUrl;
+  final String? _description;
+  final String? _descriptionBn;
 
   const DocumentModel({
     required this.id,
@@ -47,9 +49,52 @@ class DocumentModel {
     required this.uploadedAt,
     required this.uploadedBy,
     this.downloadUrl,
-  });
+    String? description,
+    String? descriptionBn,
+  })  : _description = description,
+        _descriptionBn = descriptionBn;
 
+  String get description => _description ?? title;
+  String get descriptionBn => _descriptionBn ?? titleBn;
   String get sha256Hash => checksumSha256;
   String get verifiedBy => uploadedBy;
   String get fileType => fileName.contains('.') ? fileName.split('.').last.toUpperCase() : 'PDF';
+
+  String get categoryName {
+    switch (category) {
+      case DocumentCategory.legal:
+        return 'Legal Vetting';
+      case DocumentCategory.projectDeed:
+        return 'Title Deed';
+      case DocumentCategory.govtApproval:
+        return 'Govt Approval';
+      case DocumentCategory.receipt:
+        return 'Voucher Receipt';
+      case DocumentCategory.taxCertificate:
+        return 'Tax Certificate';
+      case DocumentCategory.financialAudit:
+        return 'Financial Audit';
+      case DocumentCategory.distributionStatement:
+        return 'Distribution Statement';
+    }
+  }
+
+  String get categoryNameBn {
+    switch (category) {
+      case DocumentCategory.legal:
+        return 'আইনি মতামত';
+      case DocumentCategory.projectDeed:
+        return 'মূল সাব-রেজিস্ট্রি দলিল';
+      case DocumentCategory.govtApproval:
+        return 'সরকারি অনুমোদন ও নামজারি';
+      case DocumentCategory.receipt:
+        return 'ব্যয় ভাউচার রসিদ';
+      case DocumentCategory.taxCertificate:
+        return 'ভূমি উন্নয়ন কর দাখিলা';
+      case DocumentCategory.financialAudit:
+        return 'চার্টার্ড অ্যাকাউন্ট্যান্ট অডিট';
+      case DocumentCategory.distributionStatement:
+        return 'মুনাফা বিতরণ বিবরণী';
+    }
+  }
 }

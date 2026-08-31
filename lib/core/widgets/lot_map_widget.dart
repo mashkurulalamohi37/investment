@@ -4,6 +4,8 @@ import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
+import 'package:swapnojatri/core/widgets/app_button.dart';
+import 'package:swapnojatri/core/widgets/seal_painter.dart';
 
 class LotMapWidget extends StatefulWidget {
   final int totalShares;
@@ -34,7 +36,213 @@ class LotMapWidget extends StatefulWidget {
 }
 
 class _LotMapWidgetState extends State<LotMapWidget> {
-  int? _inspectedLotIndex;
+  void _showLotInspectionModal(BuildContext context, int index, AppPalette palette, bool isDark, bool isBangla, Set<int> userIndices) {
+    final lotNo = (index + 1).toString().padLeft(3, '0');
+    final isUserLot = userIndices.contains(index);
+    final isAllocated = index < widget.allocatedShares && !isUserLot;
+    final isAvailable = index >= widget.allocatedShares;
+
+    final row = (index ~/ 10) + 1;
+    final colLetter = String.fromCharCode(65 + (index % 10));
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: AppRadius.borderSheet,
+            border: Border.all(color: palette.ruleStrong, width: 1.0),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Sheet Drag Handle
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: palette.ruleStrong,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Header: Lot Title & Coordinates
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isBangla ? 'নির্দিষ্ট ভূমি অংশ: লট-$lotNo' : 'Surveyed Parcel: LOT-$lotNo',
+                        style: AppTypography.titleLarge(isDark: isDark, isBangla: isBangla).copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        isBangla
+                            ? 'গ্রিড স্থানাঙ্ক: কলাম $colLetter, সারি $row • দাগ নং ৪১৮'
+                            : 'Grid Coord: Col $colLetter, Row $row • RS Plot #418',
+                        style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                          color: palette.inkSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (isUserLot)
+                    SealWidget(size: 38, isBangla: isBangla)
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isAvailable ? palette.pineTint : palette.surfaceSunken,
+                        borderRadius: AppRadius.borderChip,
+                        border: Border.all(color: isAvailable ? palette.pine : palette.rule, width: 1.0),
+                      ),
+                      child: Text(
+                        isAvailable
+                            ? (isBangla ? 'উপলব্ধ' : 'AVAILABLE')
+                            : (isBangla ? 'বরাদ্দকৃত' : 'ALLOCATED'),
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: isAvailable ? palette.pine : palette.inkSecondary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 14),
+
+              // Cadastral Specifications Table
+              Container(
+                decoration: BoxDecoration(
+                  color: palette.surfaceSunken,
+                  borderRadius: AppRadius.borderChip,
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    _detailRow(isBangla ? 'ভূমির পরিমাণ' : 'Land Area', isBangla ? '০.২২৫ শতাংশ (০.১৩৬ কাঠা)' : '0.225 Decimals (0.136 Katha)', palette, isDark),
+                    const Divider(height: 14),
+                    _detailRow(isBangla ? 'মৌজা ও খতিয়ান' : 'Mouza & Khatian', isBangla ? 'বিরুলিয়া মৌজা, আরএস খতিয়ান ৯০২' : 'Birulia Mouza, RS Khatian 902', palette, isDark),
+                    const Divider(height: 14),
+                    _detailRow(isBangla ? 'সাব-রেজিস্ট্রি অফিস' : 'Sub-Registry', isBangla ? 'সাভার সাব-রেজিস্ট্রি অফিস, ঢাকা' : 'Savar Sub-Registry Office, Dhaka', palette, isDark),
+                    const Divider(height: 14),
+                    _detailRow(
+                      isBangla ? 'মালিকানা অবস্থা' : 'Status',
+                      isUserLot
+                          ? (isBangla ? 'আপনার সক্রিয় মালিকানা (দলিল ৪৯৮২/২৬)' : 'Your Ownership (Deed #4982/26)')
+                          : (isAllocated
+                              ? (isBangla ? 'নিবন্ধিত বিনিয়োগকারীর অংশ' : 'Allocated Investor Lot')
+                              : (isBangla ? 'ক্রয়ের জন্য সম্পূর্ণ প্রস্তুত' : 'Ready for Immediate Subscription')),
+                      palette,
+                      isDark,
+                      highlight: isUserLot,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Legal Boundary Schedule (চৌহদ্দি)
+              Text(
+                isBangla ? 'চৌহদ্দি সীমানা তালিকা (Schedule of Boundaries)' : 'Schedule of Boundaries',
+                style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla).copyWith(fontSize: 11),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  border: Border.all(color: palette.rule, width: 1.0),
+                  borderRadius: AppRadius.borderChip,
+                ),
+                child: Column(
+                  children: [
+                    _boundaryRow('উত্তর (North)', 'আরএস দাগ নং ৪১৭ (মৌজা সীমানা প্রাচীর)', palette),
+                    const SizedBox(height: 4),
+                    _boundaryRow('দক্ষিণ (South)', '২০ ফুট প্রশস্ত অভ্যন্তরীণ পাকা রাস্তা', palette),
+                    const SizedBox(height: 4),
+                    _boundaryRow('পূর্ব (East)', 'লট নং ${(index + 2).clamp(1, 100).toString().padLeft(3, '0')} (অভ্যন্তরীণ প্লট)', palette),
+                    const SizedBox(height: 4),
+                    _boundaryRow('পশ্চিম (West)', 'লট নং ${(index).clamp(1, 100).toString().padLeft(3, '0')} (অভ্যন্তরীণ প্লট)', palette),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Actions
+              if (isAvailable && widget.onSelectShares != null) ...[
+                AppButton(
+                  label: isBangla ? 'এই লট নির্বাচন করে সাবস্ক্রাইব করুন' : 'Select & Subscribe to This Lot',
+                  variant: AppButtonVariant.primary,
+                  isBangla: isBangla,
+                  onPressed: () {
+                    Navigator.pop(context);
+                    final count = (index - widget.allocatedShares + 1).clamp(1, 4);
+                    widget.onSelectShares!(count);
+                  },
+                ),
+              ] else ...[
+                AppButton(
+                  label: isBangla ? 'বন্ধ করুন' : 'Close',
+                  variant: AppButtonVariant.secondary,
+                  isBangla: isBangla,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(String label, String val, AppPalette palette, bool isDark, {bool highlight = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(fontSize: 11.5, color: palette.inkSecondary)),
+        Text(
+          val,
+          style: TextStyle(
+            fontSize: 11.5,
+            fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
+            color: highlight ? palette.pine : palette.ink,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _boundaryRow(String dir, String desc, AppPalette palette) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 90,
+          child: Text(dir, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: palette.inkSecondary)),
+        ),
+        Expanded(
+          child: Text(desc, style: TextStyle(fontSize: 10.5, color: palette.ink)),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +383,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                           final lotNo = (index + 1).toString().padLeft(3, '0');
                           final isUserLot = userIndices.contains(index);
                           final isAllocated = index < widget.allocatedShares && !isUserLot;
-                          final isAvailable = index >= widget.allocatedShares;
 
                           String semLabel;
                           if (isUserLot) {
@@ -193,13 +400,8 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                               behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 HapticFeedback.selectionClick();
-                                setState(() => _inspectedLotIndex = index);
                                 widget.onLotTap?.call(index);
-
-                                if (isAvailable && widget.onSelectShares != null) {
-                                  final count = (index - widget.allocatedShares + 1).clamp(1, 4);
-                                  widget.onSelectShares!(count);
-                                }
+                                _showLotInspectionModal(context, index, palette, isDark, isBangla, userIndices);
                               },
                               child: Container(color: Colors.transparent),
                             ),
@@ -302,44 +504,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
               ),
             ],
           ),
-
-          if (_inspectedLotIndex != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: palette.surfaceSunken,
-                borderRadius: AppRadius.borderChip,
-                border: Border.all(color: palette.rule, width: 1.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isBangla
-                        ? 'লট নং: LOT-${(_inspectedLotIndex! + 1).toString().padLeft(3, '0')}'
-                        : 'Lot Ref: LOT-${(_inspectedLotIndex! + 1).toString().padLeft(3, '0')}',
-                    style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    userIndices.contains(_inspectedLotIndex!)
-                        ? (isBangla ? 'আপনার মালিকানাধীন' : 'Your Ownership')
-                        : (_inspectedLotIndex! < widget.allocatedShares
-                            ? (isBangla ? 'অন্যান্য বিনিয়োগকারীর বরাদ্দ' : 'Allocated')
-                            : (isBangla ? 'নির্বাচনযোগ্য (৳ ২৫,৫০০)' : 'Available (৳ 25,500)')),
-                    style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-                      color: userIndices.contains(_inspectedLotIndex!)
-                          ? palette.pine
-                          : (_inspectedLotIndex! < widget.allocatedShares ? palette.inkTertiary : palette.jade),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -360,21 +524,42 @@ class _LotMapWidgetState extends State<LotMapWidget> {
         Text(
           label,
           style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+            fontSize: 11,
             color: palette.inkSecondary,
-            fontSize: 11.5,
           ),
         ),
         const SizedBox(width: 4),
         Text(
           '(${isBangla ? CurrencyFormatter.toBanglaDigits(count) : count})',
-          style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-            color: palette.inkTertiary,
+          style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+            fontSize: 10.5,
             fontWeight: FontWeight.w600,
+            color: palette.ink,
           ),
         ),
       ],
     );
   }
+}
+
+class _HatchPatternPainter extends CustomPainter {
+  final Color color;
+  const _HatchPatternPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 0.8
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawLine(Offset(0, size.height), Offset(size.width, 0), paint);
+    canvas.drawLine(Offset(0, size.height / 2), Offset(size.width / 2, 0), paint);
+    canvas.drawLine(Offset(size.width / 2, size.height), Offset(size.width, size.height / 2), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _HatchPatternPainter oldDelegate) => oldDelegate.color != color;
 }
 
 class _SurveySheetPainter extends CustomPainter {
@@ -386,7 +571,7 @@ class _SurveySheetPainter extends CustomPainter {
   final bool isBangla;
   final bool isCompact;
 
-  _SurveySheetPainter({
+  const _SurveySheetPainter({
     required this.palette,
     required this.totalShares,
     required this.allocatedShares,
@@ -399,74 +584,59 @@ class _SurveySheetPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final margin = isCompact ? 0.0 : 16.0;
-    final fieldSize = size.width - (margin * 2);
-    final cellSize = fieldSize / 10;
+    final gridWidth = size.width - (margin * 2);
+    final cellSize = gridWidth / 10.0;
 
-    final rulePaint = Paint()
+    final cellBorderPaint = Paint()
       ..color = palette.rule
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
 
-    final outerFramePaint = Paint()
-      ..color = palette.ruleStrong
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+    final hatchPaint = Paint()
+      ..color = palette.inkTertiary.withValues(alpha: 0.5)
+      ..strokeWidth = 0.8
+      ..style = PaintingStyle.stroke;
 
-    // Draw Outer Frame
-    canvas.drawRect(Rect.fromLTWH(margin, margin, fieldSize, fieldSize), outerFramePaint);
+    final userBgPaint = Paint()
+      ..color = palette.pine
+      ..style = PaintingStyle.fill;
 
+    final dotPaint = Paint()
+      ..color = palette.brass
+      ..style = PaintingStyle.fill;
+
+    final availableBgPaint = Paint()
+      ..color = palette.surface
+      ..style = PaintingStyle.fill;
+
+    final selectedBorderPaint = Paint()
+      ..color = palette.pine
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    // Draw Margin Coordinates
     if (!isCompact) {
-      // Draw Margin Coordinate Letters (A-J) and Numbers (1-10)
-      const cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-      final tickPaint = Paint()
-        ..color = palette.inkTertiary
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.0;
+      final textStyle = TextStyle(
+        fontFamily: 'serif',
+        fontSize: 8.5,
+        color: palette.inkTertiary,
+        fontWeight: FontWeight.w600,
+      );
 
       for (int i = 0; i < 10; i++) {
-        // Col Letters
-        final colSpan = TextSpan(
-          text: cols[i],
-          style: TextStyle(
-            color: palette.inkTertiary,
-            fontSize: 8.5,
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.w600,
-          ),
-        );
-        final colPainter = TextPainter(text: colSpan, textDirection: TextDirection.ltr)..layout();
-        colPainter.paint(
-          canvas,
-          Offset(margin + (i * cellSize) + (cellSize / 2) - (colPainter.width / 2), 3),
-        );
+        final colLetter = String.fromCharCode(65 + i); // A-J
+        final tpCol = TextPainter(
+          text: TextSpan(text: colLetter, style: textStyle),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        tpCol.paint(canvas, Offset(margin + (i * cellSize) + (cellSize - tpCol.width) / 2, 3));
 
-        // Row Numbers
-        final rowSpan = TextSpan(
-          text: (i + 1).toString(),
-          style: TextStyle(
-            color: palette.inkTertiary,
-            fontSize: 8.5,
-            fontFamily: 'monospace',
-            fontWeight: FontWeight.w600,
-          ),
-        );
-        final rowPainter = TextPainter(text: rowSpan, textDirection: TextDirection.ltr)..layout();
-        rowPainter.paint(
-          canvas,
-          Offset(3, margin + (i * cellSize) + (cellSize / 2) - (rowPainter.height / 2)),
-        );
-
-        // Boundary Ticks
-        canvas.drawLine(
-          Offset(margin + i * cellSize, margin - 3),
-          Offset(margin + i * cellSize, margin),
-          tickPaint,
-        );
-        canvas.drawLine(
-          Offset(margin - 3, margin + i * cellSize),
-          Offset(margin, margin + i * cellSize),
-          tickPaint,
-        );
+        final rowNum = isBangla ? CurrencyFormatter.toBanglaDigits((i + 1).toString()) : '${i + 1}';
+        final tpRow = TextPainter(
+          text: TextSpan(text: rowNum, style: textStyle),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        tpRow.paint(canvas, Offset(3, margin + (i * cellSize) + (cellSize - tpRow.height) / 2));
       }
     }
 
@@ -475,7 +645,7 @@ class _SurveySheetPainter extends CustomPainter {
       final col = index % 10;
       final row = index ~/ 10;
 
-      final cellRect = Rect.fromLTWH(
+      final rect = Rect.fromLTWH(
         margin + (col * cellSize),
         margin + (row * cellSize),
         cellSize,
@@ -484,148 +654,43 @@ class _SurveySheetPainter extends CustomPainter {
 
       final isUserLot = userIndices.contains(index);
       final isAllocated = index < allocatedShares && !isUserLot;
-      final isSelectedInCalc = (index >= allocatedShares) && (index < allocatedShares + selectedSharesCount);
+      final isAvailable = index >= allocatedShares;
+      final isSelected = isAvailable && (index < allocatedShares + selectedSharesCount);
 
       if (isUserLot) {
-        // YOURS: Pine Fill with Brass Corner Dot
-        canvas.drawRect(cellRect, Paint()..color = palette.pine);
-        canvas.drawRect(cellRect, rulePaint);
-
-        // Brass corner dot
-        canvas.drawCircle(
-          Offset(cellRect.right - 3, cellRect.top + 3),
-          1.8,
-          Paint()..color = palette.brass,
-        );
-
-        if (!isCompact && cellSize >= 20) {
-          final lotSpan = TextSpan(
-            text: (index + 1).toString().padLeft(2, '0'),
-            style: TextStyle(
-              color: palette.canvas,
-              fontSize: 8,
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.w700,
-            ),
-          );
-          final lotPainter = TextPainter(text: lotSpan, textDirection: TextDirection.ltr)..layout();
-          lotPainter.paint(
-            canvas,
-            Offset(cellRect.center.dx - lotPainter.width / 2, cellRect.center.dy - lotPainter.height / 2),
-          );
-        }
+        canvas.drawRect(rect, userBgPaint);
+        canvas.drawCircle(rect.center, 2.5, dotPaint);
       } else if (isAllocated) {
-        // ALLOCATED: 45° Hatch lines, no number
-        canvas.drawRect(cellRect, Paint()..color = palette.surface);
-        canvas.drawRect(cellRect, rulePaint);
-
-        _drawCellHatch(canvas, cellRect, palette.inkTertiary.withValues(alpha: 0.22));
-      } else if (isSelectedInCalc) {
-        // SELECTED: Pine 1.5px border over surface with top-left corner tick
-        canvas.drawRect(cellRect, Paint()..color = palette.surface);
-        canvas.drawRect(
-          cellRect,
-          Paint()
-            ..color = palette.pine
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5,
-        );
-
-        // Corner tick
-        canvas.drawLine(cellRect.topLeft, Offset(cellRect.left + 4, cellRect.top), Paint()..color = palette.pine..strokeWidth = 2.0);
-        canvas.drawLine(cellRect.topLeft, Offset(cellRect.left, cellRect.top + 4), Paint()..color = palette.pine..strokeWidth = 2.0);
-
-        if (!isCompact && cellSize >= 20) {
-          final lotSpan = TextSpan(
-            text: (index + 1).toString().padLeft(2, '0'),
-            style: TextStyle(
-              color: palette.pine,
-              fontSize: 8,
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.w700,
-            ),
-          );
-          final lotPainter = TextPainter(text: lotSpan, textDirection: TextDirection.ltr)..layout();
-          lotPainter.paint(
-            canvas,
-            Offset(cellRect.center.dx - lotPainter.width / 2, cellRect.center.dy - lotPainter.height / 2),
+        canvas.drawRect(rect, availableBgPaint);
+        canvas.save();
+        canvas.clipRect(rect);
+        for (double p = -cellSize; p < cellSize * 2; p += 4.0) {
+          canvas.drawLine(
+            Offset(rect.left + p, rect.bottom),
+            Offset(rect.left + p + cellSize, rect.top),
+            hatchPaint,
           );
         }
+        canvas.restore();
       } else {
-        // AVAILABLE: Surface fill with 1px rule border and lot number in mapTick
-        canvas.drawRect(cellRect, Paint()..color = palette.surface);
-        canvas.drawRect(cellRect, rulePaint);
+        canvas.drawRect(rect, availableBgPaint);
+      }
 
-        if (!isCompact && cellSize >= 20) {
-          final lotSpan = TextSpan(
-            text: (index + 1).toString().padLeft(2, '0'),
-            style: TextStyle(
-              color: palette.inkTertiary,
-              fontSize: 8,
-              fontFamily: 'monospace',
-              fontWeight: FontWeight.w500,
-            ),
-          );
-          final lotPainter = TextPainter(text: lotSpan, textDirection: TextDirection.ltr)..layout();
-          lotPainter.paint(
-            canvas,
-            Offset(cellRect.center.dx - lotPainter.width / 2, cellRect.center.dy - lotPainter.height / 2),
-          );
-        }
+      // Shared 1px hairline border
+      canvas.drawRect(rect, cellBorderPaint);
+
+      // Selected for investment indicator
+      if (isSelected) {
+        canvas.drawRect(rect.deflate(0.75), selectedBorderPaint);
       }
     }
-  }
-
-  void _drawCellHatch(Canvas canvas, Rect rect, Color hatchColor) {
-    final hatchPaint = Paint()
-      ..color = hatchColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    canvas.save();
-    canvas.clipRect(rect);
-
-    const pitch = 7.0;
-    for (double d = -rect.height; d < rect.width + rect.height; d += pitch) {
-      canvas.drawLine(
-        Offset(rect.left + d, rect.bottom),
-        Offset(rect.left + d + rect.height, rect.top),
-        hatchPaint,
-      );
-    }
-
-    canvas.restore();
   }
 
   @override
   bool shouldRepaint(covariant _SurveySheetPainter oldDelegate) {
     return oldDelegate.allocatedShares != allocatedShares ||
         oldDelegate.selectedSharesCount != selectedSharesCount ||
-        oldDelegate.userIndices.length != userIndices.length ||
-        oldDelegate.palette != palette;
+        oldDelegate.palette != palette ||
+        oldDelegate.isBangla != isBangla;
   }
 }
-
-class _HatchPatternPainter extends CustomPainter {
-  final Color color;
-
-  _HatchPatternPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    for (double d = -size.height; d < size.width + size.height; d += 4.0) {
-      canvas.drawLine(Offset(d, size.height), Offset(d + size.height, 0), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _HatchPatternPainter oldDelegate) => oldDelegate.color != color;
-}
-
-// Backward compatibility alias for ShareGridMatrixWidget
-typedef ShareGridMatrixWidget = LotMapWidget;

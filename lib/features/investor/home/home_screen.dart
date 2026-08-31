@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
+import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/holding_card.dart';
@@ -103,7 +105,52 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+
+              // Quick Action Shortcuts Bar
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _homeQuickAction(
+                      icon: Icons.grid_view_rounded,
+                      label: isBangla ? 'আমার লট (৪১-৪৪)' : 'My Lots (41-44)',
+                      palette: palette,
+                      isDark: isDark,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProjectDetailScreen(project: project, state: state),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _homeQuickAction(
+                      icon: Icons.account_balance_wallet_outlined,
+                      label: isBangla ? 'তহবিল স্বচ্ছতা' : 'Treasury Ledger',
+                      palette: palette,
+                      isDark: isDark,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TransparencyScreen(state: state)),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _homeQuickAction(
+                      icon: Icons.folder_open_outlined,
+                      label: isBangla ? 'দলিল ভল্ট' : 'Document Vault',
+                      palette: palette,
+                      isDark: isDark,
+                      onTap: () => onNavigateTab(2),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
 
               // 2. Matra Rule + Plot 418 Section with Lot Map Miniature & Funding Line
               MatraRuleWidget(width: 32, color: palette.pine, animate: true),
@@ -315,6 +362,45 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _homeQuickAction({
+    required IconData icon,
+    required String label,
+    required AppPalette palette,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      borderRadius: AppRadius.borderControl,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: AppRadius.borderControl,
+          border: Border.all(color: palette.rule, width: 1.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: palette.pine),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: palette.ink,
+              ),
+            ),
+          ],
         ),
       ),
     );

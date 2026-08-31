@@ -10,12 +10,14 @@ class DocumentCard extends StatefulWidget {
   final DocumentModel document;
   final bool isBangla;
   final VoidCallback? onDownload;
+  final VoidCallback? onTap;
 
   const DocumentCard({
     super.key,
     required this.document,
     this.isBangla = false,
     this.onDownload,
+    this.onTap,
   });
 
   @override
@@ -47,132 +49,135 @@ class _DocumentCardState extends State<DocumentCard> {
         ? '${hash.substring(0, 8)}...${hash.substring(hash.length - 8)}'
         : hash;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: AppRadius.borderZero,
-        border: Border.all(color: palette.ruleStrong, width: 1.0),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Left Edge: 3px Full-Height Brass Sealed Bar
-            Container(
-              width: 3.0,
-              color: palette.brass,
-            ),
+    return InkWell(
+      onTap: widget.onTap ?? widget.onDownload,
+      borderRadius: AppRadius.borderZero,
+      child: Container(
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: AppRadius.borderZero,
+          border: Border.all(color: palette.ruleStrong, width: 1.0),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Left Edge: 3px Full-Height Brass Sealed Bar (§10)
+              Container(
+                width: 3.0,
+                color: palette.brass,
+              ),
 
-            // Main Content Body
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Row: Title & 20px Seal
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              // Main Content Body
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Top Row: Title in Source Serif 4 + 20px Mini Seal (§10)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isBangla ? doc.titleBn : doc.title,
+                                  style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isBangla ? doc.descriptionBn : doc.description,
+                                  style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                                    color: palette.inkSecondary,
+                                    fontSize: 11.5,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // 20px Seal Stamp (§10)
+                          SealWidget(size: 24, isBangla: isBangla),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Middle: SHA-256 Hash Row in Monospace with Copy Affordance
+                      InkWell(
+                        onTap: _copyHash,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: palette.surfaceSunken,
+                            border: Border.all(color: palette.rule, width: 0.8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                isBangla ? doc.titleBn : doc.title,
-                                style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
+                                'SHA-256: $displayHash',
+                                style: TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 10,
+                                  color: palette.inkTertiary,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(width: 6),
                               Text(
-                                isBangla ? 'সনদকারী: ${doc.verifiedBy}' : 'Issuer: ${doc.verifiedBy}',
-                                style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                                  color: palette.inkSecondary,
-                                  fontSize: 11.5,
+                                _copied
+                                    ? (isBangla ? 'কপি হয়েছে' : 'Hash copied')
+                                    : (isBangla ? 'কপি' : 'Copy'),
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  color: _copied ? palette.jade : palette.inkSecondary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        SealWidget(size: 24, isBangla: isBangla),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-
-                    // SHA-256 Hash Row (Clickable)
-                    InkWell(
-                      onTap: _copyHash,
-                      borderRadius: AppRadius.borderChip,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: palette.surfaceSunken,
-                          borderRadius: AppRadius.borderChip,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'SHA-256: $displayHash',
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 10,
-                                color: palette.inkTertiary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              _copied
-                                  ? (isBangla ? 'কপি হয়েছে' : 'Hash copied')
-                                  : (isBangla ? 'কপি' : 'Copy'),
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                color: _copied ? palette.jade : palette.inkSecondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(height: 1),
-                    const SizedBox(height: 8),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 8),
 
-                    // Footer Row: Type, Size (Vertical Hairline separated), and Download Action
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              doc.fileType.toUpperCase(),
-                              style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-                                color: palette.inkSecondary,
-                                fontWeight: FontWeight.w600,
+                      // Footer Row: Type, Size, and Action
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                doc.fileType.toUpperCase(),
+                                style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+                                  color: palette.inkSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
-                              width: 1,
-                              height: 10,
-                              color: palette.rule,
-                            ),
-                            Text(
-                              doc.fileSize,
-                              style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-                                color: palette.inkTertiary,
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                width: 1,
+                                height: 10,
+                                color: palette.rule,
                               ),
-                            ),
-                          ],
-                        ),
-                        InkWell(
-                          onTap: widget.onDownload,
-                          child: Row(
+                              Text(
+                                doc.fileSize,
+                                style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+                                  color: palette.inkTertiary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
                             children: [
                               Icon(Icons.download_rounded, size: 14, color: palette.pine),
                               const SizedBox(width: 4),
@@ -186,14 +191,14 @@ class _DocumentCardState extends State<DocumentCard> {
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
