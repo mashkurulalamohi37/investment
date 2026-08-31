@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
 import 'package:swapnojatri/data/models/investment_model.dart';
 import 'package:swapnojatri/data/models/transaction_model.dart';
@@ -18,6 +19,7 @@ class AppState extends ChangeNotifier {
   // App Configuration
   bool _isBangla = true; // Bangla-first by default
   ThemeMode _themeMode = ThemeMode.light;
+  AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.ledgerRed; // "Ledger Paper & Registrar's Red"
   UserRole _activeRole = UserRole.investor;
 
   // Active Users
@@ -60,6 +62,7 @@ class AppState extends ChangeNotifier {
   // Getters
   bool get isBangla => _isBangla;
   ThemeMode get themeMode => _themeMode;
+  AppPaletteFlavor get paletteFlavor => _paletteFlavor;
   UserRole get activeRole => _activeRole;
   UserModel get currentUser => _activeRole == UserRole.admin ? _adminUser : _currentUser;
   bool get isAdmin => _activeRole == UserRole.admin;
@@ -127,6 +130,18 @@ class AppState extends ChangeNotifier {
 
   void toggleTheme() {
     _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+  }
+
+  void togglePaletteFlavor() {
+    _paletteFlavor = _paletteFlavor == AppPaletteFlavor.ledgerRed
+        ? AppPaletteFlavor.pineTreasury
+        : AppPaletteFlavor.ledgerRed;
+    notifyListeners();
+  }
+
+  void setPaletteFlavor(AppPaletteFlavor flavor) {
+    _paletteFlavor = flavor;
     notifyListeners();
   }
 

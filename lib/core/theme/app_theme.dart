@@ -4,79 +4,87 @@ import 'app_colors.dart';
 import 'app_radius.dart';
 
 class AppTheme {
-  static ThemeData light() {
+  static ThemeData light({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
+    final palette = flavor == AppPaletteFlavor.ledgerRed
+        ? AppPalette.ledgerLight
+        : AppPalette.pineLight;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppPalette.light.canvas,
-      extensions: const [AppPalette.light],
+      scaffoldBackgroundColor: palette.canvas,
+      extensions: [palette],
       colorScheme: ColorScheme.light(
-        primary: AppPalette.light.pine,
-        surface: AppPalette.light.surface,
-        onPrimary: AppPalette.light.canvas,
-        onSurface: AppPalette.light.ink,
-        outline: AppPalette.light.rule,
-        outlineVariant: AppPalette.light.ruleStrong,
-        error: AppPalette.light.vermilion,
+        primary: palette.pine,
+        surface: palette.surface,
+        onPrimary: palette.canvas,
+        onSurface: palette.ink,
+        outline: palette.rule,
+        outlineVariant: palette.ruleStrong,
+        error: palette.vermilion,
       ),
       dividerTheme: DividerThemeData(
-        color: AppPalette.light.rule,
+        color: palette.rule,
         thickness: 1.0,
         space: 1.0,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppPalette.light.canvas,
+        backgroundColor: palette.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: AppPalette.light.ink, size: 20),
+        iconTheme: IconThemeData(color: palette.ink, size: 20),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       cardTheme: CardThemeData(
-        color: AppPalette.light.surface,
+        color: palette.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.borderCard,
-          side: BorderSide(color: AppPalette.light.rule, width: 1.0),
+          side: BorderSide(color: palette.rule, width: 1.0),
         ),
       ),
     );
   }
 
-  static ThemeData dark() {
+  static ThemeData dark({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
+    final palette = flavor == AppPaletteFlavor.ledgerRed
+        ? AppPalette.ledgerDark
+        : AppPalette.pineDark;
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppPalette.dark.canvas,
-      extensions: const [AppPalette.dark],
+      scaffoldBackgroundColor: palette.canvas,
+      extensions: [palette],
       colorScheme: ColorScheme.dark(
-        primary: AppPalette.dark.pine,
-        surface: AppPalette.dark.surface,
-        onPrimary: AppPalette.dark.ink,
-        onSurface: AppPalette.dark.ink,
-        outline: AppPalette.dark.rule,
-        outlineVariant: AppPalette.dark.ruleStrong,
-        error: AppPalette.dark.vermilion,
+        primary: palette.pine,
+        surface: palette.surface,
+        onPrimary: palette.ink,
+        onSurface: palette.ink,
+        outline: palette.rule,
+        outlineVariant: palette.ruleStrong,
+        error: palette.vermilion,
       ),
       dividerTheme: DividerThemeData(
-        color: AppPalette.dark.rule,
+        color: palette.rule,
         thickness: 1.0,
         space: 1.0,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppPalette.dark.canvas,
+        backgroundColor: palette.canvas,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: AppPalette.dark.ink, size: 20),
+        iconTheme: IconThemeData(color: palette.ink, size: 20),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       cardTheme: CardThemeData(
-        color: AppPalette.dark.surface,
+        color: palette.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.borderCard,
-          side: BorderSide(color: AppPalette.dark.rule, width: 1.0),
+          side: BorderSide(color: palette.rule, width: 1.0),
         ),
       ),
     );

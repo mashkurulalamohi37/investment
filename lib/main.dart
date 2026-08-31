@@ -37,8 +37,8 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
           return MaterialApp(
             title: 'Swapnojatri • Land Investment',
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.light(),
-            darkTheme: AppTheme.dark(),
+            theme: AppTheme.light(flavor: _appState.paletteFlavor),
+            darkTheme: AppTheme.dark(flavor: _appState.paletteFlavor),
             themeMode: _appState.themeMode,
             builder: (context, child) {
               return LayoutBuilder(
