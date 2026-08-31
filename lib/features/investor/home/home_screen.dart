@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/holding_card.dart';
@@ -379,13 +378,13 @@ class HomeScreen extends StatelessWidget {
         HapticFeedback.selectionClick();
         onTap();
       },
-      borderRadius: AppRadius.borderControl,
+      borderRadius: BorderRadius.circular(999),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: AppRadius.borderControl,
-          border: Border.all(color: palette.rule, width: 1.0),
+          color: palette.pineTint,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: palette.pine.withValues(alpha: 0.15), width: 1.0),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -395,9 +394,9 @@ class HomeScreen extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: palette.ink,
+                color: palette.pineDeep,
               ),
             ),
           ],

@@ -42,8 +42,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? AppColors.darkCardBorder : const Color(0xFFE2E8F0);
+    final palette = context.palette;
 
     return AnimatedBuilder(
       animation: _animation,
@@ -51,8 +50,8 @@ class _SkeletonLoaderState extends State<SkeletonLoader> with SingleTickerProvid
         width: widget.width,
         height: widget.height,
         decoration: BoxDecoration(
-          color: baseColor.withValues(alpha: _animation.value),
-          borderRadius: widget.borderRadius ?? AppRadius.borderSm,
+          color: palette.rule.withValues(alpha: _animation.value),
+          borderRadius: widget.borderRadius ?? AppRadius.borderControl,
         ),
       ),
     );

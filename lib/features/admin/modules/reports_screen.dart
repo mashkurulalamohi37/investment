@@ -14,6 +14,7 @@ class AdminReportsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
 
@@ -26,7 +27,7 @@ class AdminReportsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
           isBangla ? 'আর্থিক ও অডিট প্রতিবেদন এক্সপোর্ট' : 'Reports & Exports Console',
@@ -48,10 +49,11 @@ class AdminReportsScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderMd,
+                    color: palette.surface,
+                    borderRadius: AppRadius.borderCard,
                     border: Border.all(
-                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                      color: palette.rule,
+                      width: 1.0,
                     ),
                   ),
                   child: Row(
@@ -59,10 +61,10 @@ class AdminReportsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.10),
+                          color: palette.pineTint,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.analytics_rounded, color: AppColors.primary),
+                        child: Icon(Icons.analytics_rounded, color: palette.pine, size: 20),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -88,12 +90,12 @@ class AdminReportsScreen extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Generating and downloading ${rep['title']} (${rep['format']})...'),
-                              backgroundColor: AppColors.success,
+                              backgroundColor: palette.pine,
                             ),
                           );
                         },
                         icon: const Icon(Icons.download_rounded),
-                        color: AppColors.primary,
+                        color: palette.pine,
                       ),
                     ],
                   ),

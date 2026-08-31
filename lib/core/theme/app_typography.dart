@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Institutional Typography Engine (§5 of Khatian Specification)
-/// Figures & Display: Source Serif 4 / Noto Serif Bengali
-/// Interface & Body: Archivo / Anek Bangla
+/// Modern Financial Typography Engine (Wise-inspired "Paddy Field" Direction)
+/// Clean Geometric Sans for Figures, Displays & UI; Archival Serif reserved for Legal Certificates.
 class AppTypography {
   // Tabular & Lining features for financial number consistency
   static const List<FontFeature> tabularFontFeatures = [
@@ -38,15 +37,15 @@ class AppTypography {
     }
 
     return GoogleFonts.sourceSerif4(
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      height: effectiveHeight,
-      letterSpacing: effectiveTracking,
-      color: effectiveColor,
-    ).copyWith(
-      leadingDistribution: TextLeadingDistribution.even,
-      fontFeatures: tabularFontFeatures,
-    );
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        height: effectiveHeight,
+        letterSpacing: effectiveTracking,
+        color: effectiveColor,
+      ).copyWith(
+        leadingDistribution: TextLeadingDistribution.even,
+        fontFeatures: tabularFontFeatures,
+      );
   }
 
   static TextStyle _sansStyle({
@@ -88,34 +87,34 @@ class AppTypography {
 
   // --- Scale Tokens ---
 
-  static TextStyle amountHero({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle amountHero({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 34,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w800,
         height: 1.10,
-        tracking: -0.6,
+        tracking: -0.5,
         isBangla: isBangla,
         color: color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
       );
 
-  static TextStyle amountLarge({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle amountLarge({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 26,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         height: 1.15,
         tracking: -0.4,
         isBangla: isBangla,
         color: color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
       );
 
-  static TextStyle amountMedium({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle amountMedium({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         height: 1.25,
         tracking: -0.2,
         isBangla: isBangla,
         color: color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
       );
 
-  static TextStyle amountSmall({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle amountSmall({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 15,
         fontWeight: FontWeight.w600,
         height: 1.30,
@@ -124,18 +123,18 @@ class AppTypography {
         color: color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
       );
 
-  static TextStyle titleLarge({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle titleLarge({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 23,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w700,
         height: 1.25,
         tracking: -0.3,
         isBangla: isBangla,
         color: color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
       );
 
-  static TextStyle titleMedium({bool isDark = false, bool isBangla = false, Color? color}) => _serifStyle(
+  static TextStyle titleMedium({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 18,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         height: 1.30,
         tracking: -0.1,
         isBangla: isBangla,
@@ -162,7 +161,7 @@ class AppTypography {
 
   static TextStyle bodyStrong({bool isDark = false, bool isBangla = false, Color? color}) => _sansStyle(
         fontSize: 15,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
         height: 1.50,
         tracking: 0.0,
         isBangla: isBangla,
@@ -194,6 +193,16 @@ class AppTypography {
         letterSpacing: 0.2,
         color: color ?? (isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted),
       ).copyWith(leadingDistribution: TextLeadingDistribution.even);
+
+  // Dedicated Certificate Archival Serif
+  static TextStyle certificateDisplay({bool isBangla = false, Color? color}) => _serifStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        height: 1.25,
+        tracking: 0.5,
+        isBangla: isBangla,
+        color: color,
+      );
 
   // --- Compatibility Aliases ---
   static TextStyle headingLarge({bool isDark = false, bool isBangla = false, Color? color}) => titleLarge(isDark: isDark, isBangla: isBangla, color: color);

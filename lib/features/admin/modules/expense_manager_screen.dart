@@ -25,15 +25,15 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
   final TextEditingController _amountController = TextEditingController(text: '35000');
   final TextEditingController _descController = TextEditingController(text: 'Additional mutation vetting & mouza survey');
 
-  void _showAddExpenseModal(bool isDark, bool isBangla) {
+  void _showAddExpenseModal(AppPalette palette, bool isDark, bool isBangla) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          color: palette.surface,
+          borderRadius: AppRadius.borderSheet,
         ),
         padding: EdgeInsets.only(
           top: 20,
@@ -51,10 +51,10 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
             ),
             const SizedBox(height: 16),
 
-            _inputField(isBangla ? 'খরচের খাত (Category)' : 'Category', _categoryController, isDark),
-            _inputField(isBangla ? 'প্রাপক ব্যক্তি / প্রতিষ্ঠান (Payee)' : 'Payee Name', _payeeController, isDark),
-            _inputField(isBangla ? 'টাকার পরিমাণ (Amount BDT)' : 'Amount (BDT)', _amountController, isDark, keyboardType: TextInputType.number),
-            _inputField(isBangla ? 'কাজের বিবরণ (Description)' : 'Description', _descController, isDark),
+            _inputField(isBangla ? 'খরচের খাত (Category)' : 'Category', _categoryController, palette, isDark),
+            _inputField(isBangla ? 'প্রাপক ব্যক্তি / প্রতিষ্ঠান (Payee)' : 'Payee Name', _payeeController, palette, isDark),
+            _inputField(isBangla ? 'টাকার পরিমাণ (Amount BDT)' : 'Amount (BDT)', _amountController, palette, isDark, keyboardType: TextInputType.number),
+            _inputField(isBangla ? 'কাজের বিবরণ (Description)' : 'Description', _descController, palette, isDark),
 
             const SizedBox(height: 20),
             AppButton(
@@ -78,7 +78,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
                           ? 'খরচের ভাউচার অনুমোদিত হয়ে তহবিলে পোস্ট হয়েছে!'
                           : 'Expense voucher approved and posted to live ledger!',
                     ),
-                    backgroundColor: AppColors.success,
+                    backgroundColor: palette.pine,
                   ),
                 );
               },
@@ -91,7 +91,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
     );
   }
 
-  Widget _inputField(String label, TextEditingController controller, bool isDark, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _inputField(String label, TextEditingController controller, AppPalette palette, bool isDark, {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
@@ -105,10 +105,18 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
             style: AppTypography.bodyMedium(isDark: isDark),
             decoration: InputDecoration(
               filled: true,
-              fillColor: isDark ? AppColors.darkCard : Colors.white,
+              fillColor: palette.surfaceSunken,
               border: OutlineInputBorder(
-                borderRadius: AppRadius.borderMd,
-                borderSide: BorderSide(color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder),
+                borderRadius: AppRadius.borderControl,
+                borderSide: BorderSide(color: palette.rule),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: AppRadius.borderControl,
+                borderSide: BorderSide(color: palette.rule),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: AppRadius.borderControl,
+                borderSide: BorderSide(color: palette.pine, width: 1.5),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             ),
@@ -120,13 +128,14 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = widget.state.isBangla;
     final expenses = widget.state.expenses;
     final balance = widget.state.projectRemainingBalance;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
           isBangla ? 'তহবিল ব্যবহার ও খরচ অনুমোদন' : 'Expense & Fund Ledger',
@@ -134,7 +143,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () => _showAddExpenseModal(isDark, isBangla),
+            onPressed: () => _showAddExpenseModal(palette, isDark, isBangla),
             icon: const Icon(Icons.add_circle_outline_rounded),
             tooltip: 'Add Expense Voucher',
           ),
@@ -149,10 +158,11 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : Colors.white,
-                borderRadius: AppRadius.borderLg,
+                color: palette.surface,
+                borderRadius: AppRadius.borderCard,
                 border: Border.all(
-                  color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                  color: palette.rule,
+                  width: 1.0,
                 ),
               ),
               child: Row(
@@ -167,13 +177,13 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
                       ),
                       Text(
                         CurrencyFormatter.format(balance, isBangla: isBangla),
-                        style: AppTypography.financialAmountMedium(isDark: isDark, color: AppColors.success),
+                        style: AppTypography.financialAmountMedium(isDark: isDark, color: palette.pine),
                       ),
                     ],
                   ),
                   AppButton(
                     label: isBangla ? '+ খরচ যুক্ত করুন' : '+ Add Voucher',
-                    onPressed: () => _showAddExpenseModal(isDark, isBangla),
+                    onPressed: () => _showAddExpenseModal(palette, isDark, isBangla),
                     variant: AppButtonVariant.primary,
                     height: 38,
                     isFullWidth: false,
@@ -182,7 +192,7 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             Text(
               isBangla ? 'অনুমোদিত ভাউচার তালিকা (${expenses.length})' : 'Approved Expense Vouchers (${expenses.length})',
@@ -190,12 +200,9 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
             ),
             const SizedBox(height: 12),
 
-            ...expenses.map((expense) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: ExpenseTile(
-                    expense: expense,
-                    isBangla: isBangla,
-                  ),
+            ...expenses.map((exp) => VoucherRow(
+                  expense: exp,
+                  isBangla: isBangla,
                 )),
             const SizedBox(height: 40),
           ],

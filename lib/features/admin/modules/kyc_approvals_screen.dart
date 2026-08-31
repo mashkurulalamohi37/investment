@@ -17,12 +17,13 @@ class AdminKycApprovalsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
     final kyc = state.kyc;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
           isBangla ? 'কেওয়াইসি ও বিনিয়োগকারী অনুমোদন' : 'KYC & Compliance Queue',
@@ -37,10 +38,11 @@ class AdminKycApprovalsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : Colors.white,
-                borderRadius: AppRadius.borderLg,
+                color: palette.surface,
+                borderRadius: AppRadius.borderCard,
                 border: Border.all(
-                  color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                  color: palette.rule,
+                  width: 1.0,
                 ),
               ),
               child: Column(
@@ -60,20 +62,21 @@ class AdminKycApprovalsScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const Divider(height: 1),
+                  Divider(color: palette.rule, height: 1),
                   const SizedBox(height: 10),
 
-                  _row(isBangla ? 'এনআইডি নম্বর' : 'NID Number', kyc.nidNumber, isDark),
-                  _row(isBangla ? 'পিতার নাম' : "Father's Name", kyc.fatherName, isDark),
-                  _row(isBangla ? 'মাতার নাম' : "Mother's Name", kyc.motherName, isDark),
-                  _row(isBangla ? 'বর্তমান ঠিকানা' : 'Address', kyc.presentAddress, isDark),
-                  _row(isBangla ? 'ব্যাংক হিসাব' : 'Bank A/C', '${kyc.bankName} (${kyc.bankAccountNumber})', isDark),
+                  _row(isBangla ? 'এনআইডি নম্বর' : 'NID Number', kyc.nidNumber, palette, isDark),
+                  _row(isBangla ? 'পিতার নাম' : "Father's Name", kyc.fatherName, palette, isDark),
+                  _row(isBangla ? 'মাতার নাম' : "Mother's Name", kyc.motherName, palette, isDark),
+                  _row(isBangla ? 'বর্তমান ঠিকানা' : 'Address', kyc.presentAddress, palette, isDark),
+                  _row(isBangla ? 'ব্যাংক হিসাব' : 'Bank A/C', '${kyc.bankName} (${kyc.bankAccountNumber})', palette, isDark),
 
                   if (kyc.nominee != null) ...[
                     const SizedBox(height: 8),
                     _row(
                       isBangla ? 'নমিনি' : 'Nominee',
                       '${kyc.nominee!.name} (${kyc.nominee!.relationship})',
+                      palette,
                       isDark,
                     ),
                   ],
@@ -89,7 +92,7 @@ class AdminKycApprovalsScreen extends StatelessWidget {
                             content: Text(
                               isBangla ? 'কেওয়াইসি সফলভাবে অনুমোদিত হয়েছে!' : 'KYC verified successfully!',
                             ),
-                            backgroundColor: AppColors.success,
+                            backgroundColor: palette.pine,
                           ),
                         );
                       },
@@ -108,18 +111,28 @@ class AdminKycApprovalsScreen extends StatelessWidget {
     );
   }
 
-  Widget _row(String label, String value, bool isDark) {
+  Widget _row(String label, String value, AppPalette palette, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTypography.caption(isDark: isDark)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: palette.inkSecondary,
+            ),
+          ),
           Flexible(
             child: Text(
               value,
-              style: AppTypography.headingSmall(isDark: isDark).copyWith(fontSize: 12.5, fontWeight: FontWeight.w600),
               textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: palette.ink,
+              ),
             ),
           ),
         ],

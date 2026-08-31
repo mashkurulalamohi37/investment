@@ -2,51 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'app_button.dart';
+import 'package:swapnojatri/core/widgets/app_button.dart';
 
 class SuccessModal extends StatelessWidget {
   final String title;
   final String description;
-  final List<Widget> summaryItems;
   final String primaryButtonText;
   final VoidCallback onPrimaryPressed;
   final String? secondaryButtonText;
   final VoidCallback? onSecondaryPressed;
+  final List<Widget> summaryItems;
   final bool isBangla;
 
   const SuccessModal({
     super.key,
     required this.title,
     required this.description,
-    this.summaryItems = const [],
     required this.primaryButtonText,
     required this.onPrimaryPressed,
     this.secondaryButtonText,
     this.onSecondaryPressed,
+    this.summaryItems = const [],
     this.isBangla = false,
   });
 
-  static Future<void> show(
+  static void show(
     BuildContext context, {
     required String title,
     required String description,
-    List<Widget> summaryItems = const [],
     required String primaryButtonText,
     required VoidCallback onPrimaryPressed,
     String? secondaryButtonText,
     VoidCallback? onSecondaryPressed,
+    List<Widget> summaryItems = const [],
     bool isBangla = false,
   }) {
-    return showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => SuccessModal(
         title: title,
         description: description,
-        summaryItems: summaryItems,
         primaryButtonText: primaryButtonText,
         onPrimaryPressed: onPrimaryPressed,
+        summaryItems: summaryItems,
         secondaryButtonText: secondaryButtonText,
         onSecondaryPressed: onSecondaryPressed,
         isBangla: isBangla,
@@ -56,28 +56,29 @@ class SuccessModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        color: palette.surface,
+        borderRadius: AppRadius.borderSheet,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Animated Success Icon with pulsing halo
+          // Animated Success Icon
           Container(
             width: 72,
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.success.withValues(alpha: 0.15),
-              border: Border.all(color: AppColors.success.withValues(alpha: 0.4), width: 2),
+              color: palette.pineTint,
+              border: Border.all(color: palette.pine.withValues(alpha: 0.3), width: 2),
             ),
-            child: const Center(
-              child: Icon(Icons.check_circle_rounded, size: 44, color: AppColors.success),
+            child: Center(
+              child: Icon(Icons.check_circle_rounded, size: 44, color: palette.pine),
             ),
           ),
           const SizedBox(height: 18),
@@ -99,10 +100,10 @@ class SuccessModal extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : AppColors.lightBg,
-                borderRadius: AppRadius.borderMd,
+                color: palette.surfaceSunken,
+                borderRadius: AppRadius.borderCard,
                 border: Border.all(
-                  color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                  color: palette.rule,
                   width: 1,
                 ),
               ),
@@ -119,7 +120,7 @@ class SuccessModal extends StatelessWidget {
             variant: AppButtonVariant.primary,
             isBangla: isBangla,
           ),
-          if (secondaryButtonText != null && onSecondaryPressed != null) ...[
+          if (secondaryButtonText != null) ...[
             const SizedBox(height: 10),
             AppButton(
               label: secondaryButtonText!,
@@ -128,7 +129,6 @@ class SuccessModal extends StatelessWidget {
               isBangla: isBangla,
             ),
           ],
-          const SizedBox(height: 8),
         ],
       ),
     );

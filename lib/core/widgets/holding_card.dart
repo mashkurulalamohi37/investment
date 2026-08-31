@@ -6,6 +6,7 @@ import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/amount_text.dart';
 import 'package:swapnojatri/core/widgets/seal_painter.dart';
 
+/// Wise-Inspired Holding Card (Clean, Flat, Pure White with Bold Paddy Green Figures)
 class HoldingCard extends StatelessWidget {
   final double totalInvested;
   final int totalShares;
@@ -32,92 +33,103 @@ class HoldingCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: isDark ? AppColors.holdingCardGradientDark : AppColors.holdingCardGradientLight,
+        color: palette.surface,
         borderRadius: AppRadius.borderHero,
         border: Border.all(
-          color: palette.brass.withValues(alpha: isDark ? 0.35 : 0.25),
-          width: 1.2,
+          color: palette.rule,
+          width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: palette.pine.withValues(alpha: isDark ? 0.5 : 0.15),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 18,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
-      padding: const EdgeInsets.all(22.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Top Row: Gold Matra Line + Official Stamp Seal
+          // 1. Top Row: Section Label Badge + Official Seal
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 38,
-                height: 2.0,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: palette.brass,
-                  borderRadius: BorderRadius.circular(1),
+                  color: palette.pineTint,
+                  borderRadius: AppRadius.borderChip,
+                ),
+                child: Text(
+                  isBangla ? 'আপনার মোট জমি বিনিয়োগ' : 'TOTAL ASSET HOLDING',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: palette.pine,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
-              SealWidget(size: 26, isBangla: isBangla),
+              SealWidget(size: 24, isBangla: isBangla),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // 2. Section Label
-          Text(
-            isBangla ? 'আপনার মোট জমি বিনিয়োগ' : 'Total Asset-Backed Holding',
-            style: AppTypography.caption(isBangla: isBangla).copyWith(
-              color: Colors.white.withValues(alpha: 0.72),
-              fontSize: 12,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(height: 4),
-
-          // 3. Amount in AmountHero with Champagne Gold accent
+          // 2. Bold Paddy Green Balance Amount
           AmountText(
             amount: totalInvested,
             isBangla: isBangla,
             animate: true,
-            style: AppTypography.amountHero(isBangla: isBangla, color: Colors.white).copyWith(
+            style: AppTypography.amountHero(isBangla: isBangla, color: palette.pine).copyWith(
               fontSize: 34,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 18),
 
-          // 4. Hairline Divider at 12% Opacity
-          Divider(
-            color: Colors.white.withValues(alpha: 0.12),
-            height: 1.0,
-          ),
-          const SizedBox(height: 16),
-
-          // 5. Two-Column Ruled Table
-          _tableRow(
-            label1: isBangla ? 'মালিকানা অংশ' : 'Shares Allocated',
-            val1: isBangla
-                ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())}/১০০ অংশ'
-                : '$totalShares of 100 Shares',
-            label2: isBangla ? 'নির্দিষ্ট লট নং' : 'Cadastral Lots',
-            val2: 'LOT-041..044',
-            palette: palette,
-            isBangla: isBangla,
-          ),
-          const SizedBox(height: 12),
-          _tableRow(
-            label1: isBangla ? 'হেফাজতকারী ব্যাংক' : 'Custody Escrow',
-            val1: isBangla ? 'সিটি ব্যাংক পিএলসি' : 'City Bank PLC',
-            label2: isBangla ? 'অর্জিত লভ্যাংশ' : 'Dividends Paid',
-            val2: CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
-            val2Color: palette.brassLight,
-            palette: palette,
-            isBangla: isBangla,
+          // 3. Ruled 2-Column Stat Well in Soft Sunken Tint
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: palette.surfaceSunken,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: palette.rule, width: 1.0),
+            ),
+            child: Column(
+              children: [
+                _tableRow(
+                  label1: isBangla ? 'মালিকানা অংশ' : 'Shares Allocated',
+                  val1: isBangla
+                      ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())}/১০০ অংশ'
+                      : '$totalShares of 100 Shares',
+                  label2: isBangla ? 'নির্দিষ্ট লট নং' : 'Cadastral Lots',
+                  val2: 'LOT-041..044',
+                  palette: palette,
+                  isDark: isDark,
+                  isBangla: isBangla,
+                ),
+                Divider(
+                  color: palette.rule,
+                  height: 16,
+                  thickness: 0.8,
+                ),
+                _tableRow(
+                  label1: isBangla ? 'হেফাজতকারী ব্যাংক' : 'Custody Escrow',
+                  val1: isBangla ? 'সিটি ব্যাংক পিএলসি' : 'City Bank PLC',
+                  label2: isBangla ? 'অর্জিত লভ্যাংশ' : 'Dividends Paid',
+                  val2: CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
+                  val2Color: palette.pine,
+                  palette: palette,
+                  isDark: isDark,
+                  isBangla: isBangla,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -131,6 +143,7 @@ class HoldingCard extends StatelessWidget {
     required String val2,
     Color? val2Color,
     required AppPalette palette,
+    required bool isDark,
     required bool isBangla,
   }) {
     return Row(
@@ -141,44 +154,45 @@ class HoldingCard extends StatelessWidget {
             children: [
               Text(
                 label1,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+                style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+                  color: palette.inkSecondary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 val1,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: palette.ink,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        Container(
+          width: 1,
+          height: 26,
+          color: palette.rule,
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label2,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+                style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
+                  color: palette.inkSecondary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 val2,
-                style: TextStyle(
-                  color: val2Color ?? Colors.white,
-                  fontSize: 13,
+                style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w700,
+                  color: val2Color ?? palette.ink,
                 ),
               ),
             ],
@@ -188,6 +202,3 @@ class HoldingCard extends StatelessWidget {
     );
   }
 }
-
-// Backward compatibility alias for PortfolioHeroCard
-typedef PortfolioHeroCard = HoldingCard;

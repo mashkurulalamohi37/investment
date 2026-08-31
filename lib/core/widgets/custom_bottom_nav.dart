@@ -66,13 +66,13 @@ class CustomBottomNav extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Active Gold Indicator Bar
+                        // Active Indicator Bar
                         Container(
                           width: 16,
                           height: 2,
                           margin: const EdgeInsets.only(bottom: 4),
                           decoration: BoxDecoration(
-                            color: isSelected ? palette.brass : Colors.transparent,
+                            color: isSelected ? palette.pine : Colors.transparent,
                             borderRadius: BorderRadius.circular(1),
                           ),
                         ),

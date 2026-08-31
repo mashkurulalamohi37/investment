@@ -105,7 +105,7 @@ class ProjectCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                     decoration: BoxDecoration(
                       color: palette.surfaceSunken,
-                      borderRadius: AppRadius.borderChip,
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: palette.rule, width: 1.0),
                     ),
                     child: Row(

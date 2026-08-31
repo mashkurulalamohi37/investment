@@ -19,6 +19,7 @@ class ErrorStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
@@ -30,11 +31,11 @@ class ErrorStateView extends StatelessWidget {
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.errorLight,
+                color: palette.vermilion.withValues(alpha: 0.10),
               ),
-              child: const Icon(Icons.error_outline_rounded, size: 36, color: AppColors.error),
+              child: Icon(Icons.error_outline_rounded, size: 36, color: palette.vermilion),
             ),
             const SizedBox(height: 16),
             Text(

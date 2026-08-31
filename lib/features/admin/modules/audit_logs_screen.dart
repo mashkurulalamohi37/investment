@@ -15,12 +15,13 @@ class AdminAuditLogsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
     final logs = state.auditLogs;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
           isBangla ? 'অডিট লগ ও নিরাপত্তা ট্রেইল' : 'Immutable Audit Logs',
@@ -42,10 +43,11 @@ class AdminAuditLogsScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderMd,
+                    color: palette.surface,
+                    borderRadius: AppRadius.borderCard,
                     border: Border.all(
-                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                      color: palette.rule,
+                      width: 1.0,
                     ),
                   ),
                   child: Column(
@@ -55,15 +57,15 @@ class AdminAuditLogsScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: AppColors.primarySubtle,
-                              borderRadius: AppRadius.borderXs,
+                              color: palette.pineTint,
+                              borderRadius: AppRadius.borderChip,
                             ),
                             child: Text(
                               log.action,
                               style: AppTypography.caption().copyWith(
-                                color: AppColors.primaryDark,
+                                color: palette.pineDeep,
                                 fontFamily: 'monospace',
                                 fontWeight: FontWeight.w700,
                               ),

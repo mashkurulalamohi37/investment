@@ -18,12 +18,13 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
     final investments = state.investments;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
           isBangla ? 'বিনিয়োগ যাচাই ও শেয়ার লট বরাদ্দ' : 'Investments & Share Allocation',
@@ -38,15 +39,15 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
-                borderRadius: AppRadius.borderLg,
+                color: palette.pineTint,
+                borderRadius: AppRadius.borderCard,
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.25),
+                  color: palette.pine.withValues(alpha: 0.25),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primary, size: 28),
+                  Icon(Icons.admin_panel_settings_rounded, color: palette.pine, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -83,10 +84,11 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkCard : Colors.white,
-                    borderRadius: AppRadius.borderLg,
+                    color: palette.surface,
+                    borderRadius: AppRadius.borderCard,
                     border: Border.all(
-                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                      color: palette.rule,
+                      width: 1.0,
                     ),
                   ),
                   child: Column(
@@ -116,17 +118,17 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Divider(height: 1),
+                      Divider(color: palette.rule, height: 1),
                       const SizedBox(height: 10),
 
-                      _infoRow(isBangla ? 'আবেদনকৃত শেয়ার' : 'Shares', '${inv.shares} Shares (@ ৳${inv.unitPrice.toInt()})', isDark),
-                      _infoRow(isBangla ? 'মোট অর্থ' : 'Total Amount', CurrencyFormatter.format(inv.grossAmount, isBangla: isBangla), isDark),
-                      _infoRow(isBangla ? 'পেমেন্ট চ্যানেল' : 'Payment Method', inv.paymentMethod ?? 'Bank Transfer', isDark),
-                      _infoRow(isBangla ? 'ট্রানজেকশন রেফারেন্স' : 'Transaction Ref', inv.paymentReference ?? 'N/A', isDark),
+                      _infoRow(isBangla ? 'আবেদনকৃত শেয়ার' : 'Shares', '${inv.shares} Shares (@ ৳${inv.unitPrice.toInt()})', palette, isDark),
+                      _infoRow(isBangla ? 'মোট অর্থ' : 'Total Amount', CurrencyFormatter.format(inv.grossAmount, isBangla: isBangla), palette, isDark),
+                      _infoRow(isBangla ? 'পেমেন্ট চ্যানেল' : 'Payment Method', inv.paymentMethod ?? 'Bank Transfer', palette, isDark),
+                      _infoRow(isBangla ? 'ট্রানজেকশন রেফারেন্স' : 'Transaction Ref', inv.paymentReference ?? 'N/A', palette, isDark),
 
                       if (inv.allocatedLotNumbers.isNotEmpty) ...[
                         const SizedBox(height: 6),
-                        _infoRow(isBangla ? 'বরাদ্দকৃত লট' : 'Allocated Lots', inv.allocatedLotNumbers.join(', '), isDark),
+                        _infoRow(isBangla ? 'বরাদ্দকৃত লট' : 'Allocated Lots', inv.allocatedLotNumbers.join(', '), palette, isDark),
                       ],
 
                       if (inv.status == InvestmentStatus.pending) ...[
@@ -142,7 +144,7 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
                                       ? 'পেমেন্ট সফলভাবে যাচাই হয়েছে এবং শেয়ার লট বরাদ্দ সম্পন্ন হয়েছে!'
                                       : 'Payment verified and share lots allocated atomically!',
                                 ),
-                                backgroundColor: AppColors.success,
+                                backgroundColor: palette.pine,
                               ),
                             );
                           },
@@ -161,18 +163,28 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, bool isDark) {
+  Widget _infoRow(String label, String value, AppPalette palette, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTypography.caption(isDark: isDark)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: palette.inkSecondary,
+            ),
+          ),
           Flexible(
             child: Text(
               value,
-              style: AppTypography.headingSmall(isDark: isDark).copyWith(fontSize: 12.5, fontWeight: FontWeight.w700),
               textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: palette.ink,
+              ),
             ),
           ),
         ],
