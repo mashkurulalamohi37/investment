@@ -1,0 +1,1425 @@
+SWAPNOJATRI INVESTMENT PLATFORM
+
+Technical Product Requirements & Software Specification
+
+Project: LandVest 100
+
+Document Version: V1.0
+
+Prepared for: Development Team
+
+Date: 31 August 2026
+
+উদ্দেশ্য: একটি scalable, secure, audit-friendly project-based investment management ও transparency platform তৈরি করা, যেখানে Investor ও Admin project, investment, fund movement, asset, profit/distribution এবং supporting documents দেখতে ও পরিচালনা করতে পারবে।
+
+1. Executive Summary
+
+Swapnojatri Investment Platform হবে একটি multi-project investment management system। প্রথম project LandVest 100; ভবিষ্যতে একই platform-এ নতুন project যোগ করা যাবে।
+
+Parameter
+
+LandVest 100
+
+Total Shares
+
+100
+
+Price per Share
+
+৳25,500
+
+Target Fund
+
+৳25,50,000
+
+Investor Limit
+
+Business rule অনুযায়ী 1–4 shares
+
+Purpose
+
+ঢাকায় জমির share/land-related investment
+
+Return
+
+Actual project profit-এর নির্ধারিত share; guaranteed return নয়
+
+1.1 Goals
+
+Investor নিজের investment ও transaction বুঝতে পারবে
+
+Project fund collection/utilization স্বচ্ছ হবে
+
+প্রতিটি financial event-এর audit trail থাকবে
+
+Documents, expenses, assets, profit ও distribution এক জায়গায় থাকবে
+
+একই architecture দিয়ে বহু project চালানো যাবে
+
+Mobile-first ও সহজ UI হবে
+
+2. Product Scope
+
+2.1 In Scope
+
+Public website/project pages
+
+Investor registration, OTP login ও profile
+
+Project discovery ও detail
+
+Share reservation/allocation
+
+Payment verification ও reconciliation
+
+Investor portfolio
+
+Transaction ledger
+
+Fund utilization/expense ledger
+
+Asset/land records
+
+Project timeline
+
+Profit/distribution workflow
+
+Document vault
+
+Notifications
+
+Admin dashboard
+
+RBAC
+
+Audit log
+
+Reports/export
+
+Backup/security/monitoring
+
+2.2 V1 Out of Scope
+
+নিজস্ব banking system
+
+Guaranteed profit engine
+
+Anonymous investment
+
+Public secondary trading
+
+Financial records hard-delete
+
+3. Roles & Permissions
+
+Role
+
+Permissions
+
+Super Admin
+
+সব settings, users, projects, finance, roles, audit logs
+
+Project Manager
+
+Assigned projects, milestones, documents, updates
+
+Finance Manager
+
+Payments, transactions, expenses, reconciliation, reports
+
+Compliance/KYC
+
+KYC review/status
+
+Support
+
+Investor view/support; financial edit নয়
+
+Investor
+
+নিজের portfolio/transactions/documents; public project data
+
+RBAC backend API level-এ enforce করতে হবে; শুধু UI button hide করা security নয়।
+
+4. Information Architecture
+
+Public: Home → Projects → Project Details → FAQ → Login/Register
+
+Investor: Dashboard → My Projects → Project Detail → My Investment → Transactions → Profit/Distribution → Documents → Notifications → Profile/KYC → Support
+
+Admin: Dashboard → Projects → Investors → Investments → Payments → Fund Utilization → Assets → Profit & Distribution → Documents → Reports → Notifications → Audit Logs → Settings
+
+5. Screen Requirements
+
+5.1 Public Home
+
+Platform introduction
+
+Active project cards
+
+Funding progress
+
+Verified aggregate metrics
+
+How it works
+
+Risk/legal notice
+
+Login/Register CTA
+
+5.2 Project Details
+
+Project name/status
+
+Target & collected fund
+
+Allocated/available shares
+
+Objective
+
+Investment unit
+
+Use-of-funds summary
+
+Timeline
+
+Publishable asset information
+
+Public documents
+
+Risk disclosure
+
+Last updated
+
+5.3 Investor Dashboard
+
+Total invested
+
+Active investments
+
+Total shares
+
+Realized profit received
+
+Pending distribution
+
+Recent transactions
+
+Project updates
+
+Statements/documents
+
+5.4 My Investment
+
+Investment ID
+
+Project
+
+Shares
+
+Unit price
+
+Gross/net investment
+
+Fees if applicable
+
+Date
+
+Status
+
+Payment references
+
+5.5 Transactions
+
+Credit/debit ledger
+
+Project/date/type/status filters
+
+Transaction ID
+
+Immutable timestamp
+
+PDF/CSV statement
+
+5.6 Fund Utilization
+
+Opening fund
+
+Expense list
+
+Category/payee/date/amount
+
+Supporting bill
+
+Approver
+
+Running balance
+
+Remaining balance
+
+5.7 Profit & Distribution
+
+Revenue
+
+Realized expenses
+
+Realized profit
+
+Distribution pool
+
+Investor entitlement
+
+Draft→Approved→Processing→Paid/Failed
+
+5.8 Document Vault
+
+Category
+
+Version
+
+Upload date
+
+Public/Investor/Admin visibility
+
+Secure download
+
+Checksum recommended
+
+6. Core Business Rules
+
+LandVest 100-এ total shares = 100; share price = ৳25,500; target = ৳25,50,000।
+
+Investment amount = allocated shares × unit price.
+
+Payment verified না হওয়া পর্যন্ত allocation Pending থাকবে, যদি business policy তাই নির্ধারণ করে।
+
+একটি share একই সময়ে দুই investor-কে allocate করা যাবে না; DB transaction/locking আবশ্যক।
+
+Cancellation/refund হলে reversal + audit event তৈরি হবে; original financial record hard-delete করা যাবে না।
+
+Profit distribution শুধুমাত্র approved/realized figures থেকে হবে।
+
+Estimated ও Realized value আলাদা field ও UI label হবে।
+
+Critical financial edit-এ before/after value, actor, time ও reason audit log-এ থাকবে।
+
+7. Database Architecture
+
+Recommended database: PostgreSQL. Money floating-point-এ রাখা যাবে না; Decimal(18,2) বা smallest-unit integer convention একভাবে ব্যবহার করতে হবে।
+
+users
+
+Field
+
+Notes
+
+id
+
+UUID PK
+
+name
+
+phone
+
+UNIQUE
+
+email
+
+password_hash
+
+status
+
+created_at
+
+updated_at
+
+roles
+
+Field
+
+Notes
+
+id
+
+name
+
+user_roles
+
+Field
+
+Notes
+
+user_id
+
+FK
+
+role_id
+
+FK
+
+projects
+
+Field
+
+Notes
+
+id
+
+UUID PK
+
+code
+
+UNIQUE
+
+name
+
+description
+
+status
+
+target_amount
+
+share_count
+
+share_price
+
+start_date
+
+end_date
+
+investments
+
+Field
+
+Notes
+
+id
+
+UUID PK
+
+investment_no
+
+UNIQUE
+
+user_id
+
+FK
+
+project_id
+
+FK
+
+shares
+
+unit_price
+
+gross_amount
+
+fees
+
+net_amount
+
+status
+
+created_at
+
+share_allocations
+
+Field
+
+Notes
+
+id
+
+project_id
+
+FK
+
+investment_id
+
+FK
+
+share_no/lot_no
+
+status
+
+allocated_at
+
+payments
+
+Field
+
+Notes
+
+id
+
+investment_id
+
+FK
+
+amount
+
+method
+
+reference
+
+received_at
+
+verified_by
+
+status
+
+transactions
+
+Field
+
+Notes
+
+id
+
+project_id
+
+FK
+
+user_id
+
+investment_id
+
+type
+
+direction
+
+amount
+
+balance_after
+
+reference
+
+created_at
+
+expenses
+
+Field
+
+Notes
+
+id
+
+project_id
+
+FK
+
+category
+
+description
+
+payee
+
+amount
+
+expense_date
+
+status
+
+approved_by
+
+document_id
+
+assets
+
+Field
+
+Notes
+
+id
+
+project_id
+
+FK
+
+asset_type
+
+title
+
+description
+
+purchase_value
+
+current_value
+
+ownership_reference
+
+status
+
+profit_periods
+
+Field
+
+Notes
+
+id
+
+project_id
+
+FK
+
+period_start
+
+period_end
+
+revenue
+
+realized_expense
+
+realized_profit
+
+distribution_pool
+
+status
+
+distributions
+
+Field
+
+Notes
+
+id
+
+profit_period_id
+
+FK
+
+user_id
+
+FK
+
+investment_id
+
+FK
+
+eligible_shares
+
+amount
+
+status
+
+paid_at
+
+payment_reference
+
+documents
+
+Field
+
+Notes
+
+id
+
+project_id
+
+user_id
+
+category
+
+file_name
+
+storage_key
+
+mime_type
+
+file_size
+
+version
+
+visibility
+
+checksum
+
+uploaded_by
+
+created_at
+
+notifications
+
+Field
+
+Notes
+
+id
+
+user_id
+
+project_id
+
+title
+
+body
+
+type
+
+read_at
+
+created_at
+
+audit_logs
+
+Field
+
+Notes
+
+id
+
+actor_user_id
+
+entity_type
+
+entity_id
+
+action
+
+before_json
+
+after_json
+
+metadata
+
+created_at
+
+kyc_records
+
+Field
+
+Notes
+
+id
+
+user_id
+
+status
+
+verified_by
+
+verified_at
+
+notes
+
+created_at
+
+nominees
+
+Field
+
+Notes
+
+id
+
+user_id
+
+name
+
+relationship
+
+contact
+
+percentage
+
+created_at
+
+8. API Design
+
+REST API recommended; base path /api/v1. Protected endpoints must authenticate, authorize role/object ownership and return a request_id.
+
+Method
+
+Endpoint
+
+Purpose
+
+POST
+
+/auth/register
+
+Registration
+
+POST
+
+/auth/login
+
+Login
+
+POST
+
+/auth/otp/request
+
+OTP
+
+POST
+
+/auth/otp/verify
+
+OTP verification
+
+GET
+
+/projects
+
+Project list
+
+GET
+
+/projects/:id
+
+Project detail
+
+POST
+
+/investments
+
+Investment request
+
+GET
+
+/me/investments
+
+Portfolio
+
+GET
+
+/me/transactions
+
+Ledger
+
+GET
+
+/me/distributions
+
+Distributions
+
+GET
+
+/me/documents
+
+Documents
+
+POST
+
+/admin/payments/:id/verify
+
+Verify payment
+
+POST
+
+/admin/investments/:id/allocate
+
+Allocate shares
+
+POST
+
+/admin/expenses
+
+Create expense
+
+POST
+
+/admin/expenses/:id/approve
+
+Approve expense
+
+POST
+
+/admin/profit-periods
+
+Create profit period
+
+POST
+
+/admin/distributions/calculate
+
+Calculate
+
+POST
+
+/admin/distributions/:id/approve
+
+Approve
+
+POST
+
+/admin/distributions/:id/mark-paid
+
+Mark paid
+
+GET
+
+/admin/audit-logs
+
+Audit log
+
+Success format: {"success":true,"data":{},"meta":{}}
+
+Error format: {"success":false,"error":{"code":"VALIDATION_ERROR","message":"...","fields":{}},"request_id":"..."}
+
+Financial endpoints-এ Idempotency-Key ব্যবহার করতে হবে।
+
+9. Financial Engine
+
+9.1 Base Calculation
+
+100 × ৳25,500 = ৳25,50,000 target fund.
+
+9.2 Investor Example
+
+Shares
+
+Investment
+
+1
+
+৳25,500
+
+2
+
+৳51,000
+
+4
+
+৳1,02,000
+
+9.3 Distribution
+
+Recommended engine: pro-rata by eligible shares, configurable fees/tax fields, custom allocation where legally/business-approved, and mandatory reason for manual adjustment.
+
+Example: Investor Distribution = Distribution Pool × Investor Eligible Shares ÷ Total Eligible Shares.
+
+Estimated profit কখনো Guaranteed Profit হিসেবে দেখানো যাবে না।
+
+10. Critical Workflows
+
+10.1 Investor Onboarding
+
+Register
+
+OTP verify
+
+Profile complete
+
+KYC if required
+
+Compliance review
+
+Activate
+
+10.2 Investment
+
+Select project
+
+Check available shares
+
+Select shares
+
+Calculate amount
+
+Create request
+
+Capture payment reference
+
+Finance verifies
+
+Atomically allocate shares
+
+Generate receipt
+
+Notify investor
+
+10.3 Expense
+
+Create expense
+
+Attach bill
+
+Approval
+
+Post to ledger
+
+Update running balance
+
+Audit
+
+10.4 Profit Distribution
+
+Close period
+
+Reconcile revenue/expenses
+
+Calculate realized profit
+
+Approve pool
+
+Calculate investor entitlement
+
+Second approval if configured
+
+Process payments
+
+Record paid/reference
+
+Notify
+
+11. Security Requirements
+
+HTTPS/HSTS
+
+Argon2id/bcrypt password hashing
+
+OTP expiry/rate limits
+
+Short-lived access token + refresh rotation or secure sessions
+
+Server-side RBAC and object ownership checks
+
+MFA for critical admin actions
+
+Parameterized DB queries
+
+XSS/CSRF protection
+
+Private file storage + signed URLs + MIME/size validation + malware scanning
+
+Encryption at rest for sensitive data where appropriate
+
+Secrets manager/environment variables
+
+Append-only audit log
+
+Encrypted automated backups + restore tests
+
+Rate limiting, anomaly monitoring, structured logs
+
+12. Compliance & Legal Controls
+
+Software architecture legal approval-এর বিকল্প নয়। মানুষের কাছ থেকে অর্থ সংগ্রহ, project-based investment, profit sharing, land/share ownership, custody এবং payout-এর কাঠামো বাংলাদেশে প্রযোজ্য আইন ও regulatory requirements অনুযায়ী launch-এর আগে legal/compliance professional দিয়ে যাচাই করতে হবে।
+
+Investment Agreement versioning
+
+Risk disclosure acknowledgement
+
+Terms/Privacy acceptance logs
+
+KYC/AML requirements where applicable
+
+Tax/reporting fields configurable
+
+No guaranteed-return wording unless legally valid
+
+13. UI/UX Standards
+
+Modern fintech-style, clean and trustworthy
+
+Mobile-first responsive design
+
+Bangla-first; English-ready
+
+৳ currency formatting
+
+Clear status chips
+
+Accessible charts with text summary
+
+Prominent investment/fund/utilized/remaining/realized profit
+
+Last Updated timestamp on financial screens
+
+Never expose another investor's private data
+
+14. Admin Dashboard
+
+Module
+
+Required Functions
+
+Overview
+
+KPIs, projects, collection, utilization, distributions, alerts
+
+Projects
+
+Create/edit/status/milestones/settings
+
+Investors
+
+Search/profile/KYC/portfolio
+
+Investments
+
+Review/approve/allocate/cancel/refund
+
+Payments
+
+Verify/reject/reconcile
+
+Expenses
+
+Create/bill/approve/reverse
+
+Assets
+
+Purchase/value/reference/documents
+
+Profit
+
+Periods/reconciliation/distribution
+
+Documents
+
+Upload/version/visibility
+
+Notifications
+
+Broadcast/project/investor
+
+Reports
+
+PDF/CSV exports
+
+Audit
+
+Searchable immutable log
+
+Settings
+
+Roles/permissions/templates/system config
+
+15. Reports
+
+Project collection
+
+Share allocation
+
+Investor statement
+
+Payment reconciliation
+
+Expense report
+
+Project balance
+
+Asset register
+
+Profit period
+
+Distribution
+
+Pending payments
+
+Audit activity
+
+PDF ও CSV export; export action audit log-এ record করতে হবে।
+
+16. Notifications
+
+Event
+
+Message Type
+
+Investment confirmed
+
+Investment confirmation
+
+Share allocated
+
+Allocation confirmation
+
+Project update
+
+New update
+
+Document added
+
+New document
+
+Distribution approved
+
+Approval
+
+Distribution paid
+
+Payout confirmation
+
+17. Non-Functional Requirements
+
+Area
+
+Requirement
+
+Performance
+
+Common API p95 target <500ms under expected load; heavy reports async
+
+Reliability
+
+Financial operations use DB transactions
+
+Scalability
+
+Multi-project/multi-investor; pagination
+
+Consistency
+
+No duplicate allocation/payment
+
+Accessibility
+
+Semantic UI, keyboard navigation, readable contrast
+
+Localization
+
+Bangla + English-ready
+
+Observability
+
+Structured logs, request IDs, error tracking, metrics
+
+Backup
+
+Automated encrypted backup + restore drill
+
+18. QA & Acceptance Criteria
+
+Cannot allocate more shares than available
+
+Investor cannot access another investor's data by changing IDs
+
+Duplicate payment cannot create duplicate transaction
+
+Reversal preserves original record
+
+Project balance matches approved ledger
+
+Distribution cannot exceed approved pool
+
+Critical changes always create audit logs
+
+Mobile browser compatibility
+
+18.1 Testing
+
+Unit
+
+Integration/API
+
+Concurrency/database
+
+RBAC/security
+
+End-to-end
+
+Load/performance
+
+Backup/restore
+
+UAT
+
+19. Technical Stack Recommendation
+
+Frontend: Next.js + React + TypeScript + Tailwind CSS. Backend: NestJS/Node.js or equivalent typed API framework. Database: PostgreSQL. Optional Redis for queues/cache. Private object storage for documents. CDN/WAF/reverse proxy as appropriate.
+
+Environments: Development → Staging → Production. Production DB development/testing-এ ব্যবহার করা যাবে না।
+
+20. CI/CD & Deployment
+
+Git repository + protected main
+
+PR review
+
+Automated lint/typecheck/test
+
+Staging deployment
+
+Production approval gate
+
+Versioned DB migrations
+
+Rollback plan
+
+Monitoring and alerting
+
+21. Development Roadmap
+
+Phase
+
+Deliverable
+
+0
+
+Business/legal rules freeze + data dictionary
+
+1
+
+UX wireframe + design system
+
+2
+
+DB + auth + RBAC + backend foundation
+
+3
+
+Investor portal
+
+4
+
+Admin + finance + fund utilization
+
+5
+
+Profit/distribution + documents + audit
+
+6
+
+Reports + notifications + security hardening
+
+7
+
+QA/UAT + deployment + training
+
+22. Developer Deliverables
+
+Frontend + backend source code
+
+DB schema/migrations
+
+OpenAPI/Swagger API docs
+
+Architecture diagram + ERD
+
+Environment template
+
+Deployment guide
+
+Admin manual
+
+Investor guide
+
+Automated tests
+
+Security checklist
+
+Backup/restore procedure
+
+Data export procedure
+
+Production build
+
+23. V1 vs Power Features
+
+V1 Must-Have
+
+Power Features
+
+Auth/OTP
+
+Passkeys/MFA
+
+Projects
+
+Advanced analytics
+
+Investments
+
+Automated payment reconciliation
+
+Portfolio
+
+Performance analytics
+
+Transactions
+
+Automated statements
+
+Fund utilization
+
+Multi-level approval
+
+Documents
+
+Checksum/versioning
+
+Distribution
+
+Automated payout integration
+
+RBAC
+
+Fine-grained policy engine
+
+Audit
+
+Tamper-evident audit storage
+
+24. Pre-Launch Checklist
+
+Legal structure and investment documents approved
+
+Profit formula/eligibility frozen
+
+Payment/reconciliation process defined
+
+KYC requirements confirmed
+
+Admin approval matrix configured
+
+LandVest 100 seed data verified
+
+All calculations tested
+
+Security review completed
+
+Backup restore tested
+
+Monitoring enabled
+
+Terms/Privacy/Risk Disclosure published
+
+UAT sign-off
+
+25. LandVest 100 Seed Data
+
+Field
+
+Initial Value
+
+Project Code
+
+LV100
+
+Project Name
+
+LandVest 100
+
+Shares
+
+100
+
+Share Price
+
+৳25,500
+
+Target Fund
+
+৳25,50,000
+
+Currency
+
+BDT
+
+Type
+
+Land-related project investment
+
+Initial Status
+
+Draft/Active — Admin controlled
+
+Production-এর আগে exact investment terms, profit-sharing formula, fees, refund/cancellation rules, eligibility, legal structure ও disclosures লিখিতভাবে freeze করতে হবে।
+
+END OF TECHNICAL REQUIREMENTS — SWAPNOJATRI INVESTMENT PLATFORM V1.0

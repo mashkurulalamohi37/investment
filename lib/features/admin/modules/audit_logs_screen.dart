@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:swapnojatri/core/theme/app_colors.dart';
+import 'package:swapnojatri/core/theme/app_radius.dart';
+import 'package:swapnojatri/core/theme/app_typography.dart';
+import 'package:swapnojatri/core/localization/currency_formatter.dart';
+import 'package:swapnojatri/data/state/app_state.dart';
+
+class AdminAuditLogsScreen extends StatelessWidget {
+  final AppState state;
+
+  const AdminAuditLogsScreen({
+    super.key,
+    required this.state,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isBangla = state.isBangla;
+    final logs = state.auditLogs;
+
+    return Scaffold(
+      backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
+      appBar: AppBar(
+        title: Text(
+          isBangla ? 'অডিট লগ ও নিরাপত্তা ট্রেইল' : 'Immutable Audit Logs',
+          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isBangla ? 'সকল আর্থিক ও প্রশাসনিক কার্যকলাপ (${logs.length})' : 'Append-Only Action Trail (${logs.length})',
+              style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+            ),
+            const SizedBox(height: 12),
+
+            ...logs.map((log) => Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkCard : Colors.white,
+                    borderRadius: AppRadius.borderMd,
+                    border: Border.all(
+                      color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primarySubtle,
+                              borderRadius: AppRadius.borderXs,
+                            ),
+                            child: Text(
+                              log.action,
+                              style: AppTypography.caption().copyWith(
+                                color: AppColors.primaryDark,
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            CurrencyFormatter.formatDate(log.timestamp, isBangla: isBangla),
+                            style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        log.details,
+                        style: AppTypography.bodySmall(isDark: isDark, isBangla: isBangla).copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Actor: ${log.actorName} (${log.actorRole})',
+                            style: AppTypography.caption(isDark: isDark).copyWith(fontSize: 10.5),
+                          ),
+                          Text(
+                            'IP: ${log.ipAddress}',
+                            style: AppTypography.caption(isDark: isDark).copyWith(fontFamily: 'monospace', fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+}
