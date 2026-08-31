@@ -4,10 +4,19 @@ import 'app_colors.dart';
 import 'app_radius.dart';
 
 class AppTheme {
-  static ThemeData light({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
-    final palette = flavor == AppPaletteFlavor.ledgerRed
-        ? AppPalette.ledgerLight
-        : AppPalette.pineLight;
+  static AppPalette getPalette(AppPaletteFlavor flavor, bool isDark) {
+    switch (flavor) {
+      case AppPaletteFlavor.paddyField:
+        return isDark ? AppPalette.paddyDark : AppPalette.paddyLight;
+      case AppPaletteFlavor.ledgerRed:
+        return isDark ? AppPalette.ledgerDark : AppPalette.ledgerLight;
+      case AppPaletteFlavor.pineTreasury:
+        return isDark ? AppPalette.pineDark : AppPalette.pineLight;
+    }
+  }
+
+  static ThemeData light({AppPaletteFlavor flavor = AppPaletteFlavor.paddyField}) {
+    final palette = getPalette(flavor, false);
 
     return ThemeData(
       useMaterial3: true,
@@ -17,7 +26,7 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: palette.pine,
         surface: palette.surface,
-        onPrimary: palette.canvas,
+        onPrimary: Colors.white,
         onSurface: palette.ink,
         outline: palette.rule,
         outlineVariant: palette.ruleStrong,
@@ -47,10 +56,8 @@ class AppTheme {
     );
   }
 
-  static ThemeData dark({AppPaletteFlavor flavor = AppPaletteFlavor.ledgerRed}) {
-    final palette = flavor == AppPaletteFlavor.ledgerRed
-        ? AppPalette.ledgerDark
-        : AppPalette.pineDark;
+  static ThemeData dark({AppPaletteFlavor flavor = AppPaletteFlavor.paddyField}) {
+    final palette = getPalette(flavor, true);
 
     return ThemeData(
       useMaterial3: true,

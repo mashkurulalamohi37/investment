@@ -19,7 +19,7 @@ class AppState extends ChangeNotifier {
   // App Configuration
   bool _isBangla = true; // Bangla-first by default
   ThemeMode _themeMode = ThemeMode.light;
-  AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.ledgerRed; // "Ledger Paper & Registrar's Red"
+  AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.paddyField; // "Paddy Field" (Wise-inspired)
   UserRole _activeRole = UserRole.investor;
 
   // Active Users
@@ -134,9 +134,17 @@ class AppState extends ChangeNotifier {
   }
 
   void togglePaletteFlavor() {
-    _paletteFlavor = _paletteFlavor == AppPaletteFlavor.ledgerRed
-        ? AppPaletteFlavor.pineTreasury
-        : AppPaletteFlavor.ledgerRed;
+    switch (_paletteFlavor) {
+      case AppPaletteFlavor.paddyField:
+        _paletteFlavor = AppPaletteFlavor.ledgerRed;
+        break;
+      case AppPaletteFlavor.ledgerRed:
+        _paletteFlavor = AppPaletteFlavor.pineTreasury;
+        break;
+      case AppPaletteFlavor.pineTreasury:
+        _paletteFlavor = AppPaletteFlavor.paddyField;
+        break;
+    }
     notifyListeners();
   }
 
