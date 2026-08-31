@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
@@ -260,13 +261,9 @@ class _LotMapWidgetState extends State<LotMapWidget> {
     }
 
     if (widget.isCompact) {
-      return AspectRatio(
-        aspectRatio: 1.0,
+      return ClipRect(
         child: Container(
-          decoration: BoxDecoration(
-            color: palette.surfaceSunken,
-            border: Border.all(color: palette.ruleStrong, width: 1.0),
-          ),
+          color: palette.surfaceSunken,
           child: CustomPaint(
             painter: _SurveySheetPainter(
               palette: palette,
@@ -292,53 +289,56 @@ class _LotMapWidgetState extends State<LotMapWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isBangla ? 'প্লট ৪১৮ — ১০০টি চিহ্নিত অংশ' : 'Plot 418 — 100 Surveyed Lots',
-                    style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'প্লট ৪১৮ — ১০০টি চিহ্নিত অংশ' : 'Plot 418 — 100 Surveyed Lots',
+                      style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    isBangla
-                        ? 'মৌজা: বিরুলিয়া, সাভার • আরএস খতিয়ান ৯০২'
-                        : 'Mouza: Birulia, Savar • RS Khatian #902',
-                    style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                      color: palette.inkSecondary,
+                    const SizedBox(height: 2),
+                    Text(
+                      isBangla
+                          ? 'মৌজা: বিরুলিয়া • আরএস খতিয়ান ৯০২'
+                          : 'Mouza: Birulia • RS Khatian #902',
+                      style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                        color: palette.inkSecondary,
+                        fontSize: 11,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: palette.surfaceSunken,
                   borderRadius: AppRadius.borderChip,
                   border: Border.all(color: palette.rule, width: 1.0),
                 ),
                 child: Text(
-                  'CADASTRAL 10×10',
+                  '10×10 LOTS',
                   style: TextStyle(
                     fontFamily: 'monospace',
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w600,
-                    color: palette.inkSecondary,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: palette.pine,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
-
-          // Survey Sheet Canvas with Interactive Grid Overlay
           LayoutBuilder(
             builder: (context, constraints) {
               final size = constraints.maxWidth;
@@ -347,7 +347,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
 
               return Stack(
                 children: [
-                  // Drawn Cadastral Canvas
                   Container(
                     width: size,
                     height: size,
@@ -364,8 +363,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                       ),
                     ),
                   ),
-
-                  // Transparent 44x44 Hit Target Grid Overlay
                   if (widget.isInteractive)
                     Positioned(
                       left: margin,
@@ -414,8 +411,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
             },
           ),
           const SizedBox(height: 12),
-
-          // Scale & Reference Note
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -424,7 +419,7 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                   Container(width: 24, height: 1, color: palette.inkTertiary),
                   const SizedBox(width: 6),
                   Text(
-                    isBangla ? '১ ঘর = ১/১০০ অংশ (০.২২৫ শতাংশ)' : '1 cell = 1/100 share (0.225 dec)',
+                    isBangla ? '১ ঘর = ১/১০০ অংশ' : '1 cell = 1/100 share',
                     style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                       color: palette.inkTertiary,
                       fontSize: 10,
@@ -444,8 +439,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
           const SizedBox(height: 12),
           const Divider(height: 1),
           const SizedBox(height: 12),
-
-          // Ruled Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -484,11 +477,14 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                 box: Container(
                   width: 12,
                   height: 12,
-                  color: palette.pine,
+                  decoration: BoxDecoration(
+                    color: palette.pine,
+                    border: Border.all(color: palette.pine, width: 1.0),
+                  ),
                   child: Center(
                     child: Container(
-                      width: 3,
-                      height: 3,
+                      width: 4,
+                      height: 4,
                       decoration: BoxDecoration(
                         color: palette.brass,
                         shape: BoxShape.circle,
@@ -582,19 +578,28 @@ class _SurveySheetPainter extends CustomPainter {
   });
 
   @override
+  @override
   void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+
     final margin = isCompact ? 0.0 : 16.0;
-    final gridWidth = size.width - (margin * 2);
-    final cellSize = gridWidth / 10.0;
+    final maxGridDimension = isCompact
+        ? math.min(size.width, size.height)
+        : (size.width - (margin * 2));
+    final cellSize = maxGridDimension / 10.0;
+
+    final startX = isCompact ? (size.width - (cellSize * 10)) / 2 : margin;
+    final startY = isCompact ? (size.height - (cellSize * 10)) / 2 : margin;
 
     final cellBorderPaint = Paint()
       ..color = palette.rule
-      ..strokeWidth = 1.0
+      ..strokeWidth = isCompact ? 0.6 : 1.0
       ..style = PaintingStyle.stroke;
 
     final hatchPaint = Paint()
-      ..color = palette.inkTertiary.withValues(alpha: 0.5)
-      ..strokeWidth = 0.8
+      ..color = palette.inkTertiary.withValues(alpha: 0.4)
+      ..strokeWidth = isCompact ? 0.5 : 0.8
       ..style = PaintingStyle.stroke;
 
     final userBgPaint = Paint()
@@ -611,7 +616,7 @@ class _SurveySheetPainter extends CustomPainter {
 
     final selectedBorderPaint = Paint()
       ..color = palette.pine
-      ..strokeWidth = 1.5
+      ..strokeWidth = isCompact ? 1.0 : 1.5
       ..style = PaintingStyle.stroke;
 
     // Draw Margin Coordinates
@@ -646,8 +651,8 @@ class _SurveySheetPainter extends CustomPainter {
       final row = index ~/ 10;
 
       final rect = Rect.fromLTWH(
-        margin + (col * cellSize),
-        margin + (row * cellSize),
+        startX + (col * cellSize),
+        startY + (row * cellSize),
         cellSize,
         cellSize,
       );
@@ -659,12 +664,13 @@ class _SurveySheetPainter extends CustomPainter {
 
       if (isUserLot) {
         canvas.drawRect(rect, userBgPaint);
-        canvas.drawCircle(rect.center, 2.5, dotPaint);
+        canvas.drawCircle(rect.center, isCompact ? 1.5 : 2.5, dotPaint);
       } else if (isAllocated) {
         canvas.drawRect(rect, availableBgPaint);
         canvas.save();
         canvas.clipRect(rect);
-        for (double p = -cellSize; p < cellSize * 2; p += 4.0) {
+        final step = isCompact ? 3.0 : 4.0;
+        for (double p = -cellSize; p < cellSize * 2; p += step) {
           canvas.drawLine(
             Offset(rect.left + p, rect.bottom),
             Offset(rect.left + p + cellSize, rect.top),
@@ -684,6 +690,8 @@ class _SurveySheetPainter extends CustomPainter {
         canvas.drawRect(rect.deflate(0.75), selectedBorderPaint);
       }
     }
+
+    canvas.restore();
   }
 
   @override
