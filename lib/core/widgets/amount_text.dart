@@ -69,7 +69,7 @@ class _AmountTextState extends State<AmountText> with SingleTickerProviderStateM
       fontFeatures: AppTypography.tabularFontFeatures,
     );
 
-    if (!widget.animate) {
+    if (!widget.animate || !AppMotion.isMotionEnabled(context)) {
       return Text(
         CurrencyFormatter.format(
           widget.amount,
