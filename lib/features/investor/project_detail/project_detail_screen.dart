@@ -307,10 +307,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                isBangla ? 'বিনিয়োগ ও মুনাফা প্রজেকশন' : 'Investment & ROI Projection',
-                style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla),
+              Expanded(
+                child: Text(
+                  isBangla ? 'বিনিয়োগ ও মুনাফা প্রজেকশন' : 'Investment & ROI Projection',
+                  style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -335,10 +339,27 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                isBangla ? 'শেয়ার সংখ্যা (১-৪ টি অনুমোদিত):' : 'Number of shares (1-4 max):',
-                style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'শেয়ার সংখ্যা' : 'Shares',
+                      style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
+                        fontSize: 13,
+                      ),
+                    ),
+                    Text(
+                      isBangla ? 'সর্বোচ্চ ১-৪ টি অনুমোদিত' : '1–4 shares limit',
+                      style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                        color: palette.inkSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
                 children: [1, 2, 3, 4].map((count) {
                   final isSel = _selectedShares == count;
@@ -349,9 +370,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                     },
                     borderRadius: AppRadius.borderChip,
                     child: Container(
-                      margin: const EdgeInsets.only(left: 6),
-                      width: 34,
-                      height: 32,
+                      margin: const EdgeInsets.only(left: 4),
+                      width: 32,
+                      height: 30,
                       decoration: BoxDecoration(
                         color: isSel ? palette.pine : palette.surfaceSunken,
                         border: Border.all(
@@ -364,7 +385,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
                       child: Text(
                         isBangla ? CurrencyFormatter.toBanglaDigits(count.toString()) : '$count',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: isSel ? Colors.white : palette.ink,
                         ),
