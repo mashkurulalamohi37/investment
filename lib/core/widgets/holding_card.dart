@@ -43,11 +43,15 @@ class HoldingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Top 1.5px Brass Matra Rule
+          // 1. Top 1.5px Matra Rule in canvas (brass is reserved for seals and
+          // serial numbers only — §4: gold appears at most twice in the whole
+          // app. Pine-on-pine-gradient would be invisible here, so this one
+          // rule uses canvas at low opacity for contrast instead of a third
+          // accent colour.)
           Container(
             width: 32,
             height: 1.5,
-            color: palette.brass,
+            color: palette.canvas.withValues(alpha: 0.55),
           ),
           const SizedBox(height: 12),
 
@@ -97,7 +101,7 @@ class HoldingCard extends StatelessWidget {
             val1: isBangla ? 'সিটি ব্যাংক (গুলশান)' : 'City Bank PLC',
             label2: isBangla ? 'বিতরণকৃত মুনাফা' : 'Dividends received',
             val2: CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
-            val2Color: palette.brassLight,
+            val2Color: palette.canvas,
             palette: palette,
             isBangla: isBangla,
           ),

@@ -18,6 +18,12 @@ class CurrencyFormatter {
     '9': '৯',
   };
 
+  /// Bangla short month names, indexed 1-12 (Jan = index 1)
+  static const List<String> _banglaMonthsShort = [
+    '', 'জানু', 'ফেব', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+    'জুলাই', 'আগস্ট', 'সেপ্ট', 'অক্টো', 'নভে', 'ডিসে',
+  ];
+
   /// Format an amount into Bangladeshi Taka format (e.g. ৳ 25,50,000 or ৳ ২৫,৫০,০০০)
   static String format(num amount, {bool isBangla = false, bool includeSymbol = true, bool compact = false}) {
     if (compact) {
@@ -85,10 +91,31 @@ class CurrencyFormatter {
     return output;
   }
 
-  /// Formats date
+  /// Formats date. Never mixes scripts: Bangla mode uses Bangla digits AND
+  /// Bangla month names; English mode uses Latin digits and English months.
   static String formatDate(DateTime date, {bool isBangla = false}) {
-    final formatter = DateFormat('dd MMM yyyy');
-    final formatted = formatter.format(date);
-    return isBangla ? toBanglaDigits(formatted) : formatted;
+    if (isBangla) {
+      final day = toBanglaDigits(date.day.toString());
+      final month = _banglaMonthsShort[date.month];
+      final year = toBanglaDigits(date.year.toString());
+      return '$day $month $year';
+    }
+    return DateFormat('dd MMM yyyy').format(date);
+  }
+
+  /// Day+month only, e.g. "12 Feb" / "১২ ফেব" — for compact ledger date columns.
+  static String formatDayMonth(DateTime date, {bool isBangla = false}) {
+    if (isBangla) {
+      final day = toBanglaDigits(date.day.toString());
+      final month = _banglaMonthsShort[date.month];
+      return '$day $month';
+    }
+    return DateFormat('dd MMM').format(date);
+  }
+
+  /// Year only, respecting script.
+  static String formatYear(DateTime date, {bool isBangla = false}) {
+    final year = date.year.toString();
+    return isBangla ? toBanglaDigits(year) : year;
   }
 }

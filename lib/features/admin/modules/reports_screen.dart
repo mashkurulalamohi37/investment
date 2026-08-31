@@ -59,10 +59,10 @@ class AdminReportsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: (isDark ? AppColors.accentGold : AppColors.primary).withValues(alpha: 0.15),
+                          color: AppColors.primary.withValues(alpha: 0.10),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.analytics_rounded, color: isDark ? AppColors.accentGoldLight : AppColors.primary),
+                        child: Icon(Icons.analytics_rounded, color: AppColors.primary),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -93,7 +93,7 @@ class AdminReportsScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.download_rounded),
-                        color: isDark ? AppColors.accentGoldLight : AppColors.primary,
+                        color: AppColors.primary,
                       ),
                     ],
                   ),

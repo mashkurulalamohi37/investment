@@ -152,7 +152,7 @@ class PortfolioScreen extends StatelessWidget {
                                 },
                                 child: Row(
                                   children: [
-                                    Icon(Icons.workspace_premium_rounded, size: 16, color: palette.brass),
+                                    Icon(Icons.description_outlined, size: 16, color: palette.pine),
                                     const SizedBox(width: 6),
                                     Text(
                                       isBangla ? 'অফিসিয়াল মালিকানা সনদপত্র দেখুন' : 'View Registered Share Certificate',

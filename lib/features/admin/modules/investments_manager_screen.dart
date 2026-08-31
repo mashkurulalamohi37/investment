@@ -38,15 +38,15 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: (isDark ? AppColors.accentGold : AppColors.primary).withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: AppRadius.borderLg,
                 border: Border.all(
-                  color: (isDark ? AppColors.accentGold : AppColors.primary).withValues(alpha: 0.3),
+                  color: AppColors.primary.withValues(alpha: 0.25),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.admin_panel_settings_rounded, color: AppColors.accentGoldDark, size: 28),
+                  const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primary, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

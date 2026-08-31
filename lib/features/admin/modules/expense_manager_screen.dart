@@ -4,7 +4,7 @@ import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/app_button.dart';
-import 'package:swapnojatri/core/widgets/expense_tile.dart';
+import 'package:swapnojatri/core/widgets/voucher_row.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 
 class AdminExpenseManagerScreen extends StatefulWidget {

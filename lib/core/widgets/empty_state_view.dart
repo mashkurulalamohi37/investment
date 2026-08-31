@@ -24,6 +24,7 @@ class EmptyStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final palette = context.palette;
 
     return Center(
       child: Padding(
@@ -31,17 +32,21 @@ class EmptyStateView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // A hairline-ringed well, not a filled tinted circle (§2: no big
+            // icon in a tinted circle) and no gold as a dark-mode accent swap
+            // — gold stays reserved for seals only.
             Container(
               width: 72,
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (isDark ? AppColors.accentGold : AppColors.primary).withValues(alpha: 0.1),
+                color: palette.surfaceSunken,
+                border: Border.all(color: palette.rule, width: 1.0),
               ),
               child: Icon(
                 icon,
-                size: 36,
-                color: isDark ? AppColors.accentGoldLight : AppColors.primary,
+                size: 30,
+                color: palette.inkTertiary,
               ),
             ),
             const SizedBox(height: 20),

@@ -3,7 +3,6 @@ import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/data/models/transaction_model.dart';
-import 'package:intl/intl.dart';
 
 class LedgerRow extends StatelessWidget {
   final TransactionModel transaction;
@@ -25,8 +24,8 @@ class LedgerRow extends StatelessWidget {
         transaction.type == TransactionType.profitDistribution ||
         transaction.type == TransactionType.refund;
 
-    final dateDayMonth = DateFormat('dd MMM').format(transaction.timestamp);
-    final dateYear = DateFormat('yyyy').format(transaction.timestamp);
+    final dateDayMonth = CurrencyFormatter.formatDayMonth(transaction.timestamp, isBangla: isBangla);
+    final dateYear = CurrencyFormatter.formatYear(transaction.timestamp, isBangla: isBangla);
 
     return InkWell(
       onTap: onTap,
@@ -47,7 +46,7 @@ class LedgerRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isBangla ? CurrencyFormatter.toBanglaDigits(dateDayMonth) : dateDayMonth,
+                    dateDayMonth,
                     style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                       color: palette.inkSecondary,
                       fontWeight: FontWeight.w600,
@@ -55,7 +54,7 @@ class LedgerRow extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    isBangla ? CurrencyFormatter.toBanglaDigits(dateYear) : dateYear,
+                    dateYear,
                     style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                       color: palette.inkTertiary,
                       fontSize: 10,

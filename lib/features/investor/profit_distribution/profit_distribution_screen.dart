@@ -35,59 +35,50 @@ class ProfitDistributionScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Pro-rata Mathematical Formula Card
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: isDark ? AppColors.heroGradientDark : AppColors.heroGradientLight,
-                borderRadius: AppRadius.borderXl,
-                border: Border.all(
-                  color: AppColors.accentGold.withValues(alpha: 0.3),
+            // Pro-rata Formula — a plain ruled panel, not a second hero
+            // gradient (the app has exactly one permitted gradient, used on
+            // the holding card) and no gold border or tracked-out label.
+            Builder(builder: (context) {
+              final palette = context.palette;
+              return Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
+                  border: Border.all(color: palette.ruleStrong, width: 1.0),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.functions_rounded, color: AppColors.accentGoldLight, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        isBangla ? 'স্বচ্ছ লভ্যাংশ বণ্টন সূত্র' : 'Pro-Rata Payout Formula',
-                        style: AppTypography.caption().copyWith(
-                          color: AppColors.accentGoldLight,
-                          letterSpacing: 1.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: AppRadius.borderMd,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'স্বচ্ছ লভ্যাংশ বণ্টন সূত্র' : 'Pro-rata payout formula',
+                      style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla),
                     ),
-                    child: Text(
-                      'Investor Payout = (Distribution Pool × Your Eligible Shares) ÷ Total Project Shares',
-                      style: AppTypography.headingSmall().copyWith(
-                        color: Colors.white,
-                        fontFamily: 'monospace',
-                        fontSize: 12.5,
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: palette.surfaceSunken,
+                        borderRadius: AppRadius.borderChip,
+                        border: Border.all(color: palette.rule, width: 1.0),
+                      ),
+                      child: Text(
+                        'Investor payout = (Distribution pool x your eligible shares) / total project shares',
+                        style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 13),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    isBangla
-                        ? 'আপনার ৪টি শেয়ারের জন্য ল্যান্ডভেস্ট ১০০ এর মোট লভ্যাংশ পুলের ৪% সরাসরি বরাদ্দ হবে।'
-                        : 'Your 4 shares earn exactly 4% of the audited realized distribution pool.',
-                    style: AppTypography.bodySmall().copyWith(color: Colors.white70),
-                  ),
-                ],
-              ),
-            ),
+                    const SizedBox(height: 10),
+                    Text(
+                      isBangla
+                          ? 'আপনার ৪টি শেয়ারের জন্য ল্যান্ডভেস্ট ১০০ এর মোট লভ্যাংশ পুলের ৪% সরাসরি বরাদ্দ হবে।'
+                          : 'Your 4 shares earn exactly 4% of the audited realized distribution pool.',
+                      style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+                    ),
+                  ],
+                ),
+              );
+            }),
             const SizedBox(height: 24),
 
             // Payouts for Active Investor
