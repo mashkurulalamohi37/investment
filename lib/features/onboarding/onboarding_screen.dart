@@ -299,65 +299,72 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required AppPalette palette,
     required bool isDark,
   }) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 6),
-          // Visual Card
-          visual,
-          const SizedBox(height: 16),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 8),
+                // Visual Card
+                visual,
+                const SizedBox(height: 18),
 
-          // Section Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              color: palette.pineTint,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: palette.pine.withValues(alpha: 0.2), width: 1.0),
-            ),
-            child: Text(
-              badge,
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 9.5,
-                fontWeight: FontWeight.w700,
-                color: palette.pine,
-                letterSpacing: 0.5,
-              ),
+                // Section Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: palette.pineTint,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: palette.pine.withValues(alpha: 0.2), width: 1.0),
+                  ),
+                  child: Text(
+                    badge,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      color: palette.pine,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Title in Rich Source Serif
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Body with High Contrast
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    body,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
+                      color: palette.inkSecondary,
+                      fontSize: 13,
+                      height: 1.55,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
             ),
           ),
-          const SizedBox(height: 10),
-
-          // Title in Rich Source Serif
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
-              fontSize: 18.5,
-              fontWeight: FontWeight.w700,
-              height: 1.3,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Body with High Contrast
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(
-              body,
-              textAlign: TextAlign.center,
-              style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
-                color: palette.inkSecondary,
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-        ],
-      ),
+        );
+      },
     );
   }
 

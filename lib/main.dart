@@ -1,5 +1,7 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_theme.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/splash/splash_screen.dart';
@@ -33,7 +35,7 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
           final isDark = _appState.themeMode == ThemeMode.dark;
 
           return MaterialApp(
-            title: 'Swapnojatri Investment Platform',
+            title: 'Swapnojatri • Land Investment',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
@@ -41,32 +43,34 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
             builder: (context, child) {
               return LayoutBuilder(
                 builder: (context, constraints) {
-                  // Desktop / Large screen frame wrapper
+                  // Desktop preview frame with authentic phone proportions
                   if (constraints.maxWidth > 500) {
-                    return Scaffold(
-                      backgroundColor: isDark ? const Color(0xFF070B12) : const Color(0xFFE8ECEF),
-                      body: SafeArea(
-                        child: Center(
-                          child: Container(
-                            constraints: BoxConstraints(
-                              maxWidth: 440,
-                              maxHeight: constraints.maxHeight.clamp(0.0, 920.0),
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF070B12) : const Color(0xFFF7F9FC),
-                              borderRadius: constraints.maxHeight > 700 ? BorderRadius.circular(16) : BorderRadius.zero,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
-                                  blurRadius: 28,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: child ?? const SizedBox.shrink(),
+                    final targetHeight = math.min(constraints.maxHeight - 32, 820.0);
+
+                    return Container(
+                      color: isDark ? const Color(0xFF070B12) : const Color(0xFFE2E6E4),
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 412,
+                        height: targetHeight,
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkBg : AppColors.lightBg,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                            width: 1.5,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.12),
+                              blurRadius: 32,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
                         ),
+                        clipBehavior: Clip.antiAlias,
+                        child: child ?? const SizedBox.shrink(),
                       ),
                     );
                   }
