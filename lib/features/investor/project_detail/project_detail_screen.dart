@@ -425,13 +425,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> with SingleTi
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: isDark
-                  ? const LinearGradient(colors: [Color(0xFF0F261D), Color(0xFF091712)])
-                  : const LinearGradient(colors: [Color(0xFFE8F5EE), Color(0xFFF1F9F4)]),
-              borderRadius: AppRadius.borderXl,
+              color: isDark ? AppColors.darkCard : Colors.white,
+              borderRadius: AppRadius.borderLg,
               border: Border.all(
-                color: AppColors.accentGold.withValues(alpha: 0.35),
-                width: 1.2,
+                color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                width: 1,
               ),
             ),
             child: Column(

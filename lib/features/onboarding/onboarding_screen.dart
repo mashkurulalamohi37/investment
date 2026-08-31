@@ -134,29 +134,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Visual Art Container
+                          // Institutional Emblem Container
                           Container(
-                            width: 140,
-                            height: 140,
+                            width: 110,
+                            height: 110,
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: isDark ? AppColors.heroGradientDark : AppColors.heroGradientLight,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (isDark ? AppColors.accentGold : AppColors.primary).withValues(alpha: 0.2),
-                                  blurRadius: 32,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
+                              color: isDark ? const Color(0xFF132A22) : const Color(0xFF0B281E),
+                              borderRadius: AppRadius.borderXl,
                               border: Border.all(
-                                color: AppColors.accentGold.withValues(alpha: 0.3),
-                                width: 1.5,
+                                color: isDark ? const Color(0xFF234B3D) : const Color(0xFF1B4D3C),
+                                width: 1.2,
                               ),
                             ),
                             child: Center(
                               child: Icon(
                                 slide['icon'] as IconData,
-                                size: 58,
+                                size: 48,
                                 color: AppColors.accentGoldLight,
                               ),
                             ),

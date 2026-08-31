@@ -31,190 +31,141 @@ class PortfolioHeroCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: isDark ? AppColors.heroGradientDark : AppColors.heroGradientLight,
-        borderRadius: AppRadius.borderXl,
+        color: isDark ? const Color(0xFF0E1A16) : const Color(0xFF0B281E),
+        borderRadius: AppRadius.borderLg,
         boxShadow: isDark ? AppShadows.darkHero : AppShadows.lightHero,
         border: Border.all(
-          color: AppColors.accentGold.withValues(alpha: 0.35),
-          width: 1.2,
+          color: isDark ? const Color(0xFF1E3A30) : const Color(0xFF1A4637),
+          width: 1,
         ),
       ),
-      child: Stack(
+      padding: const EdgeInsets.all(22.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Subtle background decorative glowing sphere
-          Positioned(
-            right: -30,
-            top: -30,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.accentGold.withValues(alpha: 0.08),
-              ),
-            ),
-          ),
-          Positioned(
-            left: -20,
-            bottom: -20,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.success.withValues(alpha: 0.06),
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top header label & Verified Badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: AppRadius.borderSm,
-                          ),
-                          child: const Icon(
-                            Icons.account_balance_wallet_outlined,
-                            size: 16,
-                            color: AppColors.accentGoldLight,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isBangla ? 'মোট সক্রিয় পোর্টফোলিও' : 'TOTAL ACTIVE PORTFOLIO',
-                          style: AppTypography.caption().copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            letterSpacing: 1.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+          // Institutional Escrow & Custody Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.successLight,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.2),
-                        borderRadius: AppRadius.borderFull,
-                        border: Border.all(
-                          color: AppColors.success.withValues(alpha: 0.4),
-                          width: 0.8,
-                        ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isBangla ? 'সিটি ব্যাংক এসক্রো হিসাব • ল্যান্ডভেস্ট ১০০' : 'CITY BANK ESCROW • LANDVEST 100',
+                    style: AppTypography.caption().copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      letterSpacing: 0.8,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: AppRadius.borderXs,
+                ),
+                child: Text(
+                  isBangla ? 'দলিল নং ৪৯৮২/২৬' : 'DEED #4982/26',
+                  style: AppTypography.caption().copyWith(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // Main Capital Balance
+          Text(
+            isBangla ? 'মোট বিনিয়োগকৃত মূলধন' : 'Total Portfolio Valuation',
+            style: AppTypography.caption().copyWith(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 4),
+          AnimatedCountText(
+            endValue: totalInvested,
+            isBangla: isBangla,
+            style: AppTypography.financialAmountLarge().copyWith(
+              color: Colors.white,
+              fontSize: 34,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Divider(color: Colors.white12, height: 1),
+          const SizedBox(height: 16),
+
+          // Secondary Financial Columns
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'মালিকানাধীন শেয়ার লট' : 'Allocated Lots',
+                      style: AppTypography.caption().copyWith(
+                        color: Colors.white.withValues(alpha: 0.65),
+                        fontSize: 11.5,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.success,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            isBangla ? 'স্বচ্ছ ও যাচাইকৃত' : 'Audited & Active',
-                            style: AppTypography.caption().copyWith(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isBangla
+                          ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())} টি শেয়ার (লট ৪১-৪৪)'
+                          : '$totalShares Shares (Lots 041-044)',
+                      style: AppTypography.headingSmall().copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                // Large Main Balance with Animated Count Odometer
-                AnimatedCountText(
-                  endValue: totalInvested,
-                  isBangla: isBangla,
-                  style: AppTypography.financialAmountLarge().copyWith(
-                    color: Colors.white,
-                    fontSize: 36,
-                    letterSpacing: -0.8,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isBangla
-                      ? 'ল্যান্ডভেস্ট ১০০ প্রকল্পে সাবস্ক্রিপশনকৃত মূলধন'
-                      : 'Principal invested in LandVest 100 Opportunity',
-                  style: AppTypography.bodySmall().copyWith(
-                    color: Colors.white.withValues(alpha: 0.65),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-                const Divider(color: Colors.white12, thickness: 1),
-                const SizedBox(height: 16),
-
-                // Secondary Metrics Row
-                Row(
+              ),
+              Container(width: 1, height: 28, color: Colors.white12),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isBangla ? 'মোট শেয়ার লট' : 'Allocated Shares',
-                            style: AppTypography.caption().copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            isBangla
-                                ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())} টি শেয়ার'
-                                : '$totalShares Shares',
-                            style: AppTypography.headingSmall().copyWith(
-                              color: AppColors.accentGoldLight,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      isBangla ? 'বিতরণকৃত মুনাফা' : 'Realized Dividend',
+                      style: AppTypography.caption().copyWith(
+                        color: Colors.white.withValues(alpha: 0.65),
+                        fontSize: 11.5,
                       ),
                     ),
-                    Container(width: 1, height: 32, color: Colors.white12),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isBangla ? 'উত্তোলিত মোট লভ্যাংশ' : 'Realized Return',
-                            style: AppTypography.caption().copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
-                            style: AppTypography.headingSmall().copyWith(
-                              color: AppColors.successLight,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(height: 2),
+                    Text(
+                      CurrencyFormatter.format(realizedProfit, isBangla: isBangla),
+                      style: AppTypography.headingSmall().copyWith(
+                        color: AppColors.successLight,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
