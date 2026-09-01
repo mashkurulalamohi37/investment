@@ -93,8 +93,8 @@ class AssetsScreen extends StatelessWidget {
 
                             _assetDetailRow(isBangla ? 'সম্পদের ধরন' : 'Asset Type', asset.assetType, palette, isDark),
                             _assetDetailRow(isBangla ? 'জমির পরিমাপ' : 'Land Measurement', '${asset.landAreaDecimals} Decimals (শতাংশ)', palette, isDark),
-                            _assetDetailRow(isBangla ? 'সাব-রেজিস্ট্রি দলিল নম্বর' : 'Deed Registration No.', asset.deedNumber, palette, isDark),
-                            _assetDetailRow(isBangla ? 'নামজারি ও আরএস খতিয়ান' : 'Mutation Khatian & Case', asset.mutationKhatian, palette, isDark),
+                            _assetDetailRow(isBangla ? 'প্রকল্প সম্পদ রেফারেন্স' : 'Project Asset Ref', asset.deedNumber, palette, isDark),
+                            _assetDetailRow(isBangla ? 'আইনি ও ভৌগোলিক স্থিতি' : 'Verification Status', asset.mutationKhatian, palette, isDark),
                             _assetDetailRow(isBangla ? 'ক্রয়মূল্য (Acquisition)' : 'Purchase Cost', CurrencyFormatter.format(asset.purchaseValue, isBangla: isBangla), palette, isDark),
                             _assetDetailRow(isBangla ? 'মূল্যায়ন (Current Value)' : 'Appraised Valuation', CurrencyFormatter.format(asset.currentValue, isBangla: isBangla), palette, isDark),
                             _assetDetailRow(isBangla ? 'আইনি কর্মকর্তা' : 'Legal Compliance Officer', asset.legalVerificationOfficer ?? 'Supreme Court Advocate', palette, isDark),

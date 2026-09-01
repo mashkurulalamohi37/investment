@@ -47,6 +47,8 @@ class AppState extends ChangeNotifier {
   void _initSeedData() {
     _landVest100 = ProjectSeeds.landVest100;
     _projects.add(_landVest100);
+    _projects.add(ProjectSeeds.agroVest1);
+    _projects.add(ProjectSeeds.landVest90);
     _investments.addAll(ProjectSeeds.defaultInvestments);
     _transactions.addAll(ProjectSeeds.defaultTransactions);
     _expenses.addAll(ProjectSeeds.defaultExpenses);
@@ -135,6 +137,7 @@ class AppState extends ChangeNotifier {
 
   void togglePaletteFlavor() {
     switch (_paletteFlavor) {
+      case AppPaletteFlavor.royalBlue:
       case AppPaletteFlavor.paddyField:
         _paletteFlavor = AppPaletteFlavor.ledgerRed;
         break;
@@ -142,9 +145,14 @@ class AppState extends ChangeNotifier {
         _paletteFlavor = AppPaletteFlavor.pineTreasury;
         break;
       case AppPaletteFlavor.pineTreasury:
-        _paletteFlavor = AppPaletteFlavor.paddyField;
+        _paletteFlavor = AppPaletteFlavor.royalBlue;
         break;
     }
+    notifyListeners();
+  }
+
+  void addProject(ProjectModel project) {
+    _projects.add(project);
     notifyListeners();
   }
 
@@ -168,6 +176,14 @@ class AppState extends ChangeNotifier {
   }
 
   // Investment Actions
+  bool investInProject(String projectId, int shares, String paymentMethod, [String paymentReference = 'TXN-ONLINE-DIRECT']) {
+    return submitInvestmentRequest(
+      shares: shares,
+      paymentMethod: paymentMethod,
+      paymentReference: paymentReference,
+    );
+  }
+
   bool submitInvestmentRequest({
     required int shares,
     required String paymentMethod,
@@ -241,9 +257,11 @@ class AppState extends ChangeNotifier {
         actorName: _currentUser.name,
         actorRole: 'Investor',
         action: 'SUBMIT_INVESTMENT',
+        actionBn: 'বিনিয়োগ আবেদন দাখিল',
         entityType: 'Investment',
         entityId: invNo,
         details: 'Submitted investment for $shares shares ($totalAmount BDT) via $paymentMethod',
+        detailsBn: '$paymentMethod মাধ্যমে $sharesটি শেয়ারের (৳$totalAmount) বিনিয়োগ আবেদন দাখিলকৃত',
         ipAddress: '103.145.118.99',
         timestamp: DateTime.now(),
       ),
@@ -343,9 +361,11 @@ class AppState extends ChangeNotifier {
         actorName: _adminUser.name,
         actorRole: 'Admin',
         action: 'ALLOCATE_SHARES',
+        actionBn: 'শেয়ার লট বরাদ্দ',
         entityType: 'Investment',
         entityId: inv.investmentNo,
         details: 'Verified payment and allocated lots ${lotNumbers.join(', ')}',
+        detailsBn: 'পেমেন্ট যাচাই সম্পন্ন ও লট ${lotNumbers.join(', ')} সফলভাবে বরাদ্দকৃত',
         ipAddress: '103.145.118.22',
         timestamp: DateTime.now(),
       ),
@@ -387,9 +407,11 @@ class AppState extends ChangeNotifier {
         actorName: _adminUser.name,
         actorRole: 'Finance Manager',
         action: 'ADD_EXPENSE_VOUCHER',
+        actionBn: 'ব্যয় ভাউচার এন্ট্রি',
         entityType: 'Expense',
         entityId: voucherNo,
         details: 'Approved expense ৳$amount for $payee ($category)',
+        detailsBn: '$payee ($category) এর অনুকূলে ৳$amount অনুমোদিত ব্যয় ভাউচার দাখিল',
         ipAddress: '103.145.118.22',
         timestamp: DateTime.now(),
       ),

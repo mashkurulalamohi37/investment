@@ -57,7 +57,7 @@ class ProfitDistributionScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: palette.surfaceSunken,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadius.borderControl,
                       border: Border.all(color: palette.rule, width: 1.0),
                     ),
                     child: Text(

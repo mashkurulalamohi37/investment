@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
-import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/widgets/seal_painter.dart';
 import 'package:swapnojatri/core/widgets/app_button.dart';
+import 'package:swapnojatri/core/widgets/landvest_logo_widget.dart';
+import 'package:swapnojatri/core/widgets/app_logo_widget.dart';
 import 'package:swapnojatri/features/auth/auth_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -25,26 +27,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _nextPage() {
-    HapticFeedback.selectionClick();
-    if (_currentPage < 2) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOutCubic,
-      );
-    } else {
-      _navigateToAuth();
-    }
-  }
-
-  void _navigateToAuth() {
-    HapticFeedback.selectionClick();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const AuthScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
@@ -54,65 +36,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: palette.canvas,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Column(
             children: [
-              // 1. Top Brand Navigation Bar
+              // 1. Top Header Bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Brand Crest & Monogram
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: palette.pine,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: palette.brass, width: 1.2),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'স্ব',
-                            style: TextStyle(
-                              fontFamily: 'serif',
-                              color: palette.brass,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _isBangla ? 'স্বপ্নযাত্রী' : 'SWAPNOJATRI',
-                                style: AppTypography.titleMedium(isDark: isDark, isBangla: _isBangla).copyWith(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                _isBangla ? 'ভূমি ইনভেস্টমেন্ট' : 'Land Investment',
-                                style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
-                                  color: palette.inkTertiary,
-                                  fontSize: 9.5,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  // Brand Monogram & Title
+                  SwapnojatriLogoWidget(
+                    size: 34,
+                    showText: true,
+                    isDark: isDark,
+                    isBangla: _isBangla,
                   ),
-                  const SizedBox(width: 8),
 
                   // Language Switcher Chip
                   InkWell(
@@ -120,23 +57,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       HapticFeedback.selectionClick();
                       setState(() => _isBangla = !_isBangla);
                     },
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.borderChip,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: palette.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: AppRadius.borderChip,
                         border: Border.all(color: palette.ruleStrong, width: 1.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.language_rounded, size: 13, color: palette.pine),
-                          const SizedBox(width: 4),
+                          Icon(Icons.language_rounded, size: 14, color: palette.pine),
+                          const SizedBox(width: 5),
                           Text(
                             _isBangla ? 'English' : 'বাংলা',
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 11.5,
                               fontWeight: FontWeight.w700,
                               color: palette.pine,
                             ),
@@ -147,24 +91,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
-              // 2. Middle Interactive Slides
+              // 2. Middle Slides
               Expanded(
                 child: PageView(
                   controller: _pageController,
                   onPageChanged: (idx) => setState(() => _currentPage = idx),
                   children: [
-                    // Slide 1: Cadastral Land Survey
+                    // Slide 1: Multi-Project Investments
                     _buildSlide(
-                      visual: _buildCadastralVisual(palette, isDark),
-                      badge: _isBangla ? 'মৌজা ও খতিয়ান ভিত্তিক' : 'SURVEYED CADASTRAL PARCELS',
+                      visual: _buildMultiProjectVisual(palette, isDark),
+                      badge: _isBangla ? 'প্রকল্পভিত্তিক লাভ বণ্টন' : 'PROJECT PROFIT-SHARING',
                       title: _isBangla
-                          ? '১০০টি সুনির্দিষ্ট অংশে আইনত বিভক্ত জমি'
-                          : 'Fractional Ownership in 100 Surveyed Lots',
+                          ? 'ভিন্ন ভিন্ন প্রজেক্টে স্বচ্ছ অংশীদারিত্ব'
+                          : 'Transparent Multi-Project Investments',
                       body: _isBangla
-                          ? 'সাভার মৌজার প্লট নং ৪১৮-এর প্রতিটি অংশ সাব-রেজিস্ট্রি দলিল, আরএস খতিয়ান ও নামজারি দ্বারা আইনত নিশ্চিত।'
-                          : 'Each lot of Plot #418 is legally demarcated by registered title deeds, RS Khatian #902, and official mutation records.',
+                          ? 'রিয়েল এস্টেট (LandVest 100) থেকে শুরু করে কৃষি ও লাভজনক বাণিজ্যিক উদ্যোগে অংশ নিয়ে সরাসরি নিট লভ্যাংশ অর্জনের সুযোগ।'
+                          : 'Participate in diverse initiatives from Real Estate (LandVest 100) to Smart Agro Farming, and earn proportional net project dividends.',
                       palette: palette,
                       isDark: isDark,
                     ),
@@ -172,13 +116,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     // Slide 2: Transparent Public Ledger & Escrow
                     _buildSlide(
                       visual: _buildLedgerVisual(palette, isDark),
-                      badge: _isBangla ? 'পাবলিক লেজার ও এসক্রো' : 'INSTITUTIONAL ESCROW LEDGER',
+                      badge: _isBangla ? 'স্বচ্ছ অডিট ও ব্যাংক নিরাপত্তা' : 'AUDITED ESCROW LEDGER',
                       title: _isBangla
-                          ? 'প্রতিটি টাকার স্বচ্ছ অডিট ও ব্যাংক হেফাজত'
-                          : 'Full Public Ledger for Every Single Taka',
+                          ? 'প্রতিটি টাকার স্বচ্ছ অডিট ও নিরাপত্তা'
+                          : 'Full Public Ledger for Every Project Taka',
                       body: _isBangla
-                          ? 'সিটি ব্যাংক পিএলসি এসক্রো হিসাব থেকে জমি রেজিস্ট্রি ও সীমানা নির্ধারণের প্রতিটি খরচ উন্মুক্ত ভাউচারে সংরক্ষিত।'
-                          : 'Funds are safeguarded in City Bank PLC Escrow and disbursed strictly against audited public vouchers.',
+                          ? 'ব্যাংক এসক্রো হেফাজত ও উন্মুক্ত অডিট ভাউচারের মাধ্যমে প্রকল্প ব্যয় ও অর্জিত আয়ের শতভাগ স্বচ্ছতা।'
+                          : 'Project capital is safeguarded in designated banking escrow and disbursed against audited public vouchers.',
                       palette: palette,
                       isDark: isDark,
                     ),
@@ -186,107 +130,116 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     // Slide 3: Cryptographic Share Certificate
                     _buildSlide(
                       visual: _buildCertificateVisual(palette, isDark),
-                      badge: _isBangla ? 'অফিসিয়াল সনদপত্র' : 'REGISTERED SHARE CERTIFICATE',
+                      badge: _isBangla ? 'ডিজিটাল সনদ ও লভ্যাংশ' : 'DIVIDEND SUBSCRIPTION CERTIFICATE',
                       title: _isBangla
-                          ? 'স্বাক্ষরিত ও সিলমোহরযুক্ত শেয়ার সনদ'
-                          : 'Tamper-Proof Official Share Certificate',
+                          ? 'কোনো জটিল দলিলের ঝামেলা ছাড়াই'
+                          : 'Zero Personal Paperwork Hassle',
                       body: _isBangla
-                          ? 'বিনিয়োগ সম্পন্ন হওয়ামাত্র আপনার নামে ক্রিপ্টোগ্রাফিক হ্যাশযুক্ত আইনি সনদপত্র তাৎক্ষণিকভাবে ইস্যু করা হয়।'
-                          : 'Upon subscription verification, an immutable, tamper-evident certificate is issued with a unique SHA-256 seal.',
+                          ? 'জমি বা খতিয়ানের জটিল প্রশাসনিক ঝামেলা ছাড়াই ব্যাংক বা বিকাশ অ্যাকাউন্টে সরাসরি লভ্যাংশ বণ্টন।'
+                          : 'Receive verified dividends directly into your Bank or bKash account without the burden of managing property deeds.',
                       palette: palette,
                       isDark: isDark,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
 
-              // 3. Bottom Progress Bar & Action Controls
+              // 3. Bottom Action Area
               Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 3-Step Elegant Segmented Pill
+                  // 3-Step Segmented Pill
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(3, (index) {
                       final isActive = index == _currentPage;
-                      final isPassed = index < _currentPage;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: isActive ? 36 : 14,
-                        height: 4,
+                        width: isActive ? 24 : 8,
+                        height: 5,
                         decoration: BoxDecoration(
-                          color: isActive
-                              ? palette.pine
-                              : (isPassed ? palette.pine.withValues(alpha: 0.4) : palette.ruleStrong),
-                          borderRadius: BorderRadius.circular(2),
+                          color: isActive ? palette.pine : palette.ruleStrong,
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       );
                     }),
                   ),
                   const SizedBox(height: 16),
 
-                  // Primary Action Button
-                  AppButton(
-                    label: _currentPage == 2
-                        ? (_isBangla ? 'শুরু করুন' : 'Get Started')
-                        : (_isBangla ? 'পরবর্তী ধাপ' : 'Next Step'),
-                    variant: AppButtonVariant.primary,
-                    isBangla: _isBangla,
-                    onPressed: _nextPage,
+                  // Next / Proceed Primary Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: AppButton(
+                      label: _currentPage == 2
+                          ? (_isBangla ? 'সরাসরি ডেমো এক্সপ্লোর করুন' : 'Explore Demo Platform')
+                          : (_isBangla ? 'পরবর্তী ধাপ' : 'Next Step'),
+                      variant: AppButtonVariant.primary,
+                      isBangla: _isBangla,
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        if (_currentPage < 2) {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOutCubic,
+                          );
+                        } else {
+                          _proceedToAuth();
+                        }
+                      },
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
-                  // Secondary Sign In / Skip Link
+                  // Secondary Skip & Direct Login Row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: _navigateToAuth,
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
+                        onPressed: _proceedToAuth,
                         child: Text(
                           _isBangla ? 'এড়িয়ে যান' : 'Skip',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: palette.inkTertiary,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: palette.inkSecondary,
                           ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: _navigateToAuth,
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _isBangla ? 'লগইন করুন' : 'Sign In',
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                color: palette.pine,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 2),
-                            Icon(Icons.arrow_forward_rounded, size: 13, color: palette.pine),
-                          ],
+                      TextButton.icon(
+                        onPressed: _proceedToAuth,
+                        icon: Icon(Icons.arrow_forward_rounded, size: 14, color: palette.pine),
+                        iconAlignment: IconAlignment.end,
+                        label: Text(
+                          _isBangla ? 'লগইন করুন' : 'Sign In',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: palette.pine,
+                          ),
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 4),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _proceedToAuth() {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const AuthScreen(),
+        transitionDuration: const Duration(milliseconds: 350),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
     );
   }
@@ -306,58 +259,61 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const SizedBox(height: 8),
-                // Visual Card
+                const SizedBox(height: 6),
+                // 1. Visual Card
                 visual,
-                const SizedBox(height: 18),
-
-                // Section Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: palette.pineTint,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: palette.pine.withValues(alpha: 0.2), width: 1.0),
-                  ),
-                  child: Text(
-                    badge,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                      color: palette.pine,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 12),
 
-                // Title in Rich Source Serif
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w700,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Body with High Contrast
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    body,
-                    textAlign: TextAlign.center,
-                    style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
-                      color: palette.inkSecondary,
-                      fontSize: 13,
-                      height: 1.55,
+                // 2. Section Badge & Headline
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
+                      decoration: BoxDecoration(
+                        color: palette.pineTint,
+                        borderRadius: AppRadius.borderChip,
+                        border: Border.all(color: palette.pine.withValues(alpha: 0.3), width: 0.8),
+                      ),
+                      child: Text(
+                        badge,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: palette.pineDeep,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.notoSerifBengali(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          height: 1.3,
+                          color: palette.ink,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        body,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.anekBangla(
+                          color: palette.inkSecondary,
+                          fontSize: 13,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
               ],
@@ -368,164 +324,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // Visual 1: Cadastral Survey Sheet Diagram
-  Widget _buildCadastralVisual(AppPalette palette, bool isDark) {
+  // Visual 1: Multi-Project Showcase (LandVest 100 + AgroVest)
+  Widget _buildMultiProjectVisual(AppPalette palette, bool isDark) {
     return Container(
-      width: 240,
-      height: 180,
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 320),
+      height: 200,
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: AppRadius.borderCard,
-        border: Border.all(color: palette.ruleStrong, width: 1.2),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: palette.pine.withValues(alpha: 0.05),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-      ),
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          // Header Bar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'BIRULIA • PLOT 418',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                    color: palette.inkSecondary,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Row(
-                children: [
-                  Container(width: 4, height: 4, decoration: BoxDecoration(color: palette.brass, shape: BoxShape.circle)),
-                  const SizedBox(width: 4),
-                  Text(
-                    'NORTH ↑',
-                    style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.inkTertiary),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-
-          // 5x5 Survey Grid
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: palette.surfaceSunken,
-                border: Border.all(color: palette.rule, width: 1.0),
-              ),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 25,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
-                  childAspectRatio: 1.0,
-                ),
-                itemBuilder: (context, index) {
-                  final isOwned = index == 12; // Center Lot (LOT-042)
-                  final isAllocated = index == 6 || index == 7 || index == 11 || index == 13 || index == 17;
-
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: isOwned
-                          ? palette.pine
-                          : (isAllocated ? palette.surfaceSunken : palette.surface),
-                      border: Border.all(color: palette.rule, width: 0.6),
-                    ),
-                    child: Center(
-                      child: isOwned
-                          ? Container(
-                              width: 5,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: palette.brass,
-                                shape: BoxShape.circle,
-                              ),
-                            )
-                          : Text(
-                              (index + 31).toString().padLeft(3, '0'),
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 7,
-                                color: isAllocated ? palette.inkTertiary : palette.inkSecondary,
-                              ),
-                            ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-
-          // Footer Badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: palette.surfaceSunken,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: palette.rule, width: 0.8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    _isBangla ? 'লট-০৪২ (আপনার অংশ)' : 'LOT-042 (YOURS)',
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w700,
-                      color: palette.pine,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Text(
-                  '0.225 DEC',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, fontWeight: FontWeight.w600, color: palette.inkSecondary),
-                ),
-              ],
-            ),
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F2B48).withValues(alpha: isDark ? 0.3 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-    );
-  }
-
-  // Visual 2: Ruled Ledger Diagram
-  Widget _buildLedgerVisual(AppPalette palette, bool isDark) {
-    return Container(
-      width: 240,
-      height: 180,
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: AppRadius.borderCard,
-        border: Border.all(color: palette.ruleStrong, width: 1.2),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: palette.pine.withValues(alpha: 0.05),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-      ),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -533,46 +350,210 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'ESCROW AUDIT LEDGER',
-                style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, fontWeight: FontWeight.w700, color: palette.pine),
+                'MULTI-PROJECT PORTFOLIO',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                  color: palette.inkSecondary,
+                ),
               ),
-              SealWidget(size: 20, isBangla: _isBangla),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: palette.pineTint,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'PROFIT-SHARING',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 8,
+                    fontWeight: FontWeight.w700,
+                    color: palette.pine,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-          const Divider(height: 1),
+          const SizedBox(height: 8),
+
+          // Project Item 1: LandVest 100
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: palette.surfaceSunken,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFC59B27).withValues(alpha: 0.3),
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const LandVestLogoWidget(size: 24, showText: false),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'LandVest 100 • রিয়েল এস্টেট',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: palette.ink),
+                        ),
+                        Text(
+                          '১০০ শেয়ার • প্রতি ভাগ ২৫,৫০০ ৳',
+                          style: TextStyle(fontSize: 9.5, color: palette.inkSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '৭৪/১০০',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFFC59B27),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 6),
 
-          _ledgerRowItem('VCH-001', 'Land Purchase Deed', '৳ 12,50,000', palette, isDark),
-          const SizedBox(height: 4),
-          _ledgerRowItem('VCH-002', 'Sub-Registry Stamp', '৳ 4,80,000', palette, isDark),
-          const SizedBox(height: 4),
-          _ledgerRowItem('VCH-003', 'Boundary Wall & RCC', '৳ 3,20,000', palette, isDark),
+          // Project Item 2: AgroVest Farm
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: palette.surfaceSunken,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: palette.rule, width: 0.8),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text('🌾', style: TextStyle(fontSize: 12)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'স্মার্ট এগ্রো ফার্মিং • সিজন ১',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: palette.ink),
+                        ),
+                        Text(
+                          'ত্রৈমাসিক লভ্যাংশ • ১৫,০০০ ৳/ভাগ',
+                          style: TextStyle(fontSize: 9.5, color: palette.inkSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'নতুন প্রজেক্ট',
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      color: palette.pine,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-          const Spacer(),
+  // Visual 2: Live Escrow Ledger Balance Diagram
+  Widget _buildLedgerVisual(AppPalette palette, bool isDark) {
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 320),
+      height: 200,
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: AppRadius.borderCard,
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: palette.pine.withValues(alpha: 0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'ESCROW & AUDIT RECONCILIATION',
+                style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, fontWeight: FontWeight.w700, color: palette.inkSecondary),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: palette.pineTint,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '100% AUDITED',
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 8, fontWeight: FontWeight.w700, color: palette.pine),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: palette.surfaceSunken,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: palette.rule, width: 0.8),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _isBangla ? 'তহবিল স্থিতি:' : 'Treasury Balance:',
-                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w500, color: palette.inkSecondary),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('CITY BANK ESCROW ACCOUNT', style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.inkTertiary)),
+                    const SizedBox(height: 2),
+                    Text('৳ 25,50,000', style: TextStyle(fontFamily: 'serif', fontSize: 16, fontWeight: FontWeight.w700, color: palette.ink)),
+                  ],
                 ),
-                Text(
-                  '৳ 5,00,000',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    color: palette.pine,
-                  ),
-                ),
+                Icon(Icons.account_balance_rounded, color: const Color(0xFFC59B27), size: 22),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _miniLedgerRow('Site Development & Execution', '৳ 1,50,000', 'VCH-01', palette),
+                _miniLedgerRow('Agro Setup & Organic Farm Tools', '৳ 85,000', 'VCH-02', palette),
+                _miniLedgerRow('Quarterly Dividend Distribution', '৳ 2,50,000', 'VCH-03', palette),
               ],
             ),
           ),
@@ -581,107 +562,101 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _ledgerRowItem(String code, String title, String amount, AppPalette palette, bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: palette.ink)),
-            Text(code, style: TextStyle(fontFamily: 'monospace', fontSize: 7.5, color: palette.inkTertiary)),
-          ],
-        ),
-        Row(
-          children: [
-            Text(amount, style: TextStyle(fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.w700, color: palette.ink)),
-            const SizedBox(width: 3),
-            Icon(Icons.verified_rounded, size: 10, color: palette.jade),
-          ],
-        ),
-      ],
+  Widget _miniLedgerRow(String desc, String amt, String vch, AppPalette palette) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: palette.surfaceSunken,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: palette.rule, width: 0.6),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(vch, style: TextStyle(fontFamily: 'monospace', fontSize: 8, fontWeight: FontWeight.w700, color: palette.pine)),
+              const SizedBox(width: 6),
+              Text(desc, style: TextStyle(fontSize: 10, color: palette.ink)),
+            ],
+          ),
+          Text(amt, style: TextStyle(fontFamily: 'monospace', fontSize: 9.5, fontWeight: FontWeight.w700, color: palette.ink)),
+        ],
+      ),
     );
   }
 
-  // Visual 3: Official Share Certificate
+  // Visual 3: Digital Certificate Preview
   Widget _buildCertificateVisual(AppPalette palette, bool isDark) {
     return Container(
-      width: 240,
-      height: 180,
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 320),
+      height: 200,
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: AppRadius.borderCard,
-        border: Border.all(color: palette.brass, width: 1.5),
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
         boxShadow: isDark
             ? null
             : [
                 BoxShadow(
-                  color: palette.brass.withValues(alpha: 0.1),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+                  color: palette.pine.withValues(alpha: 0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
       ),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          // Inner hairline border
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'PROFIT-SHARING CERTIFICATE',
+                style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, fontWeight: FontWeight.w700, color: palette.inkSecondary),
+              ),
+              Text(
+                '#LV100-2026-042',
+                style: TextStyle(fontFamily: 'monospace', fontSize: 8.5, fontWeight: FontWeight.w700, color: const Color(0xFFC59B27)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                border: Border.all(color: palette.ruleStrong, width: 0.8),
+                color: palette.surfaceSunken,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFC59B27).withValues(alpha: 0.4), width: 1.0),
               ),
-              child: Column(
+              child: Row(
                 children: [
-                  Text(
-                    'LANDVEST 100 SHARE CERTIFICATE',
-                    style: TextStyle(
-                      fontFamily: 'serif',
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w700,
-                      color: palette.pine,
-                      letterSpacing: 0.6,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('REGISTERED SUBSCRIBER', style: TextStyle(fontFamily: 'monospace', fontSize: 7.5, color: palette.inkTertiary)),
+                        Text('MASHKURUL ALAM OHI', style: TextStyle(fontFamily: 'serif', fontSize: 13, fontWeight: FontWeight.w700, color: palette.ink)),
+                        Text('LANDVEST 100 • 4 SHARES SUBSCRIBED', style: TextStyle(fontFamily: 'monospace', fontSize: 8, fontWeight: FontWeight.w700, color: palette.pine)),
+                        Text('PROPORTIONAL DIVIDEND ELIGIBLE', style: TextStyle(fontFamily: 'monospace', fontSize: 7.5, color: palette.inkSecondary)),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 1),
-                  Text(
-                    'Plot #418 • Savar Mouza • 1/100th Share',
-                    style: TextStyle(fontFamily: 'monospace', fontSize: 7.5, color: palette.inkTertiary),
-                  ),
-                  const SizedBox(height: 6),
-                  const Divider(height: 1),
-                  const SizedBox(height: 6),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('CERTIFICATE NO', style: TextStyle(fontFamily: 'monospace', fontSize: 7, color: palette.inkTertiary)),
-                          Text('LV100-2026-042', style: TextStyle(fontFamily: 'monospace', fontSize: 9.5, fontWeight: FontWeight.w700, color: palette.ink)),
-                        ],
-                      ),
-                      SealWidget(size: 28, isBangla: _isBangla),
-                    ],
-                  ),
-                  const Spacer(),
-
-                  // SHA-256 Stamp
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    color: palette.surfaceSunken,
-                    child: Text(
-                      'SHA256: 8f9b2d...91c0e4 • VERIFIED',
-                      style: TextStyle(fontFamily: 'monospace', fontSize: 7, color: palette.inkTertiary),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                  const SealWidget(size: 38, isBangla: true),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('DIGITAL SEAL VERIFIED', style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.pine, fontWeight: FontWeight.w700)),
+              Text('SWAPNOJATRI REGISTRY', style: TextStyle(fontFamily: 'monospace', fontSize: 8, color: palette.inkTertiary)),
+            ],
           ),
         ],
       ),

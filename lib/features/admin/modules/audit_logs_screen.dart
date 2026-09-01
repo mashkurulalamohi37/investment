@@ -25,8 +25,24 @@ class AdminAuditLogsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           isBangla ? 'অডিট লগ ও নিরাপত্তা ট্রেইল' : 'Immutable Audit Logs',
-          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => state.toggleLanguage(),
+            child: Text(
+              isBangla ? 'EN' : 'বাং',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: palette.pine,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -63,10 +79,10 @@ class AdminAuditLogsScreen extends StatelessWidget {
                               borderRadius: AppRadius.borderChip,
                             ),
                             child: Text(
-                              log.action,
+                              log.getAction(isBangla),
                               style: AppTypography.caption().copyWith(
                                 color: palette.pineDeep,
-                                fontFamily: 'monospace',
+                                fontFamily: isBangla ? null : 'monospace',
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -79,7 +95,7 @@ class AdminAuditLogsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        log.details,
+                        log.getDetails(isBangla),
                         style: AppTypography.bodySmall(isDark: isDark, isBangla: isBangla).copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -89,12 +105,17 @@ class AdminAuditLogsScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Actor: ${log.actorName} (${log.actorRole})',
-                            style: AppTypography.caption(isDark: isDark).copyWith(fontSize: 10.5),
+                            isBangla
+                                ? 'সম্পাদনকারী: ${log.actorName} (${log.actorRole == 'Super Admin' ? 'সুপার অ্যাডমিন' : 'ফাইন্যান্স ম্যানেজার'})'
+                                : 'Actor: ${log.actorName} (${log.actorRole})',
+                            style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(fontSize: 10.5),
                           ),
                           Text(
                             'IP: ${log.ipAddress}',
-                            style: AppTypography.caption(isDark: isDark).copyWith(fontFamily: 'monospace', fontSize: 10),
+                            style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
+                              fontFamily: 'monospace',
+                              fontSize: 10,
+                            ),
                           ),
                         ],
                       ),

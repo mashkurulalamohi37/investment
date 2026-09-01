@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
-import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/localization/currency_formatter.dart';
-import 'package:swapnojatri/core/widgets/status_chip.dart';
-import 'package:swapnojatri/core/widgets/app_button.dart';
-import 'package:swapnojatri/data/models/investment_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/admin/modules/add_project_screen.dart';
+import 'package:swapnojatri/features/admin/modules/admin_project_detail_screen.dart';
 
-class AdminInvestmentsManagerScreen extends StatelessWidget {
+class AdminInvestmentsManagerScreen extends StatefulWidget {
   final AppState state;
 
   const AdminInvestmentsManagerScreen({
@@ -17,177 +14,205 @@ class AdminInvestmentsManagerScreen extends StatelessWidget {
   });
 
   @override
+  State<AdminInvestmentsManagerScreen> createState() => _AdminInvestmentsManagerScreenState();
+}
+
+class _AdminInvestmentsManagerScreenState extends State<AdminInvestmentsManagerScreen> {
+  int _selectedTabIndex = 0;
+
+  final List<String> _tabsBn = ['সব (12)', 'সক্রিয় (8)', 'আসন্ন (3)', 'বন্ধ (1)'];
+
+  @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isBangla = state.isBangla;
-    final investments = state.investments;
+    final isBangla = widget.state.isBangla;
+    final allProjects = widget.state.projects;
 
     return Scaffold(
       backgroundColor: palette.canvas,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
-          isBangla ? 'বিনিয়োগ যাচাই ও শেয়ার লট বরাদ্দ' : 'Investments & Share Allocation',
-          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: palette.pineTint,
-                borderRadius: AppRadius.borderCard,
-                border: Border.all(
-                  color: palette.pine.withValues(alpha: 0.25),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.admin_panel_settings_rounded, color: palette.pine, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isBangla ? 'পারমাণবিক শেয়ার বরাদ্দ কনসোল' : 'Atomic Share Allocation Engine',
-                          style: AppTypography.headingSmall(isDark: isDark, isBangla: isBangla).copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          isBangla
-                              ? 'পেমেন্ট রেফারেন্স যাচাই করার সাথে সাথে স্বয়ংক্রিয়ভাবে পরবর্তী ধারাবাহিক লট নম্বর বরাদ্দ হবে।'
-                              : 'Verifying payment assigns next sequential lot numbers without duplicates.',
-                          style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Text(
-              isBangla ? 'আবেদন তালিকা (${investments.length})' : 'Investment Applications (${investments.length})',
-              style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
-            ),
-            const SizedBox(height: 12),
-
-            ...investments.map((inv) => Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: palette.surface,
-                    borderRadius: AppRadius.borderCard,
-                    border: Border.all(
-                      color: palette.rule,
-                      width: 1.0,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                inv.investmentNo,
-                                style: AppTypography.headingSmall(isDark: isDark).copyWith(
-                                  fontFamily: 'monospace',
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              Text(
-                                '${inv.projectName} • ${CurrencyFormatter.formatDate(inv.createdAt, isBangla: isBangla)}',
-                                style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
-                              ),
-                            ],
-                          ),
-                          StatusChip.investment(inv.status, isBangla: isBangla),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Divider(color: palette.rule, height: 1),
-                      const SizedBox(height: 10),
-
-                      _infoRow(isBangla ? 'আবেদনকৃত শেয়ার' : 'Shares', '${inv.shares} Shares (@ ৳${inv.unitPrice.toInt()})', palette, isDark),
-                      _infoRow(isBangla ? 'মোট অর্থ' : 'Total Amount', CurrencyFormatter.format(inv.grossAmount, isBangla: isBangla), palette, isDark),
-                      _infoRow(isBangla ? 'পেমেন্ট চ্যানেল' : 'Payment Method', inv.paymentMethod ?? 'Bank Transfer', palette, isDark),
-                      _infoRow(isBangla ? 'ট্রানজেকশন রেফারেন্স' : 'Transaction Ref', inv.paymentReference ?? 'N/A', palette, isDark),
-
-                      if (inv.allocatedLotNumbers.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        _infoRow(isBangla ? 'বরাদ্দকৃত লট' : 'Allocated Lots', inv.allocatedLotNumbers.join(', '), palette, isDark),
-                      ],
-
-                      if (inv.status == InvestmentStatus.pending) ...[
-                        const SizedBox(height: 14),
-                        AppButton(
-                          label: isBangla ? 'পেমেন্ট যাচাই ও শেয়ার বরাদ্দ করুন' : 'Verify Payment & Allocate Lots',
-                          onPressed: () {
-                            state.adminVerifyAndAllocateShare(inv.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isBangla
-                                      ? 'পেমেন্ট সফলভাবে যাচাই হয়েছে এবং শেয়ার লট বরাদ্দ সম্পন্ন হয়েছে!'
-                                      : 'Payment verified and share lots allocated atomically!',
-                                ),
-                                backgroundColor: palette.pine,
-                              ),
-                            );
-                          },
-                          icon: Icons.task_alt_rounded,
-                          variant: AppButtonVariant.primary,
-                          isBangla: isBangla,
-                        ),
-                      ],
-                    ],
-                  ),
-                )),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _infoRow(String label, String value, AppPalette palette, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.5,
-              color: palette.inkSecondary,
-            ),
+          isBangla ? 'সব প্রজেক্ট' : 'All Projects (Admin)',
+          style: GoogleFonts.hindSiliguri(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.ink,
           ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: palette.ink,
+        ),
+        actions: [
+          // "+ নতুন প্রজেক্ট" Button
+          Padding(
+            padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddProjectScreen(state: widget.state)),
+                );
+              },
+              icon: const Icon(Icons.add, size: 16, color: Colors.white),
+              label: Text(
+                isBangla ? 'নতুন প্রজেক্ট' : 'New Project',
+                style: GoogleFonts.hindSiliguri(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0066FF),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
               ),
             ),
           ),
         ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Filter Tabs
+            Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _tabsBn.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final isSelected = _selectedTabIndex == index;
+                  return InkWell(
+                    onTap: () => setState(() => _selectedTabIndex = index),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFF0066FF) : palette.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFF0066FF) : palette.ruleStrong,
+                          width: 1.0,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _tabsBn[index],
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 11.5,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected ? Colors.white : palette.inkSecondary,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Projects Management List
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                itemCount: allProjects.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final project = allProjects[index];
+                  final progress = (project.allocatedShares / project.totalShares).clamp(0.0, 1.0);
+
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminProjectDetailScreen(
+                            project: project,
+                            state: widget.state,
+                          ),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: palette.surface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: palette.rule, width: 1.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  project.name,
+                                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
+                                ),
+                                Text(
+                                  project.location,
+                                  style: GoogleFonts.poppins(fontSize: 11, color: palette.inkSecondary),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00C853).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                isBangla ? 'সক্রিয়' : 'Active',
+                                style: GoogleFonts.hindSiliguri(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF00C853),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '৳ 18,36,000 / ৳ 25,50,000',
+                              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: palette.ink),
+                            ),
+                            Text(
+                              '${(progress * 100).toInt()}%',
+                              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF0066FF)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 6,
+                            backgroundColor: palette.surfaceSunken,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0066FF)),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${project.allocatedShares} / ${project.totalShares} Shares Allocated',
+                          style: GoogleFonts.poppins(fontSize: 10.5, color: palette.inkSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
+import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/widgets/status_chip.dart';
 import 'package:swapnojatri/core/widgets/matra_rule_widget.dart';
@@ -32,25 +33,25 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: palette.canvas,
       appBar: AppBar(
         title: Text(
-          isBangla ? 'বিনিয়োগকারী প্রোফাইল ও সেটিংস' : 'Account & Security Settings',
+          isBangla ? 'বিনিয়োগকারী প্রোফাইল' : 'Investor Profile',
           style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
         ),
-        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Card (0 radius, 1px rule)
+              // User Card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
                   border: Border.all(color: palette.rule, width: 1.0),
                 ),
                 child: Row(
@@ -109,10 +110,12 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   );
                 },
+                borderRadius: AppRadius.borderCard,
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: palette.surfaceSunken,
+                    borderRadius: AppRadius.borderCard,
                     border: Border.all(color: palette.ruleStrong, width: 1.0),
                   ),
                   child: Row(
@@ -161,6 +164,7 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
                   border: Border.all(color: palette.rule, width: 1.0),
                 ),
                 child: Column(
@@ -221,6 +225,7 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
                   border: Border.all(color: palette.rule, width: 1.0),
                 ),
                 child: Column(

@@ -137,11 +137,26 @@ class _AdminExpenseManagerScreenState extends State<AdminExpenseManagerScreen> {
     return Scaffold(
       backgroundColor: palette.canvas,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
-          isBangla ? 'তহবিল ব্যবহার ও খরচ অনুমোদন' : 'Expense & Fund Ledger',
-          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+          isBangla ? 'তহবিল ব্যবহার ও খরচ অনুমোদন' : 'Expense & Treasury Ledger',
+          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
         actions: [
+          TextButton(
+            onPressed: () => widget.state.toggleLanguage(),
+            child: Text(
+              isBangla ? 'EN' : 'বাং',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: palette.pine,
+              ),
+            ),
+          ),
           IconButton(
             onPressed: () => _showAddExpenseModal(palette, isDark, isBangla),
             icon: const Icon(Icons.add_circle_outline_rounded),

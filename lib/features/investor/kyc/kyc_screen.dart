@@ -75,8 +75,8 @@ class _KycScreenState extends State<KycScreen> {
           const SizedBox(height: 4),
           Text(
             isBangla
-                ? 'বাংলাদেশ ব্যাংক ও ভূমি মন্ত্রণালয়ের নীতিমালা অনুযায়ী বিনিয়োগকারীর পরিচিতি তথ্য বাধ্যতামূলক।'
-                : 'Identity verification is mandatory under Bangladesh Real Estate and Anti-Money Laundering regulations.',
+                ? 'বাংলাদেশ ব্যাংক ও জাতীয় আর্থিক নীতিমালা অনুযায়ী বিনিয়োগকারীর পরিচিতি তথ্য বাধ্যতামূলক।'
+                : 'Identity verification is mandatory under standard financial and Anti-Money Laundering regulations.',
             style: AppTypography.body(isDark: isDark, isBangla: isBangla).copyWith(
               color: palette.inkSecondary,
               fontSize: 13,
@@ -156,8 +156,8 @@ class _KycScreenState extends State<KycScreen> {
                       const SizedBox(height: 2),
                       Text(
                         isBangla
-                            ? 'আপনার পরিচিতি সাভার মৌজা প্লট ৪১৮ এর জন্য কার্যকর।'
-                            : 'Cleared for ownership deeds and dividend disbursements on Plot 418.',
+                            ? 'আপনার পরিচিতি স্বপ্নযাত্রীর সকল প্রজেক্টে বিনিয়োগ ও লভ্যাংশ পাওয়ার জন্য সক্রিয়।'
+                            : 'Cleared for all project subscriptions and dividend disbursements.',
                         style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
                           color: palette.inkSecondary,
                           fontSize: 11.5,

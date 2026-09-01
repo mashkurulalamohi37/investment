@@ -101,7 +101,7 @@ class _SealPainter extends CustomPainter {
         Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2),
       );
     } else {
-      // Small 20px inline seal: center dot and inner disc
+      // Small inline seal: center dot
       final centerPaint = Paint()
         ..color = color
         ..style = PaintingStyle.fill;

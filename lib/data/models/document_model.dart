@@ -84,13 +84,13 @@ class DocumentModel {
       case DocumentCategory.legal:
         return 'আইনি মতামত';
       case DocumentCategory.projectDeed:
-        return 'মূল সাব-রেজিস্ট্রি দলিল';
+        return 'প্রকল্প নিবন্ধন ও চুক্তিপত্র';
       case DocumentCategory.govtApproval:
-        return 'সরকারি অনুমোদন ও নামজারি';
+        return 'সরকারি লাইসেন্স ও অনুমোদন';
       case DocumentCategory.receipt:
         return 'ব্যয় ভাউচার রসিদ';
       case DocumentCategory.taxCertificate:
-        return 'ভূমি উন্নয়ন কর দাখিলা';
+        return 'প্রকল্প কর ও ক্লিয়ারেন্স সনদ';
       case DocumentCategory.financialAudit:
         return 'চার্টার্ড অ্যাকাউন্ট্যান্ট অডিট';
       case DocumentCategory.distributionStatement:

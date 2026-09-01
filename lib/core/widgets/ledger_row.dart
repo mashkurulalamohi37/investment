@@ -80,7 +80,7 @@ class LedgerRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    transaction.title,
+                    isBangla ? transaction.titleBn : transaction.title,
                     style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,

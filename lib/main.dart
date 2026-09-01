@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_theme.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/splash/splash_screen.dart';
@@ -35,12 +34,13 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
           final isDark = _appState.themeMode == ThemeMode.dark;
 
           return MaterialApp(
-            title: 'Swapnojatri • Land Investment',
+            title: 'Swapnojatri Investment Platform • স্বপ্নযাত্রী ইনভেস্টমেন্ট প্ল্যাটফর্ম',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light(flavor: _appState.paletteFlavor),
             darkTheme: AppTheme.dark(flavor: _appState.paletteFlavor),
             themeMode: _appState.themeMode,
             builder: (context, child) {
+              final palette = AppTheme.getPalette(_appState.paletteFlavor, isDark);
               return LayoutBuilder(
                 builder: (context, constraints) {
                   // Desktop preview frame with authentic phone proportions
@@ -48,17 +48,17 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
                     final targetHeight = math.min(constraints.maxHeight - 32, 820.0);
 
                     return Container(
-                      color: isDark ? const Color(0xFF070A08) : const Color(0xFFEFF2EE),
+                      color: isDark ? const Color(0xFF0C100E) : const Color(0xFFE2E7DF),
                       alignment: Alignment.center,
                       child: Container(
                         width: 412,
                         height: targetHeight,
                         margin: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkBg : AppColors.lightBg,
+                          color: palette.canvas,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: isDark ? AppColors.darkCardBorder : AppColors.lightCardBorder,
+                            color: palette.ruleStrong,
                             width: 1.5,
                           ),
                           boxShadow: [

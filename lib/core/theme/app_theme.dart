@@ -6,8 +6,9 @@ import 'app_radius.dart';
 class AppTheme {
   static AppPalette getPalette(AppPaletteFlavor flavor, bool isDark) {
     switch (flavor) {
+      case AppPaletteFlavor.royalBlue:
       case AppPaletteFlavor.paddyField:
-        return isDark ? AppPalette.paddyDark : AppPalette.paddyLight;
+        return isDark ? AppPalette.royalBlueDark : AppPalette.royalBlueLight;
       case AppPaletteFlavor.ledgerRed:
         return isDark ? AppPalette.ledgerDark : AppPalette.ledgerLight;
       case AppPaletteFlavor.pineTreasury:

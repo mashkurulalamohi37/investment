@@ -1,4 +1,29 @@
-enum ProjectStatus { draft, active, funded, completed, closed }
+enum ProjectStatus { draft, active, upcoming, funded, completed, closed }
+
+enum ProjectCategory {
+  realEstate,
+  agroFarming,
+  commercial,
+  business,
+}
+
+class TrackRecordProject {
+  final String nameBn;
+  final String nameEn;
+  final String detailsBn;
+  final String detailsEn;
+  final String statusBn;
+  final String statusEn;
+
+  const TrackRecordProject({
+    required this.nameBn,
+    required this.nameEn,
+    required this.detailsBn,
+    required this.detailsEn,
+    required this.statusBn,
+    required this.statusEn,
+  });
+}
 
 class Milestone {
   final String id;
@@ -26,6 +51,8 @@ class ProjectModel {
   final String name;
   final String nameBn;
   final String category;
+  final ProjectCategory projectCategory;
+  final String categoryNameBn;
   final String location;
   final String description;
   final String descriptionBn;
@@ -40,6 +67,11 @@ class ProjectModel {
   final DateTime? targetEndDate;
   final List<Milestone> milestones;
   final List<String> highlights;
+  final List<TrackRecordProject> trackRecords;
+  final String? philosophyQuoteBn;
+  final String? philosophyQuoteEn;
+  final String? profitModelBn;
+  final String? profitModelEn;
   final String imageUrl;
 
   const ProjectModel({
@@ -48,6 +80,8 @@ class ProjectModel {
     required this.name,
     required this.nameBn,
     required this.category,
+    this.projectCategory = ProjectCategory.realEstate,
+    this.categoryNameBn = 'রিয়েল এস্টেট',
     required this.location,
     required this.description,
     required this.descriptionBn,
@@ -62,6 +96,11 @@ class ProjectModel {
     this.targetEndDate,
     this.milestones = const [],
     this.highlights = const [],
+    this.trackRecords = const [],
+    this.philosophyQuoteBn,
+    this.philosophyQuoteEn,
+    this.profitModelBn,
+    this.profitModelEn,
     required this.imageUrl,
   });
 
@@ -69,6 +108,7 @@ class ProjectModel {
   String get title => name;
   String get titleBn => nameBn;
   String get locationBn => location;
+  double get sharePrice => pricePerShare;
   double get fundingProgress => totalShares > 0 ? allocatedShares / totalShares : 0.0;
   double get collectedFund => allocatedShares * pricePerShare;
   double get remainingFund => targetFund - collectedFund;
@@ -85,6 +125,8 @@ class ProjectModel {
       name: name,
       nameBn: nameBn,
       category: category,
+      projectCategory: projectCategory,
+      categoryNameBn: categoryNameBn,
       location: location,
       description: description,
       descriptionBn: descriptionBn,
@@ -99,6 +141,11 @@ class ProjectModel {
       targetEndDate: targetEndDate ?? this.targetEndDate,
       milestones: milestones,
       highlights: highlights,
+      trackRecords: trackRecords,
+      philosophyQuoteBn: philosophyQuoteBn,
+      philosophyQuoteEn: philosophyQuoteEn,
+      profitModelBn: profitModelBn,
+      profitModelEn: profitModelEn,
       imageUrl: imageUrl,
     );
   }

@@ -1,75 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_radius.dart';
-import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/widgets/app_button.dart';
+import 'package:swapnojatri/core/widgets/app_logo_widget.dart';
+import 'package:swapnojatri/core/widgets/brand_icons.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
-import 'package:swapnojatri/features/investor/main_layout.dart';
-import 'package:swapnojatri/features/admin/admin_layout.dart';
+import 'package:swapnojatri/features/app_shell.dart';
+import 'package:swapnojatri/features/auth/otp_verification_screen.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  final bool startInSignUp;
+  const AuthScreen({super.key, this.startInSignUp = false});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final TextEditingController _phoneController = TextEditingController(text: '1712345678');
-  final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController(text: '${index + 1}'));
-  final List<FocusNode> _otpFocusNodes = List.generate(6, (index) => FocusNode());
-
-  bool _isOtpSent = false;
-  bool _isLoading = false;
+  late bool _isSignUp;
   bool _isBangla = true;
+  bool _obscurePassword = true;
+  bool _rememberMe = true;
+  bool _agreeToTerms = true;
+  bool _isLoading = false;
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController(text: '01812-345678');
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController(text: '••••••••');
+  final TextEditingController _referralController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _isSignUp = widget.startInSignUp;
+  }
 
   @override
   void dispose() {
+    _nameController.dispose();
     _phoneController.dispose();
-    for (var c in _otpControllers) {
-      c.dispose();
-    }
-    for (var f in _otpFocusNodes) {
-      f.dispose();
-    }
+    _emailController.dispose();
+    _passwordController.dispose();
+    _referralController.dispose();
     super.dispose();
   }
 
-  void _sendOtp() {
-    HapticFeedback.selectionClick();
+  void _submitLogin(AppState state, {bool asAdmin = false}) async {
+    HapticFeedback.mediumImpact();
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isOtpSent = true;
-        });
-      }
-    });
-  }
 
-  void _verifyOtp(AppState state, {bool asAdmin = false}) {
-    HapticFeedback.selectionClick();
-    setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        if (asAdmin) {
-          state.switchUser('usr-002'); // Admin
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => AdminLayout(state: state)),
-          );
-        } else {
-          state.switchUser('usr-001'); // Rahim
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainLayout(state: state)),
-          );
-        }
-      }
-    });
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (asAdmin) {
+      state.switchUser('usr-002');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AppShell(state: state)),
+      );
+    } else {
+      state.switchUser('usr-001');
+      // Navigate to OTP Screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpVerificationScreen(
+            phoneNumber: _phoneController.text.isNotEmpty ? _phoneController.text : '01812-345678',
+            state: state,
+            isBangla: _isBangla,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -84,356 +89,340 @@ class _AuthScreenState extends State<AuthScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, size: 20, color: palette.ink),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: palette.ink),
+          onPressed: () {
+            if (_isSignUp) {
+              setState(() => _isSignUp = false);
+            } else {
+              Navigator.pop(context);
+            }
+          },
         ),
         actions: [
-          // Language Switcher Chip
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: InkWell(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                setState(() => _isBangla = !_isBangla);
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: palette.ruleStrong, width: 1.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.language_rounded, size: 13, color: palette.pine),
-                    const SizedBox(width: 4),
-                    Text(
-                      _isBangla ? 'English' : 'বাংলা',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: palette.pine,
-                      ),
-                    ),
-                  ],
-                ),
+          // Language Switcher
+          TextButton(
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              setState(() => _isBangla = !_isBangla);
+            },
+            child: Text(
+              _isBangla ? 'EN' : 'বাং',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF0066FF),
               ),
             ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Brand Crest & Header
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: palette.pine,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: palette.brass, width: 1.5),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'স্ব',
-                      style: TextStyle(
-                        fontFamily: 'serif',
-                        color: palette.brass,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isBangla ? 'স্বপ্নযাত্রী ইনভেস্টমেন্ট' : 'SWAPNOJATRI',
-                        style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      Text(
-                        _isBangla ? 'সুরক্ষিত ভূমি পোর্টফোলিও হিসাব' : 'Institutional Land Portfolio',
-                        style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
-                          color: palette.inkSecondary,
-                          fontSize: 11.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              // 1. Top Brand Logo
+              SwapnojatriLogoWidget(
+                size: 52,
+                showText: true,
+                isDark: isDark,
+                isBangla: _isBangla,
               ),
               const SizedBox(height: 24),
 
-              // Title Section
+              // 2. Title & Subtitle
               Text(
-                _isBangla ? 'পোর্টফোলিওতে প্রবেশ করুন' : 'Sign In to Your Portfolio',
-                style: AppTypography.titleLarge(isDark: isDark, isBangla: _isBangla).copyWith(
+                _isSignUp
+                    ? (_isBangla ? 'একাউন্ট তৈরি করুন' : 'Create Account')
+                    : (_isBangla ? 'স্বাগতম ফিরে এসেছেন! 👋' : 'Welcome Back! 👋'),
+                style: GoogleFonts.hindSiliguri(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
+                  color: palette.ink,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
-                _isBangla
-                    ? 'আপনার নিবন্ধিত মোবাইল নম্বরে ওটিপি যাচাইকরণ কোড পাঠানো হবে।'
-                    : 'A 6-digit verification code will be sent to your registered mobile number.',
-                style: AppTypography.body(isDark: isDark, isBangla: _isBangla).copyWith(
+                _isSignUp
+                    ? (_isBangla ? 'বিনিয়োগ শুরু করতে এখনই যোগ দিন' : 'Join now to start smart investing')
+                    : (_isBangla ? 'চালু রাখতে লগইন করুন' : 'Sign in to continue to your portfolio'),
+                style: GoogleFonts.hindSiliguri(
+                  fontSize: 13,
                   color: palette.inkSecondary,
-                  fontSize: 13.5,
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
-              // Phone Field with +880 Prefix in a Sunken Well
-              Text(
-                _isBangla ? 'মোবাইল নম্বর' : 'Mobile Number',
-                style: AppTypography.sectionLabel(isDark: isDark, isBangla: _isBangla).copyWith(
-                  fontSize: 12.5,
+              // 3. Form Inputs
+              if (_isSignUp) ...[
+                _buildInputField(
+                  controller: _nameController,
+                  label: _isBangla ? 'পুরো নাম' : 'Full Name',
+                  hint: _isBangla ? 'আপনার পূর্ণ নাম লিখুন' : 'Enter full name',
+                  prefixIcon: Icons.person_outline_rounded,
+                  palette: palette,
+                ),
+                const SizedBox(height: 14),
+              ],
+
+              _buildInputField(
+                controller: _phoneController,
+                label: _isBangla ? 'মোবাইল নম্বর' : 'Mobile Number',
+                hint: '01812-345678',
+                prefixIcon: Icons.phone_outlined,
+                palette: palette,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 14),
+
+              if (_isSignUp) ...[
+                _buildInputField(
+                  controller: _emailController,
+                  label: _isBangla ? 'ইমেইল (ঐচ্ছিক)' : 'Email (Optional)',
+                  hint: 'example@domain.com',
+                  prefixIcon: Icons.email_outlined,
+                  palette: palette,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 14),
+              ],
+
+              _buildInputField(
+                controller: _passwordController,
+                label: _isBangla ? 'পাসওয়ার্ড' : 'Password',
+                hint: '••••••••',
+                prefixIcon: Icons.lock_outline_rounded,
+                palette: palette,
+                obscureText: _obscurePassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    size: 20,
+                    color: palette.inkTertiary,
+                  ),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
-              const SizedBox(height: 6),
-              Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  borderRadius: AppRadius.borderControl,
-                  border: Border.all(color: palette.ruleStrong, width: 1.0),
+
+              if (_isSignUp) ...[
+                const SizedBox(height: 14),
+                _buildInputField(
+                  controller: _referralController,
+                  label: _isBangla ? 'রেফার কোড (ঐচ্ছিক)' : 'Referral Code (Optional)',
+                  hint: 'REF-12345',
+                  prefixIcon: Icons.card_giftcard_outlined,
+                  palette: palette,
                 ),
-                child: Row(
+              ],
+
+              const SizedBox(height: 12),
+
+              // 4. Remember / Forgot / Terms Checkbox
+              if (!_isSignUp) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Sunken +880 Prefix
-                    Container(
-                      width: 64,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: palette.surfaceSunken,
-                        border: Border(right: BorderSide(color: palette.rule, width: 1.0)),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '+880',
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.w700,
-                          color: palette.inkSecondary,
-                          fontSize: 13,
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: Checkbox(
+                            value: _rememberMe,
+                            activeColor: const Color(0xFF0066FF),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            onChanged: (val) => setState(() => _rememberMe = val ?? false),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isBangla ? 'আমাকে মনে রাখুন' : 'Remember me',
+                          style: GoogleFonts.hindSiliguri(
+                            fontSize: 12.5,
+                            color: palette.inkSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        enabled: !_isOtpSent,
-                        style: AppTypography.bodyStrong(isDark: isDark).copyWith(letterSpacing: 0.5),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '1XXXXXXXXX',
-                          hintStyle: TextStyle(color: palette.inkTertiary),
-                          isDense: true,
+                    GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(_isBangla ? 'পাসওয়ার্ড রিসেট লিঙ্ক এসএমএস করা হয়েছে' : 'Password reset link sent to mobile!'),
+                            backgroundColor: const Color(0xFF0066FF),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        _isBangla ? 'পাসওয়ার্ড ভুলেছেন?' : 'Forgot Password?',
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF0066FF),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              if (!_isOtpSent) ...[
-                AppButton(
-                  label: _isBangla ? 'যাচাইকরণ কোড পাঠান' : 'Send Verification Code',
-                  variant: AppButtonVariant.primary,
-                  isLoading: _isLoading,
-                  isBangla: _isBangla,
-                  onPressed: _sendOtp,
-                ),
               ] else ...[
-                // OTP as 6 Ruled Boxes
-                Text(
-                  _isBangla ? '৬ সংখ্যার ওটিপি কোড' : '6-Digit OTP Code',
-                  style: AppTypography.sectionLabel(isDark: isDark, isBangla: _isBangla).copyWith(
-                    fontSize: 12.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(6, (index) {
-                    return Container(
-                      width: 44,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: palette.surface,
-                        borderRadius: AppRadius.borderChip,
-                        border: Border.all(color: palette.ruleStrong, width: 1.0),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: Checkbox(
+                        value: _agreeToTerms,
+                        activeColor: const Color(0xFF0066FF),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        onChanged: (val) => setState(() => _agreeToTerms = val ?? false),
                       ),
-                      child: Center(
-                        child: TextField(
-                          controller: _otpControllers[index],
-                          focusNode: _otpFocusNodes[index],
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          maxLength: 1,
-                          style: AppTypography.amountMedium(isDark: isDark).copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18,
-                          ),
-                          decoration: const InputDecoration(
-                            counterText: '',
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                          onChanged: (val) {
-                            if (val.isNotEmpty && index < 5) {
-                              _otpFocusNodes[index + 1].requestFocus();
-                            }
-                          },
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _isBangla
+                            ? 'আমি শর্তাবলী ও গোপনীয়তা নীতিমালার সাথে একমত'
+                            : 'I agree to the Terms of Service and Privacy Policy',
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 12,
+                          color: palette.inkSecondary,
+                          height: 1.3,
                         ),
                       ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 24),
-
-                AppButton(
-                  label: _isBangla ? 'যাচাই করে প্রবেশ করুন' : 'Verify & Continue',
-                  variant: AppButtonVariant.primary,
-                  isLoading: _isLoading,
-                  isBangla: _isBangla,
-                  onPressed: () => _verifyOtp(state),
-                ),
-                const SizedBox(height: 8),
-
-                Center(
-                  child: TextButton(
-                    onPressed: () => setState(() => _isOtpSent = false),
-                    child: Text(
-                      _isBangla ? 'মোবাইল নম্বর পরিবর্তন করুন' : 'Change Phone Number',
-                      style: TextStyle(color: palette.inkSecondary, fontSize: 12),
                     ),
-                  ),
+                  ],
                 ),
               ],
 
-              const SizedBox(height: 32),
-              const Divider(height: 1),
               const SizedBox(height: 20),
 
-              // Instant Sandbox Mode Quick Selectors
-              Center(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.shield_outlined, size: 14, color: palette.pine),
-                        const SizedBox(width: 6),
-                        Text(
-                          _isBangla ? 'নমুনা পরিবেশ অ্যাক্সেস' : 'Instant Sandbox Access',
-                          style: AppTypography.caption(isDark: isDark, isBangla: _isBangla).copyWith(
-                            color: palette.inkSecondary,
-                            fontWeight: FontWeight.w600,
+              // 5. Primary Action Button (Royal Blue)
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => _submitLogin(state, asAdmin: false),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0066FF),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          _isSignUp
+                              ? (_isBangla ? 'সাইন আপ' : 'Sign Up')
+                              : (_isBangla ? 'লগইন' : 'Log In'),
+                          style: GoogleFonts.hindSiliguri(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    InkWell(
-                      onTap: () => _verifyOtp(state, asAdmin: false),
-                      borderRadius: AppRadius.borderControl,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: palette.surface,
-                          borderRadius: AppRadius.borderControl,
-                          border: Border.all(color: palette.ruleStrong, width: 1.0),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(color: palette.pine, shape: BoxShape.circle),
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _isBangla ? 'বিনিয়োগকারী পোর্টাল (রহিম চৌধুরী)' : 'Investor Portal (Rahim Chowdhury)',
-                                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: palette.ink),
-                                    ),
-                                    Text(
-                                      _isBangla ? '৪টি অংশ • ৳ ১,০২,০০০ বিনিয়োগ' : '4 Shares • ৳ 1,02,000 Invested',
-                                      style: TextStyle(fontSize: 11, color: palette.inkSecondary),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Icon(Icons.chevron_right_rounded, size: 18, color: palette.inkSecondary),
-                          ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 6. Social Logins Section
+              if (!_isSignUp) ...[
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: palette.rule)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        _isBangla ? 'অথবা অন্য মাধ্যমে লগইন করুন' : 'Or continue with',
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 11.5,
+                          color: palette.inkTertiary,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () => _verifyOtp(state, asAdmin: true),
-                      borderRadius: AppRadius.borderControl,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: palette.surface,
-                          borderRadius: AppRadius.borderControl,
-                          border: Border.all(color: palette.ruleStrong, width: 1.0),
+                    Expanded(child: Divider(color: palette.rule)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildSocialButton(const GoogleLogoWidget(size: 24), 'Google', palette, state),
+                    const SizedBox(width: 16),
+                    _buildSocialButton(const AppleLogoWidget(size: 24), 'Apple', palette, state),
+                    const SizedBox(width: 16),
+                    _buildSocialButton(const MicrosoftLogoWidget(size: 22), 'Microsoft', palette, state),
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // 7. Toggle between Login & SignUp
+              GestureDetector(
+                onTap: () => setState(() => _isSignUp = !_isSignUp),
+                child: RichText(
+                  text: TextSpan(
+                    text: _isSignUp
+                        ? (_isBangla ? 'ইতিমধ্যে একাউন্ট আছে? ' : 'Already have an account? ')
+                        : (_isBangla ? 'একাউন্ট নেই? ' : "Don't have an account? "),
+                    style: GoogleFonts.hindSiliguri(
+                      fontSize: 13,
+                      color: palette.inkSecondary,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: _isSignUp
+                            ? (_isBangla ? 'লগইন' : 'Log In')
+                            : (_isBangla ? 'সাইন আপ করুন' : 'Sign Up'),
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF0066FF),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(color: palette.brass, shape: BoxShape.circle),
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _isBangla ? 'প্রশাসক কনসোল (তানভীর আহমেদ)' : 'Admin Console (Tanvir Ahmed)',
-                                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: palette.ink),
-                                    ),
-                                    Text(
-                                      _isBangla ? 'তহবিল ও ব্যয় ভাউচার অনুমোদন' : 'Fund & Expense Approval',
-                                      style: TextStyle(fontSize: 11, color: palette.inkSecondary),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Icon(Icons.chevron_right_rounded, size: 18, color: palette.inkSecondary),
-                          ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Quick Admin Switcher (For Pair Testing)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: palette.surfaceSunken,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.admin_panel_settings_outlined, size: 16, color: palette.inkSecondary),
+                    const SizedBox(width: 8),
+                    Text(
+                      _isBangla ? 'অ্যাডমিন হিসেবে প্রবেশ:' : 'Admin Portal:',
+                      style: GoogleFonts.hindSiliguri(fontSize: 12, color: palette.inkSecondary),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => _submitLogin(state, asAdmin: true),
+                      child: Text(
+                        _isBangla ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Open Admin App',
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF0066FF),
                         ),
                       ),
                     ),
@@ -444,6 +433,76 @@ class _AuthScreenState extends State<AuthScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData prefixIcon,
+    required AppPalette palette,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.hindSiliguri(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+            color: palette.ink,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: palette.ruleStrong, width: 1.0),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            style: GoogleFonts.poppins(fontSize: 14, color: palette.ink),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: GoogleFonts.poppins(fontSize: 13, color: palette.inkTertiary),
+              prefixIcon: Icon(prefixIcon, size: 18, color: palette.inkSecondary),
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButton(Widget iconWidget, String label, AppPalette palette, AppState state) {
+    return Container(
+      width: 54,
+      height: 54,
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: palette.ruleStrong, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: iconWidget,
+        onPressed: () => _submitLogin(state, asAdmin: false),
       ),
     );
   }

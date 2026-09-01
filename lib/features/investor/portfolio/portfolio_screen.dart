@@ -1,240 +1,324 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/theme/app_typography.dart';
-import 'package:swapnojatri/core/localization/currency_formatter.dart';
-import 'package:swapnojatri/core/widgets/matra_rule_widget.dart';
-import 'package:swapnojatri/core/widgets/figure.dart';
-import 'package:swapnojatri/core/widgets/share_certificate_widget.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/investor/portfolio/my_investment_screen.dart';
 
 class PortfolioScreen extends StatelessWidget {
   final AppState state;
+  final Function(int tabIndex)? onNavigateTab;
 
   const PortfolioScreen({
     super.key,
     required this.state,
+    this.onNavigateTab,
   });
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isBangla = state.isBangla;
-    final investments = state.investments;
-    final distributions = state.distributions;
+    final project = state.landVest100;
 
     return Scaffold(
       backgroundColor: palette.canvas,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
-          isBangla ? 'পোর্টফোলিও ও অংশীদারিত্ব' : 'Portfolio Holdings & Shares',
-          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
+          isBangla ? 'আমার পোর্টফোলিও' : 'My Portfolio',
+          style: GoogleFonts.hindSiliguri(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: palette.ink,
           ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Summary Figures
+              // 1. Royal Blue Gradient Card
               Container(
-                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: palette.surface,
-                  border: Border.all(color: palette.rule, width: 1.0),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF0066FF),
+                      Color(0xFF004ECC),
+                      Color(0xFF0A2540),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0066FF).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Figure(
-                        label: isBangla ? 'মোট বিনিয়োগ' : 'Total Invested',
-                        value: CurrencyFormatter.format(state.totalInvested, isBangla: isBangla, compact: true),
-                        isBangla: isBangla,
+                    Text(
+                      isBangla ? 'মোট বিনিয়োগ' : 'Total Investment',
+                      style: GoogleFonts.hindSiliguri(
+                        fontSize: 13.5,
+                        color: Colors.white.withValues(alpha: 0.95),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Container(width: 1, height: 36, color: palette.rule),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Figure(
-                        label: isBangla ? 'মালিকানাধীন অংশ' : 'Total Shares',
-                        value: isBangla
-                            ? '${CurrencyFormatter.toBanglaDigits(state.totalSharesOwned.toString())} টি অংশ'
-                            : '${state.totalSharesOwned} Shares',
-                        isBangla: isBangla,
+                    const SizedBox(height: 4),
+                    Text(
+                      '৳ 76,500',
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.1,
                       ),
                     ),
-                    Container(width: 1, height: 36, color: palette.rule),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Figure(
-                        label: isBangla ? 'মোট লভ্যাংশ' : 'Dividends',
-                        value: CurrencyFormatter.format(state.totalRealizedProfit, isBangla: isBangla, compact: true),
-                        accentColor: palette.pine,
-                        isBangla: isBangla,
-                      ),
+                    const SizedBox(height: 18),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isBangla ? 'মোট লাভ' : 'Total Profit',
+                                  style: GoogleFonts.hindSiliguri(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.95),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '৳ 8,450',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF4ADE80),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isBangla ? 'মোট প্রাপ্তি' : 'Total Return',
+                                  style: GoogleFonts.hindSiliguri(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.95),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '৳ 8,450',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Section 1: Holdings as Ruled Rows (§10)
-              MatraRuleWidget(width: 32, color: palette.pine),
-              const SizedBox(height: 8),
+              // 2. "আমার প্রকল্পগুলো" Section
               Text(
-                isBangla ? 'অংশীদারিত্ব খতিয়ান' : 'Project Holdings',
-                style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
+                isBangla ? 'আমার প্রকল্পগুলো' : 'My Projects',
+                style: GoogleFonts.hindSiliguri(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: palette.ink,
                 ),
               ),
               const SizedBox(height: 12),
 
-              Container(
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  border: Border.all(color: palette.rule, width: 1.0),
-                ),
-                child: Column(
-                  children: investments.map((inv) {
-                    return ExpansionTile(
-                      shape: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
-                      collapsedShape: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
-                      title: Text(
-                        isBangla ? inv.projectTitleBn : inv.projectTitle,
-                        style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: Text(
-                        isBangla
-                            ? '${CurrencyFormatter.toBanglaDigits(inv.sharesCount.toString())}টি অংশ • ${CurrencyFormatter.format(inv.totalAmount, isBangla: true)}'
-                            : '${inv.sharesCount} Shares • ${CurrencyFormatter.format(inv.totalAmount)}',
-                        style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                          color: palette.inkSecondary,
-                        ),
-                      ),
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(14),
-                          color: palette.surfaceSunken,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isBangla
-                                    ? 'বরাদ্দকৃত লট: ${inv.assignedLots.isEmpty ? 'LOT-041, LOT-042, LOT-043, LOT-044' : inv.assignedLots.join(', ')}'
-                                    : 'Allocated Lots: ${inv.assignedLots.isEmpty ? 'LOT-041, LOT-042, LOT-043, LOT-044' : inv.assignedLots.join(', ')}',
-                                style: TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w600, color: palette.pine),
-                              ),
-                              const SizedBox(height: 8),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ShareCertificateWidget(
-                                        investorName: state.currentUser.name,
-                                        lotNumbers: 'LOT-041, LOT-042, LOT-043, LOT-044',
-                                        shareCount: inv.sharesCount,
-                                        totalValue: inv.totalAmount,
-                                        issueDate: inv.createdAt,
-                                        isBangla: isBangla,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.description_outlined, size: 16, color: palette.pine),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      isBangla ? 'অফিসিয়াল মালিকানা সনদপত্র দেখুন' : 'View Registered Share Certificate',
-                                      style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
-                                        color: palette.pine,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // Section 2: Dividend History as Second Ruled Section (§10)
-              MatraRuleWidget(width: 32, color: palette.pine),
-              const SizedBox(height: 8),
-              Text(
-                isBangla ? 'বিতরণকৃত মুনাফা ও লভ্যাংশ ইতিহাস' : 'Dividend & Payout History',
-                style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  border: Border.all(color: palette.rule, width: 1.0),
-                ),
-                child: Column(
-                  children: distributions.map((dist) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: palette.rule, width: 1.0)),
-                      ),
-                      child: Row(
+              // Project Item 1: LandVest 100
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyInvestmentScreen(project: project, state: state),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: palette.rule, width: 1.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isBangla ? dist.periodNameBn : dist.periodName,
-                                style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                isBangla ? '৪টি শেয়ারের বিপরীতে' : 'For 4 shares',
-                                style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-                                  color: palette.inkTertiary,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'LandVest 100',
+                            style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
                           ),
                           Text(
-                            '+ ${CurrencyFormatter.format(dist.investorAmount, isBangla: isBangla)}',
-                            style: AppTypography.amountSmall(isDark: isDark, isBangla: isBangla).copyWith(
-                              color: palette.jade,
-                              fontWeight: FontWeight.w700,
+                            '৳ 76,500',
+                            style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '3 Shares',
+                        style: GoogleFonts.poppins(fontSize: 12, color: palette.inkSecondary),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(color: Color(0xFF00C853), shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            isBangla ? 'মুনাফা: ৳ ৮,৪৫০' : 'Profit: ৳ 8,450',
+                            style: GoogleFonts.hindSiliguri(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF00C853),
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }).toList(),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
+
+              // Project Item 2: GreenLand City
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'GreenLand City',
+                          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
+                        ),
+                        Text(
+                          '৳ 51,000',
+                          style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '2 Shares',
+                      style: GoogleFonts.poppins(fontSize: 12, color: palette.inkSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(color: Color(0xFF0066FF), shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isBangla ? 'চলমান প্রকল্প' : 'In Progress',
+                          style: GoogleFonts.hindSiliguri(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF0066FF),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Button: Invest in More Projects
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (onNavigateTab != null) {
+                      onNavigateTab!(1);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0066FF),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    isBangla ? 'আরও প্রকল্পে বিনিয়োগ করুন' : 'Invest in More Projects',
+                    style: GoogleFonts.hindSiliguri(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

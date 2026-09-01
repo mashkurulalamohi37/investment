@@ -53,7 +53,7 @@ class _MainLayoutState extends State<MainLayout> {
       CustomBottomNavItem(
         icon: Icons.explore_outlined,
         activeIcon: Icons.explore_rounded,
-        label: isBangla ? 'প্রকল্পসমূহ' : 'Projects',
+        label: isBangla ? 'প্রকল্প' : 'Projects',
       ),
       CustomBottomNavItem(
         icon: Icons.pie_chart_outline_rounded,
@@ -63,7 +63,7 @@ class _MainLayoutState extends State<MainLayout> {
       CustomBottomNavItem(
         icon: Icons.receipt_long_outlined,
         activeIcon: Icons.receipt_long_rounded,
-        label: isBangla ? 'লেজার' : 'Ledger',
+        label: isBangla ? 'লেনদেন' : 'Transactions',
       ),
       CustomBottomNavItem(
         icon: Icons.person_outline_rounded,
@@ -75,7 +75,7 @@ class _MainLayoutState extends State<MainLayout> {
     final screens = [
       HomeScreen(state: widget.state, onNavigateTab: _onTabSelected),
       ProjectsScreen(state: widget.state),
-      PortfolioScreen(state: widget.state),
+      PortfolioScreen(state: widget.state, onNavigateTab: _onTabSelected),
       TransactionsScreen(state: widget.state),
       ProfileScreen(state: widget.state, onLogout: _handleLogout),
     ];

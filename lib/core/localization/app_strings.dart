@@ -36,8 +36,12 @@ class AppStrings {
   static const landVestTitleEn = 'LandVest 100';
   static const landVestTitleBn = 'ল্যান্ডভেস্ট ১০০';
   static const landVestCode = 'LV100';
-  static const landVestDescEn = 'Strategic land acquisition project in Savar, Dhaka with verified registration deed and high capital appreciation potential.';
-  static const landVestDescBn = 'সাভার, ঢাকায় কৌশলগত জমি অধিগ্রহণ প্রকল্প। সম্পূর্ণ যাচাইকৃত দলিল ও উচ্চ মূলধনী প্রবৃদ্ধির নিশ্চয়তা।';
+  static const landVestDescEn = 'A small-scale collaborative initiative to invest in prime Dhaka land and share net project profits without the burden of individual land title management.';
+  static const landVestDescBn = 'ঢাকায় জমিতে বিনিয়োগ করে মুনাফা ভাগাভাগি করার একটি ছোট পরিসরের যৌথ উদ্যোগ। এখানে ব্যক্তিগত জটিল দলিল ব্যবস্থাপনার ঝামেলা ছাড়াই স্বচ্ছ লভ্যাংশ বণ্টন করা হয়।';
+  
+  static const philosophyQuoteBn = '“আপনি আমাকে বিশ্বাস করেন বলে বিনিয়োগ করবেন—এটা গুরুত্বপূর্ণ; কিন্তু শুধু বিশ্বাসের কারণে করবেন না। আগে পরিকল্পনাটা বুঝুন, তারপর সিদ্ধান্ত নিন।”';
+  static const philosophyQuoteEn = '"Investing because you trust us is important; but do not invest solely on trust. Understand the project plan first, then decide according to your capacity."';
+
   static const targetFundEn = 'Target Fund';
   static const targetFundBn = 'লক্ষ্যমাত্রা তহবিল';
   static const collectedFundEn = 'Collected Fund';
@@ -50,20 +54,30 @@ class AppStrings {
   static const availableSharesBn = 'উপলব্ধ শেয়ার';
   static const allocatedSharesEn = 'Allocated Shares';
   static const allocatedSharesBn = 'বরাদ্দকৃত শেয়ার';
-  static const maxSharesPerInvestorEn = 'Limit: 1 - 4 Shares per Investor';
-  static const maxSharesPerInvestorBn = 'সীমা: প্রতি বিনিয়োগকারী ১ - ৪ টি শেয়ার';
+  static const maxSharesPerInvestorEn = 'Subscription: 1, 2, 3 or 4+ Shares';
+  static const maxSharesPerInvestorBn = 'অংশগ্রহণ: ১, ২, ৩ বা ৪+ শেয়ার (সামর্থ্য অনুযায়ী)';
+
+  // Categories
+  static const categoryAllEn = 'All Projects';
+  static const categoryAllBn = 'সকল প্রজেক্ট';
+  static const categoryRealEstateEn = 'Real Estate';
+  static const categoryRealEstateBn = 'রিয়েল এস্টেট / জমি';
+  static const categoryAgroEn = 'Agro Farming';
+  static const categoryAgroBn = 'কৃষি ও ফার্মিং';
+  static const categoryCommercialEn = 'Commercial';
+  static const categoryCommercialBn = 'বাণিজ্যিক উদ্যোগ';
 
   // Quick Actions
   static const exploreProjectsEn = 'Explore Projects';
   static const exploreProjectsBn = 'প্রকল্প দেখুন';
   static const fundTransparencyEn = 'Fund Transparency';
   static const fundTransparencyBn = 'তহবিল স্বচ্ছতা';
-  static const documentVaultEn = 'Document Vault';
-  static const documentVaultBn = 'দলিল ভল্ট';
+  static const documentVaultEn = 'Project Vault';
+  static const documentVaultBn = 'প্রকল্প ভল্ট';
   static const supportCenterEn = 'Support';
   static const supportCenterBn = 'সহায়তা কেন্দ্র';
 
   // Disclaimers
-  static const legalDisclaimerEn = 'Estimated returns are subject to actual project profits. Swapnojatri strictly adheres to legal and regulatory compliance in Bangladesh. No returns are guaranteed.';
-  static const legalDisclaimerBn = 'প্রাক্কলিত রিটার্ন প্রকল্পের প্রকৃত মুনাফার ওপর নির্ভরশীল। স্বপ্নযাত্রী বাংলাদেশের সকল আর্থিক ও আইনি বিধিমালা কঠোরভাবে মেনে চলে। কোনো নিশ্চিত লভ্যাংশ প্রতিশ্রুতি দেওয়া হয় না।';
+  static const legalDisclaimerEn = 'Returns are based on actual net project profits and milestone realization. Swapnojatri provides fractional profit-sharing participation, not direct immovable property deeds.';
+  static const legalDisclaimerBn = 'লভ্যাংশ প্রকল্পের প্রকৃত নিট মুনাফা ও নির্ধারিত মাইলস্টোন অর্জনের ওপর নির্ভরশীল। স্বপ্নযাত্রী প্রকল্পভিত্তিক লভ্যাংশ অংশীদারিত্ব প্রদান করে, সরাসরি ব্যক্তিগত দলিলপত্র নয়।';
 }

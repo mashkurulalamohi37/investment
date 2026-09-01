@@ -7,6 +7,7 @@ class TransactionModel {
   final String? investmentId;
   final String? projectId;
   final String projectName;
+  final String projectNameBn;
   final String userId;
   final TransactionType type;
   final TransactionDirection direction;
@@ -17,12 +18,14 @@ class TransactionModel {
   final TransactionStatus status;
   final DateTime createdAt;
   final String description;
+  final String? descriptionBn;
 
   const TransactionModel({
     required this.id,
     this.investmentId,
     this.projectId,
     this.projectName = 'LandVest 100',
+    this.projectNameBn = 'স্বপ্নযাত্রী ১০০',
     this.userId = 'usr-001',
     required this.type,
     this.direction = TransactionDirection.debit,
@@ -33,6 +36,7 @@ class TransactionModel {
     required this.status,
     required this.createdAt,
     this.description = 'LandVest 100 Transaction',
+    this.descriptionBn,
     String? title,
     String? referenceId,
     DateTime? timestamp,
@@ -40,6 +44,9 @@ class TransactionModel {
 
   // Convenience getters
   String get title => description.isNotEmpty ? description : projectName;
+  String get titleBn => (descriptionBn != null && descriptionBn!.isNotEmpty)
+      ? descriptionBn!
+      : (description.isNotEmpty ? description : projectNameBn);
   String get referenceId => reference;
   DateTime get timestamp => createdAt;
 }

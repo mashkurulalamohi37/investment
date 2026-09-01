@@ -64,7 +64,7 @@ class HoldingCard extends StatelessWidget {
                   borderRadius: AppRadius.borderChip,
                 ),
                 child: Text(
-                  isBangla ? 'আপনার মোট জমি বিনিয়োগ' : 'TOTAL ASSET HOLDING',
+                  isBangla ? 'আপনার মোট পোর্টফোলিও বিনিয়োগ' : 'TOTAL PORTFOLIO HOLDING',
                   style: TextStyle(
                     fontFamily: 'monospace',
                     fontSize: 10,
@@ -97,18 +97,18 @@ class HoldingCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: palette.surfaceSunken,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadius.borderControl,
               border: Border.all(color: palette.rule, width: 1.0),
             ),
             child: Column(
               children: [
                 _tableRow(
-                  label1: isBangla ? 'মালিকানা অংশ' : 'Shares Allocated',
+                  label1: isBangla ? 'অংশীদারিত্ব শেয়ার' : 'Shares Subscribed',
                   val1: isBangla
-                      ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())}/১০০ অংশ'
-                      : '$totalShares of 100 Shares',
-                  label2: isBangla ? 'নির্দিষ্ট লট নং' : 'Cadastral Lots',
-                  val2: 'LOT-041..044',
+                      ? '${CurrencyFormatter.toBanglaDigits(totalShares.toString())}টি শেয়ার'
+                      : '$totalShares Shares',
+                  label2: isBangla ? 'প্রজেক্ট রেফারেন্স' : 'Project Ref',
+                  val2: 'LandVest 100',
                   palette: palette,
                   isDark: isDark,
                   isBangla: isBangla,

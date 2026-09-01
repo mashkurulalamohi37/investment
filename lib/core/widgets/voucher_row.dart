@@ -134,54 +134,68 @@ class VoucherRow extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: palette.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.borderSheet,
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isBangla ? 'অনুমোদিত ভাউচার রসিদ' : 'Approved Expense Voucher',
-                    style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
-                      fontWeight: FontWeight.w600,
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: palette.ruleStrong,
+                      borderRadius: AppRadius.borderChip,
                     ),
                   ),
-                  SealWidget(size: 32, isBangla: isBangla),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Divider(height: 1),
-              const SizedBox(height: 16),
-              _modalRow('ভাউচার নং / Voucher No', expense.voucherNo, palette, isDark),
-              const SizedBox(height: 10),
-              _modalRow('প্রাপক / Payee', expense.payee, palette, isDark),
-              const SizedBox(height: 10),
-              _modalRow('বিবরণ / Purpose', expense.description, palette, isDark),
-              const SizedBox(height: 10),
-              _modalRow('অনুমোদনকারী / Auditor', expense.approvedBy, palette, isDark),
-              const SizedBox(height: 10),
-              _modalRow('অর্থের পরিমাণ / Amount', CurrencyFormatter.format(expense.amount, isBangla: isBangla), palette, isDark, isHighlight: true),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: palette.ruleStrong),
-                    shape: RoundedRectangleBorder(borderRadius: AppRadius.borderControl),
-                  ),
-                  child: Text(isBangla ? 'বন্ধ করুন' : 'Close', style: TextStyle(color: palette.ink)),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isBangla ? 'অনুমোদিত ভাউচার রসিদ' : 'Approved Expense Voucher',
+                      style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SealWidget(size: 32, isBangla: isBangla),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Divider(height: 1, color: palette.rule),
+                const SizedBox(height: 14),
+                _modalRow('ভাউচার নং / Voucher No', expense.voucherNo, palette, isDark),
+                _modalRow('প্রাপক / Payee', expense.payee, palette, isDark),
+                _modalRow('বিবরণ / Purpose', expense.description, palette, isDark),
+                _modalRow('অনুমোদনকারী / Auditor', expense.approvedBy, palette, isDark),
+                _modalRow('অর্থের পরিমাণ / Amount', CurrencyFormatter.format(expense.amount, isBangla: isBangla), palette, isDark, isHighlight: true),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: palette.ruleStrong),
+                      shape: RoundedRectangleBorder(borderRadius: AppRadius.borderControl),
+                    ),
+                    child: Text(
+                      isBangla ? 'বন্ধ করুন' : 'Close',
+                      style: AppTypography.bodyStrong(isDark: isDark, isBangla: isBangla).copyWith(fontSize: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -189,18 +203,36 @@ class VoucherRow extends StatelessWidget {
   }
 
   static Widget _modalRow(String label, String value, AppPalette palette, bool isDark, {bool isHighlight = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: AppTypography.caption(isDark: isDark)),
-        Text(
-          value,
-          style: AppTypography.bodyStrong(isDark: isDark).copyWith(
-            fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w500,
-            color: isHighlight ? palette.pine : palette.ink,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Text(
+              label,
+              style: AppTypography.caption(isDark: isDark).copyWith(
+                color: palette.inkSecondary,
+                fontSize: 12,
+              ),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 6,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: AppTypography.bodyStrong(isDark: isDark).copyWith(
+                fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600,
+                color: isHighlight ? palette.pine : palette.ink,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

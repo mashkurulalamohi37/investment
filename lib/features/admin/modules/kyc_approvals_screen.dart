@@ -25,10 +25,27 @@ class AdminKycApprovalsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: palette.canvas,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
-          isBangla ? 'কেওয়াইসি ও বিনিয়োগকারী অনুমোদন' : 'KYC & Compliance Queue',
-          style: AppTypography.headingMedium(isDark: isDark, isBangla: isBangla),
+          isBangla ? 'কেওয়াইসি ও বিনিয়োগকারী অনুমোদন' : 'KYC Compliance Queue',
+          style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => state.toggleLanguage(),
+            child: Text(
+              isBangla ? 'EN' : 'বাং',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: palette.pine,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

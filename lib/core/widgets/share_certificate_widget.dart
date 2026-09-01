@@ -141,23 +141,23 @@ class ShareCertificateWidget extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              isBangla ? 'অংশীদারি ভূমি মালিকানা সনদপত্র' : 'CERTIFICATE OF LAND OWNERSHIP',
+                              isBangla ? 'প্রকল্প লভ্যাংশ অংশীদারিত্ব সনদপত্র' : 'PROJECT PROFIT-SHARING CERTIFICATE',
                               style: AppTypography.titleLarge(isDark: isDark, isBangla: isBangla).copyWith(
-                                fontSize: 21,
-                                fontWeight: FontWeight.w700,
-                                color: palette.pine,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFFC59B27),
                               ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 12),
-                            Container(width: 48, height: 1.5, color: palette.brass),
+                            Container(width: 48, height: 1.5, color: const Color(0xFFC59B27)),
                             const SizedBox(height: 20),
 
                             // Certification Statement
                             Text(
                               isBangla
-                                  ? 'এতদ্বারা প্রত্যয়ন করা যাইতেছে যে, নিম্নবর্ণিত বিনিয়োগকারী ল্যান্ডভেস্ট ১০০ প্রকল্পের অধীনে সাভার মৌজাস্থ প্লট নং ৪১৮-এর নিম্নোক্ত চিহ্নিত অংশসমূহের বৈধ স্বত্বাধিকারী।'
-                                  : 'This is to certify that the undermentioned investor holds recognized fractional ownership in Plot #418, Savar Mouza under the LandVest 100 Project.',
+                                  ? 'এতদ্বারা প্রত্যয়ন করা যাইতেছে যে, নিম্নবর্ণিত বিনিয়োগকারী স্বপ্নযাত্রী ইনভেস্টমেন্ট প্ল্যাটফর্মের LandVest 100 প্রকল্পের অধীনে নির্ধারিত শেয়ারের বৈধ অংশীদার এবং প্রকল্পের নিট লভ্যাংশ প্রাপ্তির পূর্ণ অধিকারী।'
+                                  : 'This is to certify that the undermentioned investor is a verified profit-sharing subscriber in LandVest 100 under Swapnojatri Investment Platform, entitled to full project dividend distributions.',
                               style: AppTypography.body(isDark: isDark, isBangla: isBangla).copyWith(
                                 fontSize: 13,
                                 height: 1.6,
@@ -169,7 +169,7 @@ class ShareCertificateWidget extends StatelessWidget {
 
                             // Holder Name in TitleLarge Serif
                             Text(
-                              isBangla ? 'সনদ প্রাপক / Holder Name' : 'REGISTERED OWNER',
+                              isBangla ? 'নিবন্ধিত অংশীদার' : 'REGISTERED SUBSCRIBER',
                               style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
                                 color: palette.inkTertiary,
                               ),
@@ -214,7 +214,7 @@ class ShareCertificateWidget extends StatelessWidget {
                                   const Divider(height: 12),
                                   _certDataRow(
                                     isBangla ? 'সাব-রেজিস্ট্রি দলিল' : 'Title Deed',
-                                    '#4982/2026 (Savar Sub-Registry)',
+                                    isBangla ? 'দলিল নং ৪৯৮২/২০২৬ (সাভার সাব-রেজিস্ট্রি)' : '#4982/2026 (Savar Sub-Registry)',
                                     palette,
                                     isDark,
                                   ),
@@ -236,7 +236,7 @@ class ShareCertificateWidget extends StatelessWidget {
                                       children: [
                                         Container(width: 100, height: 1, color: palette.inkTertiary),
                                         const SizedBox(height: 4),
-                                        Text('রেজিস্ট্রার / Registrar', style: AppTypography.micro(isDark: isDark, isBangla: isBangla)),
+                                        Text(isBangla ? 'নিবন্ধন কর্মকর্তা' : 'Registrar', style: AppTypography.micro(isDark: isDark, isBangla: isBangla)),
                                       ],
                                     ),
                                     // Right: Managing Director Signature line
@@ -245,7 +245,7 @@ class ShareCertificateWidget extends StatelessWidget {
                                       children: [
                                         Container(width: 100, height: 1, color: palette.inkTertiary),
                                         const SizedBox(height: 4),
-                                        Text('ব্যবস্থাপনা পরিচালক / MD', style: AppTypography.micro(isDark: isDark, isBangla: isBangla)),
+                                        Text(isBangla ? 'ব্যবস্থাপনা পরিচালক' : 'Managing Director', style: AppTypography.micro(isDark: isDark, isBangla: isBangla)),
                                       ],
                                     ),
                                   ],

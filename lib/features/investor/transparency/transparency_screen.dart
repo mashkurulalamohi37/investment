@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/core/theme/app_radius.dart';
 import 'package:swapnojatri/core/theme/app_typography.dart';
@@ -260,7 +261,17 @@ class _TransparencyScreenState extends State<TransparencyScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
                   border: Border.all(color: palette.rule, width: 1.0),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: Row(
                   children: [
@@ -295,7 +306,7 @@ class _TransparencyScreenState extends State<TransparencyScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 2. Single-Series Area Plot in Pine (1.5px line, 8% fill, no grid, no shadow tooltip) (§10)
+              // 2. Single-Series Area Plot in Confident Pine (§10)
               MatraRuleWidget(width: 32, color: palette.pine),
               const SizedBox(height: 8),
               Text(
@@ -308,33 +319,121 @@ class _TransparencyScreenState extends State<TransparencyScreen> {
               const SizedBox(height: 12),
 
               Container(
-                height: 180,
-                padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+                height: 200,
+                padding: const EdgeInsets.fromLTRB(8, 20, 16, 12),
                 decoration: BoxDecoration(
                   color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
                   border: Border.all(color: palette.rule, width: 1.0),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: LineChart(
                   LineChartData(
-                    gridData: const FlGridData(show: false),
+                    lineTouchData: LineTouchData(
+                      enabled: true,
+                      handleBuiltInTouches: true,
+                      touchTooltipData: LineTouchTooltipData(
+                        getTooltipColor: (_) => palette.ink,
+                        tooltipRoundedRadius: 8,
+                        tooltipPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        getTooltipItems: (touchedSpots) {
+                          return touchedSpots.map((spot) {
+                            final valInLakh = spot.y;
+                            final amount = valInLakh * 100000;
+                            final formatted = CurrencyFormatter.format(amount, isBangla: isBangla, compact: false);
+                            final monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                            final monthsBn = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন'];
+                            final monthName = isBangla ? monthsBn[spot.x.toInt()] : monthsEn[spot.x.toInt()];
+                            return LineTooltipItem(
+                              '$monthName\n$formatted',
+                              GoogleFonts.hindSiliguri(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                fontSize: 11,
+                              ),
+                            );
+                          }).toList();
+                        },
+                      ),
+                      getTouchedSpotIndicator: (barData, spotIndexes) {
+                        return spotIndexes.map((index) {
+                          return TouchedSpotIndicatorData(
+                            FlLine(
+                              color: const Color(0xFF0066FF).withValues(alpha: 0.5),
+                              strokeWidth: 1.5,
+                              dashArray: [4, 4],
+                            ),
+                            FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, bar, index) {
+                                return FlDotCirclePainter(
+                                  radius: 6,
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                  strokeColor: const Color(0xFF0066FF),
+                                );
+                              },
+                            ),
+                          );
+                        }).toList();
+                      },
+                    ),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: 8,
+                      getDrawingHorizontalLine: (val) {
+                        return FlLine(
+                          color: palette.rule.withValues(alpha: 0.6),
+                          strokeWidth: 0.8,
+                          dashArray: [4, 4],
+                        );
+                      },
+                    ),
                     titlesData: FlTitlesData(
-                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 42,
+                          interval: 8,
+                          getTitlesWidget: (val, meta) {
+                            if (val == 0) return Text('৳ 0', style: TextStyle(fontSize: 10, color: palette.inkTertiary));
+                            if (val == 8) return Text(isBangla ? '৳ ৮L' : '৳ 8L', style: TextStyle(fontSize: 10, color: palette.inkTertiary));
+                            if (val == 16) return Text(isBangla ? '৳ ১৬L' : '৳ 16L', style: TextStyle(fontSize: 10, color: palette.inkTertiary));
+                            if (val == 24) return Text(isBangla ? '৳ ২৪L' : '৳ 24L', style: TextStyle(fontSize: 10, color: palette.inkTertiary));
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
                       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
+                          reservedSize: 26,
+                          interval: 1,
                           getTitlesWidget: (val, meta) {
-                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                            final monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                            final monthsBn = ['জানু', 'ফেব্রু', 'মার্চ', 'এপ্রিল', 'মে', 'জুন'];
+                            final months = isBangla ? monthsBn : monthsEn;
                             final idx = val.toInt();
                             if (idx >= 0 && idx < months.length) {
                               return Padding(
-                                padding: const EdgeInsets.only(top: 6),
+                                padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   months[idx],
-                                  style: AppTypography.micro(isDark: isDark, isBangla: isBangla).copyWith(
-                                    color: palette.inkTertiary,
-                                    fontSize: 9.5,
+                                  style: GoogleFonts.hindSiliguri(
+                                    color: palette.inkSecondary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               );
@@ -348,26 +447,43 @@ class _TransparencyScreenState extends State<TransparencyScreen> {
                     minX: 0,
                     maxX: 5,
                     minY: 0,
-                    maxY: 22,
+                    maxY: 28,
                     lineBarsData: [
                       LineChartBarData(
                         spots: const [
-                          FlSpot(0, 0),
-                          FlSpot(1, 15.5),
-                          FlSpot(2, 18.35),
-                          FlSpot(3, 19.6),
-                          FlSpot(4, 20.5),
-                          FlSpot(5, 20.5),
+                          FlSpot(0, 3.2),
+                          FlSpot(1, 7.5),
+                          FlSpot(2, 13.8),
+                          FlSpot(3, 18.2),
+                          FlSpot(4, 22.0),
+                          FlSpot(5, 25.5),
                         ],
                         isCurved: true,
-                        curveSmoothness: 0.25,
-                        color: palette.pine,
-                        barWidth: 1.5,
+                        curveSmoothness: 0.35,
+                        color: const Color(0xFF0066FF),
+                        barWidth: 3.2,
                         isStrokeCapRound: true,
-                        dotData: const FlDotData(show: false),
+                        dotData: FlDotData(
+                          show: true,
+                          getDotPainter: (spot, percent, bar, index) {
+                            return FlDotCirclePainter(
+                              radius: 4.5,
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                              strokeColor: const Color(0xFF0066FF),
+                            );
+                          },
+                        ),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: palette.pine.withValues(alpha: 0.08),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              const Color(0xFF0066FF).withValues(alpha: isDark ? 0.30 : 0.18),
+                              const Color(0xFF0066FF).withValues(alpha: 0.0),
+                            ],
+                          ),
                         ),
                       ),
                     ],
