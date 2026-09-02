@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { ShieldCheck, Menu, X, Globe, User as UserIcon, LayoutDashboard, LogOut } from "lucide-react";
+import SwapnojatriLogo from "@/components/ui/SwapnojatriLogo";
+import { Menu, X, Globe, LayoutDashboard, LogOut } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,31 +14,21 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: isBangla ? "হোম" : "Home" },
-    { href: "/projects/landvest-100", label: isBangla ? "ল্যান্ডভেস্ট ১০০" : "LandVest 100", badge: "Live" },
+    { href: "/projects/landvest-100", label: isBangla ? "LandVest 100" : "LandVest 100", badge: "Live" },
     { href: "/projects", label: isBangla ? "প্রকল্পসমূহ" : "All Projects" },
     { href: "/how-it-works", label: isBangla ? "কার্যপদ্ধতি" : "How It Works" },
-    { href: "/documents", label: isBangla ? "আইনি দলিলপত্র" : "Legal Vault" },
-    { href: "/about", label: isBangla ? "আমাদের সম্পর্কে" : "About" },
+    { href: "/about", label: isBangla ? "আমাদের গল্প" : "Our Story" },
+    { href: "/faq", label: isBangla ? "প্রশ্নোত্তর" : "FAQ" },
     { href: "/contact", label: isBangla ? "যোগাযোগ" : "Contact" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-xl bg-gradient-emerald flex items-center justify-center shadow-md shadow-brand-forest/20 group-hover:scale-105 transition-transform">
-              <span className="text-gold font-bold text-xl tracking-wider">SJ</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight text-slate-900 group-hover:text-brand-forest transition-colors">
-                {isBangla ? "স্বপ্নযাত্রী" : "Swapnojatri"}
-              </span>
-              <span className="text-[11px] font-semibold text-brand-forest uppercase tracking-widest">
-                {isBangla ? "ইনভেস্টমেন্ট প্ল্যাটফর্ম" : "Investment Platform"}
-              </span>
-            </div>
+          {/* Official Brand Logo */}
+          <Link href="/" className="hover:opacity-95 transition-opacity">
+            <SwapnojatriLogo size="md" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -48,9 +39,9 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all relative ${
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all relative ${
                     isActive
-                      ? "text-brand-forest bg-brand-light"
+                      ? "text-sky-900 bg-sky-50 font-bold"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
@@ -73,7 +64,7 @@ export default function Navbar() {
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
               title="Toggle Language"
             >
-              <Globe className="w-3.5 h-3.5 text-brand-forest" />
+              <Globe className="w-3.5 h-3.5 text-sky-700" />
               <span>{isBangla ? "ENG" : "বাংলা"}</span>
             </button>
 
@@ -81,7 +72,7 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-forest text-white text-sm font-semibold hover:bg-brand-primary shadow-sm transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-emerald text-white text-sm font-semibold hover:opacity-95 shadow-sm transition-all"
                 >
                   <LayoutDashboard className="w-4 h-4 text-gold" />
                   <span>{isBangla ? "ড্যাশবোর্ড" : "Dashboard"}</span>
@@ -112,7 +103,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-2 rounded-xl bg-gradient-emerald text-white text-sm font-semibold hover:opacity-95 shadow-md shadow-brand-forest/20 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-emerald text-white text-sm font-semibold hover:opacity-95 shadow-md shadow-brand-forest/20 transition-all"
                 >
                   {isBangla ? "অ্যাকাউন্ট খুলুন" : "Join as Investor"}
                 </Link>

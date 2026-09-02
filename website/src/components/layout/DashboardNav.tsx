@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Coins,
   TrendingUp,
-  FileCheck2,
   UserCheck,
   Headphones,
   LogOut,
@@ -33,13 +32,16 @@ export default function DashboardNav() {
   return (
     <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between p-4 min-h-screen">
       <div className="space-y-6">
-        {/* Brand & Home Link */}
+        {/* Official Brand Logo */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 px-2">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-emerald flex items-center justify-center font-bold text-gold text-base">
-              SJ
+            <div className="w-9 h-9 shrink-0">
+              <img src="/swapnojatri_logo.svg" alt="স্বপ্নযাত্রী" className="w-full h-full object-contain filter drop-shadow" />
             </div>
-            <span className="font-bold text-base text-slate-900">Swapnojatri</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-sm text-slate-900 leading-tight">স্বপ্নযাত্রী</span>
+              <span className="text-[9px] font-bold text-sky-700">ইনভেস্টমেন্ট</span>
+            </div>
           </Link>
           <Link href="/" className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100" title="Back to Website">
             <Home className="w-4 h-4" />

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
+import SwapnojatriLogo from "@/components/ui/SwapnojatriLogo";
 
 export default function AuthLayout({
   children,
@@ -10,16 +11,8 @@ export default function AuthLayout({
     <div className="min-h-screen bg-canvas-light flex flex-col justify-between p-4 sm:p-6 lg:p-8">
       {/* Brand Header */}
       <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-emerald flex items-center justify-center font-bold text-gold text-lg shadow-md shadow-brand-forest/20">
-            SJ
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-lg text-slate-900 tracking-tight">Swapnojatri</span>
-            <span className="text-[10px] font-semibold text-brand-forest uppercase tracking-wider">
-              Investment Platform
-            </span>
-          </div>
+        <Link href="/" className="hover:opacity-95 transition-opacity">
+          <SwapnojatriLogo size="md" />
         </Link>
         <Link href="/" className="text-xs font-semibold text-slate-500 hover:text-brand-forest">
           ← Back to Website

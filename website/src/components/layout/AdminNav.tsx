@@ -8,12 +8,8 @@ import {
   ShieldAlert,
   CreditCard,
   Receipt,
-  Layers,
-  Users,
-  TrendingUp,
   LogOut,
   Home,
-  FileCheck2,
 } from "lucide-react";
 
 export default function AdminNav() {
@@ -29,14 +25,14 @@ export default function AdminNav() {
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 border-r border-slate-800 flex flex-col justify-between p-4 min-h-screen">
       <div className="space-y-6">
-        {/* Admin Header */}
+        {/* Official Brand Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800 px-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gold text-slate-950 font-black text-base flex items-center justify-center">
-              AD
+            <div className="w-9 h-9 shrink-0">
+              <img src="/swapnojatri_logo.svg" alt="স্বপ্নযাত্রী" className="w-full h-full object-contain filter drop-shadow" />
             </div>
             <div>
-              <span className="font-bold text-sm text-white block">Swapnojatri</span>
+              <span className="font-bold text-sm text-white block leading-tight">স্বপ্নযাত্রী</span>
               <span className="text-[10px] text-gold font-mono font-bold">ADMIN CONSOLE</span>
             </div>
           </div>
