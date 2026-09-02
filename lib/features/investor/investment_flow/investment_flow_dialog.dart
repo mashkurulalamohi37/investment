@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
-import 'package:swapnojatri/core/widgets/brand_icons.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/investor/investment_flow/bank_transfer_upload_sheet.dart';
+import 'package:swapnojatri/features/investor/investment_flow/eps_checkout_sheet.dart';
 
 class InvestmentFlowDialog extends StatefulWidget {
   final ProjectModel project;
@@ -34,10 +34,8 @@ class InvestmentFlowDialog extends StatefulWidget {
 }
 
 class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
-  int _step = 1; // Step 1: Buy Share Stepper, Step 2: Payment Confirmation
+  int _step = 1; // Step 1: Buy Share Stepper, Step 2: Payment Method Choice
   int _shareCount = 3;
-  String _selectedPaymentMethod = 'bKash';
-  bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -119,77 +117,82 @@ class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
             ),
             const SizedBox(height: 24),
 
-            // Stepper Row
-            Text(
-              isBangla ? 'কত শেয়ার নিতে চান?' : 'Select number of shares',
-              style: GoogleFonts.hindSiliguri(fontSize: 14, fontWeight: FontWeight.w600, color: palette.ink),
-            ),
-            const SizedBox(height: 12),
-
+            // Stepper: Counter
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildStepperButton(
                   icon: Icons.remove,
-                  onTap: _shareCount > 1
-                      ? () {
-                          HapticFeedback.selectionClick();
-                          setState(() => _shareCount--);
-                        }
+                  onTap: _shareCount > project.minShares
+                      ? () => setState(() => _shareCount--)
                       : null,
                   palette: palette,
                 ),
-                Container(
-                  width: 72,
-                  alignment: Alignment.center,
-                  child: Text(
-                    '$_shareCount',
-                    style: GoogleFonts.poppins(fontSize: 26, fontWeight: FontWeight.w700, color: palette.ink),
-                  ),
+                const SizedBox(width: 24),
+                Column(
+                  children: [
+                    Text(
+                      '$_shareCount',
+                      style: GoogleFonts.poppins(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                        color: palette.ink,
+                      ),
+                    ),
+                    Text(
+                      isBangla ? 'টি শেয়ার' : 'Shares',
+                      style: GoogleFonts.hindSiliguri(
+                        fontSize: 12,
+                        color: palette.inkSecondary,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(width: 24),
                 _buildStepperButton(
                   icon: Icons.add,
-                  onTap: _shareCount < availableShares
-                      ? () {
-                          HapticFeedback.selectionClick();
-                          setState(() => _shareCount++);
-                        }
+                  onTap: _shareCount < project.maxShares && _shareCount < availableShares
+                      ? () => setState(() => _shareCount++)
                       : null,
                   palette: palette,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              isBangla ? 'উপলব্ধ শেয়ার: $availableShares' : 'Available Shares: $availableShares',
-              style: GoogleFonts.hindSiliguri(fontSize: 12, color: palette.inkSecondary),
-            ),
             const SizedBox(height: 24),
 
-            // Total Amount Box
+            // Investment Breakdown Details
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF0066FF).withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF0066FF).withValues(alpha: 0.3), width: 1.0),
+                color: palette.surfaceSunken,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: palette.rule, width: 1.0),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Text(
-                    isBangla ? 'মোট পরিমাণ' : 'Total Amount',
-                    style: GoogleFonts.hindSiliguri(fontSize: 14, fontWeight: FontWeight.w600, color: palette.ink),
-                  ),
-                  Text(
+                  _buildSummaryRow(
+                    isBangla ? 'মোট বিনিয়োগ' : 'Total Investment',
                     '৳ ${(_shareCount * project.sharePrice).toInt()}',
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700, color: const Color(0xFF0066FF)),
+                    palette,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSummaryRow(
+                    isBangla ? 'প্রত্যাশিত বার্ষিক মুনাফা' : 'Projected Annual ROI',
+                    '18.5% ~ 22.0%',
+                    palette,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildSummaryRow(
+                    isBangla ? 'সর্বোচ্চ সীমা' : 'Max Allowed',
+                    '${project.maxShares} ${isBangla ? 'টি শেয়ার' : 'Shares'}',
+                    palette,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
+            // Next Button
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -201,40 +204,34 @@ class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text(
-                  isBangla ? 'পরবর্তী' : 'Next',
+                  isBangla ? 'পেমেন্ট মাধ্যমে এগিয়ে যান' : 'Proceed to Payment',
                   style: GoogleFonts.hindSiliguri(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
                 ),
               ),
             ),
           ] else ...[
             // ==========================================
-            // SCREEN 9: Payment Confirmation Modal
+            // SCREEN 9: Payment Gateway & Method Selection
             // ==========================================
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0066FF).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.check_circle_rounded, size: 48, color: Color(0xFF0066FF)),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, size: 20),
+                  onPressed: () => setState(() => _step = 1),
+                ),
+                Expanded(
+                  child: Text(
+                    isBangla ? 'পেমেন্ট মাধ্যম বেছে নিন' : 'Choose Payment Option',
+                    style: GoogleFonts.hindSiliguri(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: palette.ink,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-
-            Text(
-              isBangla ? 'বিনিয়োগের অনুরোধ সফল হয়েছে!' : 'Investment Request Submitted!',
-              style: GoogleFonts.hindSiliguri(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: palette.ink,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              isBangla ? 'আপনার পেমেন্ট সম্পন্ন করে বিনিয়োগ নিশ্চিত করুন।' : 'Complete your payment to confirm investment.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.hindSiliguri(fontSize: 12.5, color: palette.inkSecondary),
-            ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 8),
 
             // Project Breakdown Card
             Container(
@@ -248,10 +245,10 @@ class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
                 children: [
                   _buildSummaryRow(isBangla ? 'প্রকল্প' : 'Project', project.name, palette),
                   const SizedBox(height: 6),
-                  _buildSummaryRow(isBangla ? 'শেয়ার' : 'Shares', '$_shareCount', palette),
+                  _buildSummaryRow(isBangla ? 'শেয়ার সংখ্যা' : 'Shares', '$_shareCount টি', palette),
                   const SizedBox(height: 6),
                   _buildSummaryRow(
-                    isBangla ? 'মোট পরিমাণ' : 'Total Amount',
+                    isBangla ? 'মোট প্রদেয়' : 'Total Payable',
                     '৳ ${(_shareCount * project.sharePrice).toInt()}',
                     palette,
                     isBold: true,
@@ -259,93 +256,179 @@ class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
-            // Payment Methods
-            Text(
-              isBangla ? 'পেমেন্ট মাধ্যম নির্বাচন করুন' : 'Select Payment Method',
-              style: GoogleFonts.hindSiliguri(fontSize: 13, fontWeight: FontWeight.w600, color: palette.ink),
-            ),
-            const SizedBox(height: 10),
+            // Option 1: EPS Payment Gateway
+            _buildGatewayMethodCard(
+              title: 'EPS Payment Gateway',
+              badge: isBangla ? 'ইনস্ট্যান্ট বরাদ্দ' : 'Instant Allocation',
+              badgeColor: const Color(0xFF00C853),
+              description: isBangla
+                  ? 'bKash, Nagad, Rocket, Visa/Mastercard এবং ইন্টারনেট ব্যাংকিং।'
+                  : 'Pay with bKash, Nagad, Rocket, Cards & Net Banking.',
+              icon: Icons.bolt_rounded,
+              iconBgColor: const Color(0xFF0066FF),
+              palette: palette,
+              isBangla: isBangla,
+              onTap: () async {
+                final nav = Navigator.of(context);
+                final scaffold = ScaffoldMessenger.of(context);
+                nav.pop(); // close current sheet
 
-            _buildPaymentOption(
-              title: 'bKash',
-              subtitle: '01812-345678 (মার্চেন্ট)',
-              logoWidget: const BkashLogoWidget(size: 32),
-              palette: palette,
-            ),
-            const SizedBox(height: 8),
-            _buildPaymentOption(
-              title: 'Nagad',
-              subtitle: '01812-345678 (মার্চেন্ট)',
-              logoWidget: const NagadLogoWidget(size: 32),
-              palette: palette,
-            ),
-            const SizedBox(height: 8),
-            _buildPaymentOption(
-              title: 'Rocket',
-              subtitle: '01812-345678-7 (ডিবিবিএল রকেট)',
-              logoWidget: const RocketLogoWidget(size: 32),
-              palette: palette,
-            ),
-            const SizedBox(height: 8),
-            _buildPaymentOption(
-              title: 'Bank Wire',
-              subtitle: 'BRAC Bank / Islamic Bank A/C',
-              logoWidget: const BankTransferLogoWidget(size: 32),
-              palette: palette,
-            ),
-            const SizedBox(height: 14),
-
-            Text(
-              isBangla
-                  ? 'পেমেন্ট সম্পন্ন করে নিচের বাটনে ক্লিক করুন।'
-                  : 'After making payment, click below to confirm.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.hindSiliguri(fontSize: 11, color: palette.inkTertiary),
-            ),
-            const SizedBox(height: 16),
-
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _isProcessing
-                    ? null
-                    : () async {
-                        final navigator = Navigator.of(context);
-                        final messenger = ScaffoldMessenger.of(context);
-                        setState(() => _isProcessing = true);
-                        await Future.delayed(const Duration(milliseconds: 600));
-                        widget.state.investInProject(project.id, _shareCount, _selectedPaymentMethod);
-                        if (!mounted) return;
-                        navigator.pop();
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isBangla
-                                  ? '$_selectedPaymentMethod এর মাধ্যমে পেমেন্ট সফলভাবে জমা হয়েছে!'
-                                  : 'Payment submitted via $_selectedPaymentMethod!',
-                            ),
-                            backgroundColor: const Color(0xFF00C853),
-                          ),
-                        );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0066FF),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: _isProcessing
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text(
-                        isBangla ? 'আমি পেমেন্ট করেছি' : 'I Have Completed Payment',
-                        style: GoogleFonts.hindSiliguri(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                await EpsCheckoutSheet.show(
+                  context: context,
+                  project: project,
+                  shareCount: _shareCount,
+                  state: widget.state,
+                  onPaymentSuccess: () {
+                    scaffold.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isBangla
+                              ? 'EPS গেটওয়ের মাধ্যমে পেমেন্ট সফলভাবে সম্পন্ন হয়েছে! শেয়ার বরাদ্দ নিশ্চিত।'
+                              : 'Payment completed via EPS Gateway! Shares allocated.',
+                        ),
+                        backgroundColor: const Color(0xFF00C853),
                       ),
-              ),
+                    );
+                  },
+                );
+              },
             ),
+            const SizedBox(height: 12),
+
+            // Option 2: Manual Bank Transfer & Receipt Upload
+            _buildGatewayMethodCard(
+              title: isBangla ? 'ব্যাংক ট্রান্সফার ও রসিদ আপলোড' : 'Bank Deposit & Slip Upload',
+              badge: isBangla ? 'ম্যানুয়াল ভেরিফিকেশন' : 'Manual Review',
+              badgeColor: const Color(0xFFFF9800),
+              description: isBangla
+                  ? 'সিটি ব্যাংক / ব্র্যাক / ইসলামী ব্যাংক অ্যাকাউন্টে জমা দিয়ে স্লিপের ছবি আপলোড করুন।'
+                  : 'Transfer to official bank account & upload deposit receipt photo.',
+              icon: Icons.receipt_long_rounded,
+              iconBgColor: const Color(0xFF7B1FA2),
+              palette: palette,
+              isBangla: isBangla,
+              onTap: () async {
+                final nav = Navigator.of(context);
+                final scaffold = ScaffoldMessenger.of(context);
+                nav.pop(); // close current sheet
+
+                await BankTransferUploadSheet.show(
+                  context: context,
+                  project: project,
+                  shareCount: _shareCount,
+                  state: widget.state,
+                  onSubmitSuccess: () {
+                    scaffold.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isBangla
+                              ? 'ব্যাংক জমার রসিদ সফলভাবে দাখিল হয়েছে! অ্যাডমিন যাচাইয়ের পর শেয়ার বরাদ্দ হবে।'
+                              : 'Deposit slip submitted for admin verification!',
+                        ),
+                        backgroundColor: const Color(0xFF0066FF),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 16),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildGatewayMethodCard({
+    required String title,
+    required String badge,
+    required Color badgeColor,
+    required String description,
+    required IconData icon,
+    required Color iconBgColor,
+    required AppPalette palette,
+    required bool isBangla,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.ruleStrong, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconBgColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconBgColor, size: 24),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: GoogleFonts.hindSiliguri(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: palette.ink,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: badgeColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          badge,
+                          style: GoogleFonts.hindSiliguri(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: badgeColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: GoogleFonts.hindSiliguri(
+                      fontSize: 11.5,
+                      color: palette.inkSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.chevron_right_rounded, color: palette.inkTertiary, size: 22),
+          ],
+        ),
       ),
     );
   }
@@ -393,59 +476,6 @@ class _InvestmentFlowDialogState extends State<InvestmentFlowDialog> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildPaymentOption({
-    required String title,
-    required String subtitle,
-    required Widget logoWidget,
-    required AppPalette palette,
-  }) {
-    final isSelected = _selectedPaymentMethod == title;
-    return InkWell(
-      onTap: () => setState(() => _selectedPaymentMethod = title),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF0066FF) : palette.ruleStrong,
-            width: isSelected ? 1.8 : 1.0,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                logoWidget,
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700, color: palette.ink),
-                    ),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.poppins(fontSize: 11, color: palette.inkSecondary),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Icon(
-              isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-              size: 20,
-              color: isSelected ? const Color(0xFF0066FF) : palette.inkTertiary,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

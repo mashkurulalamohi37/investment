@@ -114,7 +114,12 @@ class AppState extends ChangeNotifier {
   double get adminFundUtilizationPercentage => totalProjectCollected > 0
       ? (totalProjectExpenses / totalProjectCollected).clamp(0.0, 1.0)
       : 0.0;
-  int get adminPendingPaymentsCount => _investments.where((i) => i.status == InvestmentStatus.pending).length;
+  List<InvestmentModel> get pendingBankDeposits => _investments
+      .where((i) =>
+          i.status == InvestmentStatus.pending ||
+          i.status == InvestmentStatus.pendingPaymentVerification)
+      .toList();
+  int get adminPendingPaymentsCount => pendingBankDeposits.length;
   int get adminPendingKycCount => _kyc.status == KycStatus.underReview || _kyc.status == KycStatus.pending ? 1 : 0;
 
   // State Modifiers
@@ -176,6 +181,227 @@ class AppState extends ChangeNotifier {
   }
 
   // Investment Actions
+
+  /// Submit Instant Payment via EPS Payment Gateway (Auto verified & allocated)
+  bool submitEpsInvestment({
+    required int shares,
+    required String paymentMethod,
+    required String epsTransactionId,
+  }) {
+    if (shares < 1 || shares > _landVest100.maxShares) return false;
+    if (shares > _landVest100.availableShares) return false;
+
+    final unitPrice = _landVest100.pricePerShare;
+    final totalAmount = shares * unitPrice;
+    final newInvId = 'inv-${DateTime.now().millisecondsSinceEpoch}';
+    final invNo = 'SJ-LV100-00${_investments.length + 43}';
+
+    final currentAllocated = _landVest100.allocatedShares;
+    final newAllocated = currentAllocated + shares;
+    final List<String> lotNumbers = [];
+    for (int i = 1; i <= shares; i++) {
+      lotNumbers.add('LOT-${(currentAllocated + i).toString().padLeft(3, '0')}');
+    }
+
+    _landVest100 = _landVest100.copyWith(allocatedShares: newAllocated);
+
+    final investment = InvestmentModel(
+      id: newInvId,
+      investmentNo: invNo,
+      userId: _currentUser.id,
+      projectId: _landVest100.id,
+      projectName: _landVest100.name,
+      shares: shares,
+      unitPrice: unitPrice,
+      grossAmount: totalAmount,
+      fees: 0.0,
+      netAmount: totalAmount,
+      status: InvestmentStatus.allocated,
+      allocatedLotNumbers: lotNumbers,
+      paymentMethod: paymentMethod,
+      paymentReference: epsTransactionId,
+      paymentGateway: 'EPS',
+      createdAt: DateTime.now(),
+      verifiedAt: DateTime.now(),
+    );
+
+    _investments.insert(0, investment);
+
+    // Add completed transaction ledger entry
+    final transaction = TransactionModel(
+      id: 'txn-${DateTime.now().millisecondsSinceEpoch}',
+      investmentId: newInvId,
+      projectId: _landVest100.id,
+      projectName: _landVest100.name,
+      userId: _currentUser.id,
+      type: TransactionType.investment,
+      direction: TransactionDirection.debit,
+      amount: totalAmount,
+      balanceAfter: totalInvested + totalAmount,
+      reference: epsTransactionId,
+      paymentMethod: paymentMethod,
+      status: TransactionStatus.completed,
+      createdAt: DateTime.now(),
+      description: 'Subscription for $shares Shares via EPS Gateway (${lotNumbers.join(', ')})',
+      descriptionBn: 'EPS গেটওয়ের মাধ্যমে $sharesটি শেয়ার সাবস্ক্রিপশন সম্পন্ন (${lotNumbers.join(', ')})',
+    );
+    _transactions.insert(0, transaction);
+
+    // Generate Share Certificate Document immediately
+    _documents.insert(
+      0,
+      DocumentModel(
+        id: 'doc-${DateTime.now().millisecondsSinceEpoch}',
+        projectId: _landVest100.id,
+        projectName: _landVest100.name,
+        userId: _currentUser.id,
+        category: DocumentCategory.receipt,
+        title: 'Share Certificate ($shares Shares - EPS)',
+        titleBn: 'শেয়ার বরাদ্দ সনদপত্র ($sharesটি শেয়ার - EPS)',
+        fileName: 'Share_Certificate_$invNo.pdf',
+        fileSize: '1.2 MB',
+        version: 'v1.0 (EPS Verified)',
+        visibility: DocumentVisibility.investorOnly,
+        checksumSha256: '7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d',
+        uploadedAt: DateTime.now(),
+        uploadedBy: 'EPS Automated Settlement Service',
+      ),
+    );
+
+    // Add Notification
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+        title: 'EPS Payment & Allocation Successful!',
+        titleBn: 'EPS পেমেন্ট ও শেয়ার বরাদ্দ সম্পন্ন!',
+        body: 'Your payment via EPS was successfully settled. Allocated lots: ${lotNumbers.join(', ')} in LandVest 100.',
+        bodyBn: 'EPS গেটওয়ের মাধ্যমে পেমেন্ট সফল হয়েছে। ল্যান্ডভেস্ট ১০০ প্রকল্পে বরাদ্দকৃত লট: ${lotNumbers.join(', ')}।',
+        category: NotificationCategory.investment,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    // Add Audit
+    _auditLogs.insert(
+      0,
+      AuditLogModel(
+        id: 'aud-${DateTime.now().millisecondsSinceEpoch}',
+        actorName: _currentUser.name,
+        actorRole: 'Investor',
+        action: 'EPS_GATEWAY_PAYMENT',
+        actionBn: 'EPS পেমেন্ট গেটওয়ে লেনদেন',
+        entityType: 'Investment',
+        entityId: invNo,
+        details: 'Instant settlement for $shares shares ($totalAmount BDT) via $paymentMethod ($epsTransactionId)',
+        detailsBn: '$paymentMethod ($epsTransactionId) মাধ্যমে $sharesটি শেয়ারের (৳$totalAmount) তাৎক্ষণিক পেমেন্ট সম্পন্ন',
+        ipAddress: '103.145.118.99',
+        timestamp: DateTime.now(),
+      ),
+    );
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Submit Bank Deposit Investment with Uploaded Receipt Photo
+  bool submitBankDepositInvestment({
+    required int shares,
+    required String depositBankName,
+    required String depositorName,
+    required String paymentReference,
+    required String receiptImageUrl,
+  }) {
+    if (shares < 1 || shares > _landVest100.maxShares) return false;
+    if (shares > _landVest100.availableShares) return false;
+
+    final unitPrice = _landVest100.pricePerShare;
+    final totalAmount = shares * unitPrice;
+    final newInvId = 'inv-${DateTime.now().millisecondsSinceEpoch}';
+    final invNo = 'SJ-LV100-00${_investments.length + 43}';
+
+    final investment = InvestmentModel(
+      id: newInvId,
+      investmentNo: invNo,
+      userId: _currentUser.id,
+      projectId: _landVest100.id,
+      projectName: _landVest100.name,
+      shares: shares,
+      unitPrice: unitPrice,
+      grossAmount: totalAmount,
+      fees: 0.0,
+      netAmount: totalAmount,
+      status: InvestmentStatus.pendingPaymentVerification,
+      paymentMethod: 'Bank Deposit ($depositBankName)',
+      paymentReference: paymentReference,
+      receiptImageUrl: receiptImageUrl,
+      depositBankName: depositBankName,
+      depositorName: depositorName,
+      paymentGateway: 'MANUAL_BANK',
+      createdAt: DateTime.now(),
+    );
+
+    _investments.insert(0, investment);
+
+    // Add transaction ledger entry
+    final transaction = TransactionModel(
+      id: 'txn-${DateTime.now().millisecondsSinceEpoch}',
+      investmentId: newInvId,
+      projectId: _landVest100.id,
+      projectName: _landVest100.name,
+      userId: _currentUser.id,
+      type: TransactionType.investment,
+      direction: TransactionDirection.debit,
+      amount: totalAmount,
+      balanceAfter: totalInvested + totalAmount,
+      reference: paymentReference,
+      paymentMethod: 'Bank Deposit ($depositBankName)',
+      receiptImageUrl: receiptImageUrl,
+      depositBankName: depositBankName,
+      depositorName: depositorName,
+      status: TransactionStatus.pending,
+      createdAt: DateTime.now(),
+      description: 'Bank Deposit for $shares Shares (Slip #$paymentReference - Under Review)',
+      descriptionBn: '$sharesটি শেয়ারের ব্যাংক জমার রসিদ (স্লিপ #$paymentReference - যাচাইাধীন)',
+    );
+    _transactions.insert(0, transaction);
+
+    // Notification for investor
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Deposit Slip Submitted',
+        titleBn: 'ব্যাংক জমার রসিদ দাখিল হয়েছে',
+        body: 'Bank deposit receipt ($paymentReference) for $shares shares submitted. Awaiting Admin verification.',
+        bodyBn: '$sharesটি শেয়ারের ব্যাংক জমার রসিদ (#$paymentReference) দাখিল হয়েছে। অ্যাডমিন যাচাই সম্পন্ন হলে লট বরাদ্দ হবে।',
+        category: NotificationCategory.investment,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    // Audit log
+    _auditLogs.insert(
+      0,
+      AuditLogModel(
+        id: 'aud-${DateTime.now().millisecondsSinceEpoch}',
+        actorName: _currentUser.name,
+        actorRole: 'Investor',
+        action: 'SUBMIT_BANK_RECEIPT',
+        actionBn: 'ব্যাংক জমার রসিদ দাখিল',
+        entityType: 'Investment',
+        entityId: invNo,
+        details: 'Submitted bank receipt ($paymentReference) for $shares shares ($totalAmount BDT) by $depositorName',
+        detailsBn: '$depositorName কর্তৃক $sharesটি শেয়ারের (৳$totalAmount) ব্যাংক জমার স্লিপ (#$paymentReference) দাখিল',
+        ipAddress: '103.145.118.99',
+        timestamp: DateTime.now(),
+      ),
+    );
+
+    notifyListeners();
+    return true;
+  }
+
   bool investInProject(String projectId, int shares, String paymentMethod, [String paymentReference = 'TXN-ONLINE-DIRECT']) {
     return submitInvestmentRequest(
       shares: shares,
@@ -208,7 +434,7 @@ class AppState extends ChangeNotifier {
       grossAmount: totalAmount,
       fees: 0.0,
       netAmount: totalAmount,
-      status: InvestmentStatus.pending,
+      status: InvestmentStatus.pendingPaymentVerification,
       paymentMethod: paymentMethod,
       paymentReference: paymentReference,
       createdAt: DateTime.now(),
@@ -246,24 +472,6 @@ class AppState extends ChangeNotifier {
         bodyBn: 'ল্যান্ডভেস্ট ১০০ প্রকল্পে আপনার $shares টি শেয়ারের আবেদন গৃহীত হয়েছে। পেমেন্ট যাচাই প্রক্রিয়াধীন।',
         category: NotificationCategory.investment,
         createdAt: DateTime.now(),
-      ),
-    );
-
-    // Add audit log
-    _auditLogs.insert(
-      0,
-      AuditLogModel(
-        id: 'aud-${DateTime.now().millisecondsSinceEpoch}',
-        actorName: _currentUser.name,
-        actorRole: 'Investor',
-        action: 'SUBMIT_INVESTMENT',
-        actionBn: 'বিনিয়োগ আবেদন দাখিল',
-        entityType: 'Investment',
-        entityId: invNo,
-        details: 'Submitted investment for $shares shares ($totalAmount BDT) via $paymentMethod',
-        detailsBn: '$paymentMethod মাধ্যমে $sharesটি শেয়ারের (৳$totalAmount) বিনিয়োগ আবেদন দাখিলকৃত',
-        ipAddress: '103.145.118.99',
-        timestamp: DateTime.now(),
       ),
     );
 
@@ -312,9 +520,13 @@ class AppState extends ChangeNotifier {
         balanceAfter: oldTxn.balanceAfter,
         reference: oldTxn.reference,
         paymentMethod: oldTxn.paymentMethod,
+        receiptImageUrl: oldTxn.receiptImageUrl,
+        depositBankName: oldTxn.depositBankName,
+        depositorName: oldTxn.depositorName,
         status: TransactionStatus.completed,
         createdAt: oldTxn.createdAt,
         description: 'Verified & Allocated: ${lotNumbers.join(', ')}',
+        descriptionBn: 'যাচাইকৃত ও বরাদ্দকৃত লট: ${lotNumbers.join(', ')}',
       );
     }
 
@@ -368,6 +580,58 @@ class AppState extends ChangeNotifier {
         detailsBn: 'পেমেন্ট যাচাই সম্পন্ন ও লট ${lotNumbers.join(', ')} সফলভাবে বরাদ্দকৃত',
         ipAddress: '103.145.118.22',
         timestamp: DateTime.now(),
+      ),
+    );
+
+    notifyListeners();
+  }
+
+  // Admin: Reject Investment Request
+  void adminRejectInvestment(String investmentId, [String reason = 'Payment verification failed']) {
+    final index = _investments.indexWhere((i) => i.id == investmentId);
+    if (index == -1) return;
+
+    final inv = _investments[index];
+    _investments[index] = inv.copyWith(
+      status: InvestmentStatus.rejected,
+    );
+
+    // Update matching transaction
+    final txnIndex = _transactions.indexWhere((t) => t.investmentId == investmentId);
+    if (txnIndex != -1) {
+      final oldTxn = _transactions[txnIndex];
+      _transactions[txnIndex] = TransactionModel(
+        id: oldTxn.id,
+        investmentId: oldTxn.investmentId,
+        projectId: oldTxn.projectId,
+        projectName: oldTxn.projectName,
+        userId: oldTxn.userId,
+        type: oldTxn.type,
+        direction: oldTxn.direction,
+        amount: oldTxn.amount,
+        balanceAfter: oldTxn.balanceAfter,
+        reference: oldTxn.reference,
+        paymentMethod: oldTxn.paymentMethod,
+        receiptImageUrl: oldTxn.receiptImageUrl,
+        depositBankName: oldTxn.depositBankName,
+        depositorName: oldTxn.depositorName,
+        status: TransactionStatus.failed,
+        createdAt: oldTxn.createdAt,
+        description: 'Rejected: $reason',
+        descriptionBn: 'বাতিলকৃত: $reason',
+      );
+    }
+
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Investment Deposit Rejected',
+        titleBn: 'বিনিয়োগ রসিদ প্রত্যাখ্যাত',
+        body: 'Your deposit slip for ${inv.projectName} was not approved ($reason). Please contact support.',
+        bodyBn: '${inv.projectName} প্রকল্পে আপনার ব্যাংক জমার রসিদ প্রত্যাখ্যাত হয়েছে ($reason)। সহায়তার জন্য যোগাযোগ করুন।',
+        category: NotificationCategory.investment,
+        createdAt: DateTime.now(),
       ),
     );
 

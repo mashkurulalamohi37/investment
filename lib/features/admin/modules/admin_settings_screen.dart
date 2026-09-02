@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/data/models/user_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/admin/modules/admin_payment_verification_screen.dart';
 import 'package:swapnojatri/features/admin/modules/audit_logs_screen.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
@@ -47,6 +48,17 @@ class AdminSettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
+              _buildSettingsTile(
+                Icons.receipt_long_rounded,
+                isBangla ? 'পেমেন্ট ও ব্যাংক রসিদ যাচাই কিউ' : 'Payment & Deposit Slip Verification',
+                palette,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminPaymentVerificationScreen(state: state)),
+                  );
+                },
+              ),
               _buildSettingsTile(Icons.person_outline_rounded, isBangla ? 'প্রোফাইল সেটিংস' : 'Profile Settings', palette),
               _buildSettingsTile(Icons.settings_outlined, isBangla ? 'সিস্টেম সেটিংস' : 'System Settings', palette),
               _buildSettingsTile(Icons.notifications_none_rounded, isBangla ? 'নোটিফিকেশন সেটিংস' : 'Notifications Settings', palette),

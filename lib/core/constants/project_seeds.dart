@@ -238,6 +238,27 @@ class ProjectSeeds {
 
   static final List<InvestmentModel> defaultInvestments = [
     InvestmentModel(
+      id: 'inv-102',
+      investmentNo: 'SJ-LV100-0043',
+      userId: 'usr-investor-01',
+      projectId: 'proj-lv-100',
+      projectName: 'LandVest 100',
+      shares: 2,
+      unitPrice: 25500.0,
+      grossAmount: 51000.0,
+      fees: 0.0,
+      netAmount: 51000.0,
+      status: InvestmentStatus.pendingPaymentVerification,
+      allocatedLotNumbers: const [],
+      paymentMethod: 'Bank Transfer (City Bank PLC)',
+      paymentReference: 'DEP-CB-9821408',
+      receiptImageUrl: 'bank_deposit_slip_sample.jpg',
+      depositBankName: 'City Bank PLC',
+      depositorName: 'Mashkurul Alam Ohi',
+      paymentGateway: 'MANUAL_BANK',
+      createdAt: DateTime(2026, 8, 28, 16, 45),
+    ),
+    InvestmentModel(
       id: 'inv-101',
       investmentNo: 'SJ-LV100-0042',
       userId: 'usr-investor-01',

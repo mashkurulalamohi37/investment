@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/admin/modules/admin_payment_verification_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   final AppState state;
@@ -358,7 +359,104 @@ class AdminDashboardScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              // Pending Payment Verification Alert Banner (EPS & Bank Deposit)
+              if (state.adminPendingPaymentsCount > 0) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFF9800).withValues(alpha: 0.12),
+                        const Color(0xFFFF5722).withValues(alpha: 0.06),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3), width: 1.2),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF9800),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 22),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  isBangla ? 'পেমেন্ট ও রসিদ যাচাই কিউ' : 'Payment & Deposit Queue',
+                                  style: GoogleFonts.hindSiliguri(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: palette.ink,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF9800),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${state.adminPendingPaymentsCount} ${isBangla ? 'টি পেন্ডিং' : 'New'}',
+                                    style: GoogleFonts.hindSiliguri(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isBangla
+                                  ? 'বিনিয়োগকারীদের প্রেরিত ব্যাংক স্লিপ ও পেমেন্ট যাচাই করুন।'
+                                  : 'Review pending bank receipts and approve lot allocations.',
+                              style: GoogleFonts.hindSiliguri(
+                                fontSize: 11.5,
+                                color: palette.inkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminPaymentVerificationScreen(state: state),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF9800),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          isBangla ? 'যাচাই করুন' : 'Review',
+                          style: GoogleFonts.hindSiliguri(fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
               // Recent Activity ("সাম্প্রতিক কার্যকলাপ")
               Row(

@@ -44,12 +44,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Brand Monogram & Title
-                  SwapnojatriLogoWidget(
-                    size: 34,
-                    showText: true,
-                    isDark: isDark,
-                    isBangla: _isBangla,
+                  Expanded(
+                    child: SwapnojatriLogoWidget(
+                      size: 34,
+                      showText: true,
+                      isDark: isDark,
+                      isBangla: _isBangla,
+                    ),
                   ),
+                  const SizedBox(width: 8),
 
                   // Language Switcher Chip
                   InkWell(
@@ -329,7 +332,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxWidth: 320),
-      height: 200,
+      height: 215,
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: AppRadius.borderCard,
@@ -349,15 +352,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'MULTI-PROJECT PORTFOLIO',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.w700,
-                  color: palette.inkSecondary,
+              Flexible(
+                child: Text(
+                  'MULTI-PROJECT PORTFOLIO',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w700,
+                    color: palette.inkSecondary,
+                  ),
                 ),
               ),
+              const SizedBox(width: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -381,7 +388,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Project Item 1: LandVest 100
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: palette.surfaceSunken,
                 borderRadius: BorderRadius.circular(8),
@@ -392,8 +399,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               child: Row(
                 children: [
-                  const LandVestLogoWidget(size: 24, showText: false),
-                  const SizedBox(width: 10),
+                  const LandVestLogoWidget(size: 22, showText: false),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,19 +408,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         Text(
                           'LandVest 100 • রিয়েল এস্টেট',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: palette.ink),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: palette.ink),
                         ),
                         Text(
-                          '১০০ শেয়ার • প্রতি ভাগ ২৫,৫০০ ৳',
-                          style: TextStyle(fontSize: 9.5, color: palette.inkSecondary),
+                          '১০০ শেয়ার • ২৫,৫০০ ৳/ভাগ',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 9, color: palette.inkSecondary),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 4),
                   Text(
                     '৭৪/১০০',
                     style: TextStyle(
-                      fontSize: 10.5,
+                      fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFFC59B27),
                     ),
@@ -427,7 +439,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Project Item 2: AgroVest Farm
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: palette.surfaceSunken,
                 borderRadius: BorderRadius.circular(8),
@@ -436,16 +448,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 children: [
                   Container(
-                    width: 24,
-                    height: 24,
+                    width: 22,
+                    height: 22,
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     alignment: Alignment.center,
-                    child: const Text('🌾', style: TextStyle(fontSize: 12)),
+                    child: const Text('🌾', style: TextStyle(fontSize: 11)),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,19 +465,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         Text(
                           'স্মার্ট এগ্রো ফার্মিং • সিজন ১',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: palette.ink),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: palette.ink),
                         ),
                         Text(
-                          'ত্রৈমাসিক লভ্যাংশ • ১৫,০০০ ৳/ভাগ',
-                          style: TextStyle(fontSize: 9.5, color: palette.inkSecondary),
+                          'ত্রৈমাসিক লভ্যাংশ • ১৫,০০০ ৳',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 9, color: palette.inkSecondary),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 4),
                   Text(
                     'নতুন প্রজেক্ট',
                     style: TextStyle(
-                      fontSize: 9.5,
+                      fontSize: 9,
                       fontWeight: FontWeight.w700,
                       color: palette.pine,
                     ),

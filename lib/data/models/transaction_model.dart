@@ -19,6 +19,9 @@ class TransactionModel {
   final DateTime createdAt;
   final String description;
   final String? descriptionBn;
+  final String? receiptImageUrl;
+  final String? depositBankName;
+  final String? depositorName;
 
   const TransactionModel({
     required this.id,
@@ -33,6 +36,9 @@ class TransactionModel {
     this.balanceAfter = 0.0,
     this.reference = 'TRX-DEFAULT',
     this.paymentMethod = 'City Bank PLC',
+    this.receiptImageUrl,
+    this.depositBankName,
+    this.depositorName,
     required this.status,
     required this.createdAt,
     this.description = 'LandVest 100 Transaction',

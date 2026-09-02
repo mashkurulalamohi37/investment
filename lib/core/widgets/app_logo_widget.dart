@@ -69,29 +69,35 @@ class SwapnojatriLogoWidget extends StatelessWidget {
       children: [
         logoImg,
         SizedBox(width: size * 0.25),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isBangla ? 'স্বপ্নযাত্রী' : 'SWAPNOJATRI',
-              style: GoogleFonts.hindSiliguri(
-                fontSize: size * 0.42,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : palette.ink,
-                height: 1.1,
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isBangla ? 'স্বপ্নযাত্রী' : 'SWAPNOJATRI',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.hindSiliguri(
+                  fontSize: size * 0.42,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : palette.ink,
+                  height: 1.1,
+                ),
               ),
-            ),
-            Text(
-              customSubtitle ?? (isBangla ? 'ইনভেস্টমেন্ট প্ল্যাটফর্ম' : 'Investment Platform'),
-              style: GoogleFonts.hindSiliguri(
-                fontSize: size * 0.28,
-                fontWeight: FontWeight.w500,
-                color: palette.pine,
-                height: 1.1,
+              Text(
+                customSubtitle ?? (isBangla ? 'ইনভেস্টমেন্ট প্ল্যাটফর্ম' : 'Investment Platform'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.hindSiliguri(
+                  fontSize: size * 0.28,
+                  fontWeight: FontWeight.w500,
+                  color: palette.pine,
+                  height: 1.1,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

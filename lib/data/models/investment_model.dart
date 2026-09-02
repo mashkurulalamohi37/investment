@@ -1,4 +1,4 @@
-enum InvestmentStatus { pending, pendingPaymentVerification, verified, allocated, cancelled, refunded }
+enum InvestmentStatus { pending, pendingPaymentVerification, verified, allocated, cancelled, refunded, rejected }
 
 class InvestmentModel {
   final String id;
@@ -15,6 +15,10 @@ class InvestmentModel {
   final List<String> allocatedLotNumbers;
   final String? paymentMethod;
   final String? paymentReference;
+  final String? receiptImageUrl;
+  final String? depositBankName;
+  final String? depositorName;
+  final String? paymentGateway; // 'EPS', 'MANUAL_BANK', 'DIRECT'
   final DateTime createdAt;
   final DateTime? verifiedAt;
 
@@ -42,6 +46,10 @@ class InvestmentModel {
     this.paymentMethod,
     String? paymentReference,
     String? transactionRef,
+    this.receiptImageUrl,
+    this.depositBankName,
+    this.depositorName,
+    this.paymentGateway = 'EPS',
     required this.createdAt,
     this.verifiedAt,
     DateTime? updatedAt,
@@ -70,6 +78,10 @@ class InvestmentModel {
     List<String>? allocatedLotNumbers,
     DateTime? verifiedAt,
     String? paymentReference,
+    String? receiptImageUrl,
+    String? depositBankName,
+    String? depositorName,
+    String? paymentGateway,
   }) {
     return InvestmentModel(
       id: id,
@@ -86,6 +98,10 @@ class InvestmentModel {
       allocatedLotNumbers: allocatedLotNumbers ?? this.allocatedLotNumbers,
       paymentMethod: paymentMethod,
       paymentReference: paymentReference ?? this.paymentReference,
+      receiptImageUrl: receiptImageUrl ?? this.receiptImageUrl,
+      depositBankName: depositBankName ?? this.depositBankName,
+      depositorName: depositorName ?? this.depositorName,
+      paymentGateway: paymentGateway ?? this.paymentGateway,
       createdAt: createdAt,
       verifiedAt: verifiedAt ?? this.verifiedAt,
     );

@@ -20,12 +20,10 @@ A fintech investment mobile and web application built with **Flutter 3.x** and *
 - **Dual-Mode Calculator**: Synchronized stepper pills and slider with real-time recalculations of capital and equity share.
 - **7 Deep-Dive Information Modules**: Overview, Fund Usage, Timeline, Assets, Document Vault, Risk & Legal Disclosures, Updates.
 
-### 3. 💳 5-Step Secure Investment Wizard
-1. **Share Selection**: Limit enforcement (1 to 4 shares).
-2. **Review & Risk Acceptance**: Clear disclosure of asset-backed returns without guaranteed return claims.
-3. **Official Channel Selection**: City Bank PLC, BRAC Bank PLC, bKash Merchant.
-4. **Deposit Slip Submission**: Bank reference and transaction ID verification.
-5. **Confirmation Receipt**: Celebratory success screen with pending review status.
+### 3. 💳 Dual Payment Engine & Verification
+- **EPS (Easy Payment System) Gateway**: Instant online checkout supporting **bKash, Nagad, Rocket, Visa/Mastercard, and Internet Banking** with automated instant sequential lot allocation and certificate generation.
+- **Manual Bank Deposit & Slip Upload**: Official company bank details (City Bank PLC, A/C: 1402-9988-7710-1, Routing: 225275357) with one-tap copy and photo attachment preview.
+- **Admin Verification Queue & Receipt Inspector**: High-resolution receipt inspector with one-click "Approve & Allocate Shares" and "Reject" workflow.
 
 ### 4. 📊 Real-Time Fund Transparency & Vouchers
 - **Live Fund Ledger**: Target fund (৳25.5L), collected (৳18.87L), utilized (৳20.5L), remaining balance (৳5.0L).
@@ -41,11 +39,13 @@ A fintech investment mobile and web application built with **Flutter 3.x** and *
 - Audited payout periods with status lifecycle (Draft → Approved → Processing → Paid).
 
 ### 7. 🛡️ Role-Based Admin Management Console
-- **Atomic Share Lot Allocation**: Verifies payments and assigns sequential lot numbers (e.g. `LOT-075`, `LOT-076`) without duplicates.
-- **Expense Voucher Management**: Add vouchers with real-time project fund balance deduction.
-- **KYC & Compliance Queue**: Review investor NIDs, bank accounts, and nominee details.
+- **Executive KPI Dashboard**: Total projects, registered users, raised capital, and profit distribution trends.
+- **Payment & Deposit Verification Screen**: Inspect bank deposit slips and allocate shares sequentially without duplicates.
+- **Project & User Manager**: Create new land/agro projects, milestones, manage investor KYC records.
 - **Immutable Audit Trail**: Append-only log tracking actor, IP, timestamp, and action.
 - **Financial Reports**: Export statements and matrices in PDF / CSV format.
+
+> 📖 **Full System Specification**: See [SYSTEM_AND_FEATURES_DOCUMENTATION.md](file:///d:/Intern%20Projects/Investment/SYSTEM_AND_FEATURES_DOCUMENTATION.md) for exhaustive architectural diagrams, entity relationships, and module breakdown.
 
 ---
 

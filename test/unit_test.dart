@@ -111,5 +111,56 @@ void main() {
       expect(updatedInv.assignedLots, ['LOT-075', 'LOT-076']);
       expect(state.landVest100.allocatedShares, prevAllocated + 2);
     });
+
+    test('EPS Payment Gateway instant allocation works seamlessly', () {
+      final prevAllocated = state.landVest100.allocatedShares;
+      state.submitEpsInvestment(
+        shares: 3,
+        paymentMethod: 'bKash Merchant',
+        epsTransactionId: 'EPS-BK-998811',
+      );
+
+      final latestInv = state.investments.first;
+      expect(latestInv.status, InvestmentStatus.allocated);
+      expect(latestInv.shares, 3);
+      expect(latestInv.grossAmount, 3 * 25500.0);
+      expect(latestInv.paymentGateway, 'EPS');
+      expect(latestInv.allocatedLotNumbers.length, 3);
+      expect(state.landVest100.allocatedShares, prevAllocated + 3);
+    });
+
+    test('Bank deposit slip upload creates pending review with slip metadata', () {
+      state.submitBankDepositInvestment(
+        shares: 1,
+        depositBankName: 'The City Bank PLC',
+        depositorName: 'Mashkurul Alam',
+        paymentReference: 'DEP-CB-778811',
+        receiptImageUrl: 'https://vault.swapnojatri.com/receipts/slip-778811.jpg',
+      );
+
+      final latestInv = state.investments.first;
+      expect(latestInv.status, InvestmentStatus.pendingPaymentVerification);
+      expect(latestInv.shares, 1);
+      expect(latestInv.paymentGateway, 'MANUAL_BANK');
+      expect(latestInv.depositBankName, 'The City Bank PLC');
+      expect(latestInv.receiptImageUrl, isNotNull);
+      expect(latestInv.allocatedLotNumbers, isEmpty);
+    });
+
+    test('Admin rejection sets investment and transaction to rejected/failed', () {
+      state.submitBankDepositInvestment(
+        shares: 1,
+        depositBankName: 'The City Bank PLC',
+        depositorName: 'Fake Depositor',
+        paymentReference: 'INVALID-99',
+        receiptImageUrl: 'fake_slip.jpg',
+      );
+
+      final invId = state.investments.first.id;
+      state.adminRejectInvestment(invId);
+
+      final rejectedInv = state.investments.firstWhere((i) => i.id == invId);
+      expect(rejectedInv.status, InvestmentStatus.rejected);
+    });
   });
 }
