@@ -163,36 +163,15 @@ The Next.js backend provides a full REST API accessible at `/api/*`:
 
 ---
 
-## 🚀 cPanel One-Click Production Deployment
+## 🚀 Production Deployment (Hostinger & cPanel)
 
-The platform is engineered to run seamlessly on standard **cPanel Shared/Cloud Hosting** with **Node.js Selector** — eliminating the need for a separate backend server.
+The platform is engineered to run on **Hostinger (VPS or hPanel Node.js)** as well as standard **cPanel Shared/Cloud Hosting** with **Node.js Selector** — eliminating the need for a separate backend server.
 
-### Step 1: Generate the Bundle
-Run the automated bundle script from the project root or `website/` directory:
-```powershell
-cd website
-powershell -ExecutionPolicy Bypass -File bundle_cpanel.ps1
-```
-This generates an optimized, standalone zip package:
-`website/swapnojatri_cpanel_deploy.zip`
+### 🌐 Deploying to Hostinger (VPS / Cloud / hPanel)
+> 📖 **Complete Step-by-Step Hostinger Guide**: See [HOSTINGER_DEPLOYMENT_GUIDE.md](file:///d:/Intern%20Projects/Investment/website/HOSTINGER_DEPLOYMENT_GUIDE.md) for full Ubuntu VPS, PM2 process management, Nginx reverse proxy, and free SSL setup.
 
-### Step 2: Upload to cPanel
-1. Log into your **cPanel**.
-2. Open **File Manager** and navigate to your application root (e.g., `public_html` or a dedicated app directory).
-3. Upload `swapnojatri_cpanel_deploy.zip` and click **Extract**.
-
-### Step 3: Configure Node.js Selector
-1. In cPanel, click **"Setup Node.js App"**.
-2. Click **Create Application**:
-   - **Node.js Version**: `18.x` or `20.x`
-   - **Application Mode**: `Production`
-   - **Application Root**: Directory where files were extracted
-   - **Application Startup File**: `server.js`
-3. Click **Create**.
-4. Click **"Run NPM Install"** (or run `npm install --omit=dev` via Terminal).
-5. Click **"Restart"**.
-
-> 📖 **Full cPanel Guide**: For comprehensive instructions and troubleshooting, see [CPANEL_DEPLOYMENT_GUIDE.md](file:///d:/Intern%20Projects/Investment/website/CPANEL_DEPLOYMENT_GUIDE.md).
+### 🗄️ Deploying to cPanel
+> 📖 **cPanel Deployment Guide**: See [CPANEL_DEPLOYMENT_GUIDE.md](file:///d:/Intern%20Projects/Investment/website/CPANEL_DEPLOYMENT_GUIDE.md) for 1-click zip bundle and Passenger `server.js` setup.
 
 ---
 
