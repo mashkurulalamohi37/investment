@@ -113,7 +113,7 @@ class MyInvestmentScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isBangla ? 'বিনিয়োগ দলিল' : 'Investment Deed',
+                          isBangla ? 'বিনিয়োগ শুরুর তারিখ' : 'Investment Date',
                           style: GoogleFonts.hindSiliguri(fontSize: 11, color: palette.inkSecondary),
                         ),
                         Text(

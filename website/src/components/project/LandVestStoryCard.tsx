@@ -2,131 +2,193 @@
 
 import React from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { Building2, CheckCircle2, TrendingUp, Sparkles, ShieldCheck, HeartHandshake, MapPin } from "lucide-react";
+import {
+  Building2,
+  CheckCircle2,
+  TrendingUp,
+  ShieldCheck,
+  MapPin,
+  Sparkles,
+  Layers,
+  Coins,
+  ArrowUpRight,
+  Quote,
+} from "lucide-react";
 
 export default function LandVestStoryCard() {
   const { isBangla } = useAuth();
 
   const pastProjects = [
     {
-      name: "স্বপ্ননীড় প্যালেস",
-      nameEn: "Shopnoneer Palace",
-      spec: "১১ কাঠা জমিতে ১১ তলা বিল্ডিং",
-      specEn: "11 Katha Land, 11-Storey Building",
-      status: "এখন বসবাস করে (Completed & Handed Over)",
-      statusColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      name: isBangla ? "স্বপ্ননীড় প্যালেস" : "Shopnoneer Palace",
+      location: isBangla ? "ওয়াশপুর, ঢাকা" : "Washpur, Dhaka",
+      katha: isBangla ? "১১ কাঠা" : "11 Katha",
+      storey: isBangla ? "১১ তলা" : "11-Storey",
+      status: isBangla ? "হস্তান্তরিত ও বসবাসরত" : "Handed Over",
+      badgeClass: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
+      dotClass: "bg-emerald-500",
     },
     {
-      name: "স্বপ্নডানা",
-      nameEn: "Shopnodana",
-      spec: "১১.২৭ কাঠা জমিতে ১৩ তলা বিল্ডিং",
-      specEn: "11.27 Katha Land, 13-Storey Building",
-      status: "৯ তলার ছাদের কাজ চলমান (Under Construction)",
-      statusColor: "bg-blue-100 text-blue-800 border-blue-200",
+      name: isBangla ? "স্বপ্নডানা" : "Shopnodana",
+      location: isBangla ? "ওয়াশপুর, ঢাকা" : "Washpur, Dhaka",
+      katha: isBangla ? "১১.২৭ কাঠা" : "11.27 Katha",
+      storey: isBangla ? "১৩ তলা" : "13-Storey",
+      status: isBangla ? "নির্মাণাধীন (৯ম তলা)" : "9th Floor Roof",
+      badgeClass: "bg-blue-500/10 text-[#0066FF] border-blue-500/20",
+      dotClass: "bg-[#0066FF]",
     },
     {
-      name: "জল ও জ্যোৎস্না",
-      nameEn: "Jol O Jyotsna",
-      spec: "১৪ কাঠা জমিতে ১৪ তলা বিল্ডিং",
-      specEn: "14 Katha Land, 14-Storey Building",
-      status: "পাইলিং-এর কাজ চলমান (Piling in Progress)",
-      statusColor: "bg-amber-100 text-amber-800 border-amber-200",
+      name: isBangla ? "জল ও জ্যোৎস্না" : "Jol O Jyotsna",
+      location: isBangla ? "ওয়াশপুর, ঢাকা" : "Washpur, Dhaka",
+      katha: isBangla ? "১৪ কাঠা" : "14 Katha",
+      storey: isBangla ? "১৪ তলা" : "14-Storey",
+      status: isBangla ? "পাইলিং কাজ চলমান" : "Piling in Progress",
+      badgeClass: "bg-amber-500/10 text-amber-700 border-amber-500/20",
+      dotClass: "bg-amber-500",
     },
     {
-      name: "গ্রীণ টাওয়ার",
-      nameEn: "Green Tower",
-      spec: "৩০ কাঠা জমিতে ১৬ তলা বিল্ডিং",
-      specEn: "30 Katha Land, 16-Storey Building",
-      status: "শেয়ার বিক্রি চলছে... (Shares Open)",
-      statusColor: "bg-gold-tint text-gold-dark border-gold/30",
+      name: isBangla ? "গ্রীণ টাওয়ার" : "Green Tower",
+      location: isBangla ? "ওয়াশপুর, ঢাকা" : "Washpur, Dhaka",
+      katha: isBangla ? "৩০ কাঠা" : "30 Katha",
+      storey: isBangla ? "১৬ তলা" : "16-Storey",
+      status: isBangla ? "শেয়ার বুকিং উন্মুক্ত" : "Shares Open",
+      badgeClass: "bg-cyan-500/10 text-cyan-700 border-cyan-500/20",
+      dotClass: "bg-[#00B4D8]",
     },
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-cardHover overflow-hidden p-6 sm:p-10 space-y-8">
-      {/* Header Banner */}
-      <div className="space-y-3 pb-6 border-b border-slate-100">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-gold/15 text-gold-dark">
-            {isBangla ? "আমাদের গল্প ও পটভূমি" : "Our Journey & Purpose"}
-          </span>
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-light text-brand-forest">
-            {isBangla ? "মুনাফা ভাগাভাগি ভিত্তিক বিনিয়োগ" : "Profit-Sharing Model"}
-          </span>
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-card overflow-hidden">
+      {/* 1. Executive Prospectus Header */}
+      <div className="p-8 sm:p-12 border-b border-slate-100 bg-gradient-to-b from-[#F8FAFC] to-white space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-[#0066FF] border border-blue-100">
+              {isBangla ? "পটভূমি ও প্রেক্ষাপট" : "Background & Vision"}
+            </span>
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              {isBangla ? "১০০% প্রফিট-শেয়ারিং" : "Transparent Profit-Sharing"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+            <MapPin className="w-3.5 h-3.5 text-[#0066FF]" />
+            <span>Washpur Tower Road, Bosila, Dhaka</span>
+          </div>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-          {isBangla ? "LandVest 100 এর কথা..." : "The Story of LandVest 100..."}
+
+        <h2 className="text-2xl sm:text-4xl font-black text-[#0A2540] tracking-tight">
+          {isBangla ? "ল্যান্ডভেস্ট ১০০ এর পেছনের লক্ষ্য ও প্রেক্ষাপট" : "The Vision & Philosophy of LandVest 100"}
         </h2>
-        <p className="text-sm text-slate-600 leading-relaxed max-w-4xl">
+
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-4xl font-normal">
           {isBangla
-            ? "LandVest 100 মূলত ঢাকায় জমিতে বিনিয়োগ করে মুনাফা ভাগাভাগি করার একটি ছোট পরিসরের উদ্যোগ। আমরা কয়েকজন মিলে ঢাকায় জমিতে বিনিয়োগ নিয়ে কাজ করছি। আমাদের একটি বিশ্বস্ত টিম আছে। আমরা এখন পর্যন্ত ৪টা শেয়ার ভিত্তিক প্রজেক্ট নিয়ে সফলভাবে কাজ করছি:"
-            : "LandVest 100 is a dedicated initiative enabling individuals to participate in Dhaka's promising land opportunities and share profits. With our experienced team, we have successfully developed 4 major share-based residential and commercial projects:"}
+            ? "ঢাকায় সম্ভাবনাময় জমিতে এককভাবে কোটি টাকা ছাড়া বিনিয়োগ করা সাধারণ মানুষের পক্ষে দুঃসাধ্য। এই সীমাবদ্ধতা দূর করতেই LandVest 100—যেখানে মোট জমি ও উন্নয়নকে ১০০টি নির্দিষ্ট ভাগে ভাগ করে প্রতিটি ভাগে ২৫,৫০০ টাকায় আংশিক মালিকানা ও সরাসরি নিট মুনাফা অর্জনের সুযোগ সৃষ্টি করা হয়েছে।"
+            : "Purchasing prime land in Dhaka traditionally requires millions, keeping it out of reach for individual investors. LandVest 100 removes this barrier by dividing the project into 100 fixed parts at ৳25,500 each for proportional net profit sharing."}
         </p>
       </div>
 
-      {/* 4 Proven Projects Grid */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-          <MapPin className="w-4 h-4 text-brand-forest" />
-          <span>
-            {isBangla
-              ? "এই সবগুলো প্রজেক্ট ওয়াশপুরে (বসিলা ব্রীজ পার হয়ে) টাওয়ার রোডে অবস্থিত:"
-              : "All projects strategically located at Washpur Tower Road (Crossing Bosila Bridge), Dhaka:"}
+      {/* 2. Track Record Showcase (4 Delivered / Active Projects) */}
+      <div className="p-8 sm:p-12 border-b border-slate-100 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 className="text-lg font-extrabold text-[#0A2540]">
+              {isBangla ? "আমাদের সফল ও চলমান প্রকল্পসমূহ" : "Our Track Record & Ongoing Developments"}
+            </h3>
+            <p className="text-xs text-slate-500">
+              {isBangla ? "ওয়াশপুর ও বসিলা অঞ্চলে স্বপ্নযাত্রী টিমের সফল বাস্তবায়ন" : "Delivered and active residential projects by Swapnojatri team"}
+            </p>
+          </div>
+          <span className="text-xs font-mono font-bold text-[#0066FF] bg-blue-50 px-3 py-1 rounded-full border border-blue-100 self-start sm:self-auto">
+            {isBangla ? "৪টি মেগা প্রকল্প" : "4 Mega Projects"}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {pastProjects.map((p, idx) => (
             <div
               key={idx}
-              className="p-5 rounded-2xl bg-canvas-light border border-slate-200/90 hover:border-brand-forest/40 transition-all space-y-2"
+              className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-[#0066FF]/50 hover:shadow-lg transition-all space-y-4 flex flex-col justify-between group"
             >
-              <div className="flex items-center justify-between">
-                <h4 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-brand-forest" />
-                  <span>{isBangla ? p.name : p.nameEn}</span>
-                </h4>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${p.statusColor}`}>
-                  {p.status}
-                </span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 group-hover:bg-blue-50 text-[#0066FF] flex items-center justify-center transition-colors">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border flex items-center gap-1.5 ${p.badgeClass}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${p.dotClass}`} />
+                    <span>{p.status}</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="font-extrabold text-[#0A2540] text-base group-hover:text-[#0066FF] transition-colors">
+                    {p.name}
+                  </h4>
+                  <span className="text-xs text-slate-400 font-medium">{p.location}</span>
+                </div>
               </div>
-              <p className="text-xs text-slate-600">{isBangla ? p.spec : p.specEn}</p>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono font-bold text-slate-700">
+                <span>{p.katha}</span>
+                <span className="text-slate-300">•</span>
+                <span>{p.storey}</span>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Narrative & Profit-Sharing Clarification */}
-      <div className="bg-brand-light/60 rounded-2xl p-6 border border-brand-emerald/20 space-y-4 text-sm text-slate-700 leading-relaxed">
-        <p>
-          {isBangla
-            ? "আমাদের অভিজ্ঞতা থেকে মনে হয়েছে, অনেক পরিচিত মানুষ আছেন যারা জমিতে বিনিয়োগ করতে চান বা ঢাকায় বাসস্থান তৈরি করতে চান কিন্তু একা কয়েক লাখ বা কয়েক কোটি টাকা দিয়ে জমি কেনা তাদের পক্ষে সম্ভব হয় না। সেই চিন্তা থেকেই LandVest 100।"
-            : "From our ground experience, many people aspire to invest in land or build housing in Dhaka, but purchasing prime land alone requires millions which isn't feasible for everyone. That inspired LandVest 100."}
-        </p>
-        <p>
-          {isBangla
-            ? "এখানে পুরো বিনিয়োগকে আমরা ১০০টি ভাগে ভাগ করেছি। প্রতিভাগে একজন বিনিয়োগকারী মোট ২৫,৫০০ টাকা দিয়ে যুক্ত হতে পারবেন। আপনি চাইলে আপনার সামর্থ্য অনুযায়ী ১, ২, ৩ বা ৪ ভাগ—উপলব্ধ থাকা সাপেক্ষে আরও বেশিভাগও নিতে পারবেন।"
-            : "Here, total capital is divided into 100 fixed parts. Investors can join with ৳25,500 per part (1, 2, 3, 4 or more parts based on availability) to participate in profit distributions."}
-        </p>
-        <p className="font-semibold text-brand-forest">
-          {isBangla
-            ? "আমরা অপরিচিত মানুষের কাছ থেকে বড় আকারে অর্থ সংগ্রহের চিন্তা থেকে এটি শুরু করছি না। বরং পরিচিত ও আমাদের ওপর আস্থা রাখেন—এমন মানুষদের ছোট অঙ্কে একটি বিনিয়োগের সুযোগে যুক্ত করার চিন্তা থেকেই LandVest 100।"
-            : "We are not raising capital indiscriminately from strangers. Rather, LandVest 100 is designed for trusted people to participate with small amounts in a transparent profit-sharing model."}
-        </p>
-        <p className="text-xs text-slate-600">
-          {isBangla
-            ? "তাই কাউকে চাপ দিয়ে যুক্ত করাও আমাদের উদ্দেশ্য নয়। আপনি আগে পুরো বিষয়টা বুঝবেন, প্রশ্ন করবেন, ঝুঁকিটাও বুঝবেন। তারপর আমাদের পরিকল্পনা ও আমাদের ওপর আস্থা তৈরি হলে নিজের সামর্থ্য অনুযায়ী সিদ্ধান্ত নেবেন।"
-            : "Our goal is full transparency without any pressure. Understand the plan, ask questions, evaluate the risks, and invest according to your financial capability once confident."}
-        </p>
+      {/* 3. Mathematical Profit-Sharing Formula Bar */}
+      <div className="p-8 sm:p-12 border-b border-slate-100 bg-[#F8FAFC] space-y-6">
+        <h3 className="text-base font-extrabold text-[#0A2540] text-center">
+          {isBangla ? "স্বচ্ছ ফান্ডিং কাঠামো ও প্রো-রাটা লভ্যাংশ নীতি" : "Transparent Funding Structure & Pro-Rata Math"}
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center space-y-1">
+            <span className="text-xs text-slate-400 font-bold uppercase font-mono">
+              {isBangla ? "স্থির শেয়ার সংখ্যা" : "Fixed Total Shares"}
+            </span>
+            <p className="text-2xl font-black text-[#0A2540] font-mono">১০০ টি ভাগ</p>
+            <span className="text-[11px] text-slate-500 font-medium block">
+              {isBangla ? "কোনো অতিরিক্ত শেয়ার তৈরি হবে না" : "Hard cap of exactly 100 units"}
+            </span>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center space-y-1">
+            <span className="text-xs text-slate-400 font-bold uppercase font-mono">
+              {isBangla ? "ইউনিট মূল্য" : "Unit Share Price"}
+            </span>
+            <p className="text-2xl font-black text-[#0066FF] font-mono">৳ ২৫,৫০০</p>
+            <span className="text-[11px] text-slate-500 font-medium block">
+              {isBangla ? "১ থেকে সর্বোচ্চ ৪টি শেয়ার সীমা" : "Investor limit: 1 to 4 units"}
+            </span>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center space-y-1">
+            <span className="text-xs text-slate-400 font-bold uppercase font-mono">
+              {isBangla ? "লভ্যাংশ বণ্টন" : "Profit Payout"}
+            </span>
+            <p className="text-2xl font-black text-emerald-700 font-mono">প্রো-রাটা</p>
+            <span className="text-[11px] text-slate-500 font-medium block">
+              {isBangla ? "সিটি ব্যাংক এসক্রো থেকে সরাসরি ব্যাংক জমা" : "Direct payout to verified bank account"}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Core Principle Callout */}
-      <div className="p-6 rounded-2xl bg-gradient-emerald text-white text-center space-y-2 relative overflow-hidden shadow-lg shadow-brand-forest/20">
-        <p className="text-sm sm:text-base font-bold italic tracking-wide text-gold-light max-w-3xl mx-auto leading-relaxed">
+      {/* 4. Core Principle Quote Card */}
+      <div className="p-8 sm:p-12 bg-gradient-to-br from-[#0A2540] to-[#041628] text-white text-center relative overflow-hidden space-y-3">
+        <Quote className="w-8 h-8 text-[#00B4D8]/30 mx-auto" />
+        <p className="text-sm sm:text-lg font-bold italic text-cyan-light max-w-3xl mx-auto leading-relaxed">
           {isBangla
-            ? "“আপনি আমাকে বিশ্বাস করেন বলে বিনিয়োগ করবেন—এটা গুরুত্বপূর্ণ; কিন্তু শুধু বিশ্বাসের কারণে করবেন না। আগে পরিকল্পনাটা বুঝুন, তারপর সিদ্ধান্ত নিন।”"
-            : "“Investing because you trust us is important; but do not invest solely on trust. Understand the business plan first, and then make an informed decision.”"}
+            ? "“আপনি আমাদের বিশ্বাস করেন বলে বিনিয়োগ করবেন—এটা আনন্দের; কিন্তু শুধু বিশ্বাসের ওপর ভিত্তি করে নয়, আগে আমাদের প্রাতিষ্ঠানিক পরিকল্পনা, ব্যাংক এসক্রো ও অডিট ভাউচার খতিয়ান বুঝুন, তারপর যুক্ত হোন।”"
+            : "“Investing based on trust is valued; but do not invest solely on trust. Understand our institutional structure, escrow safety, and audited ledger first.”"}
         </p>
+        <span className="text-[11px] font-mono tracking-wider text-slate-400 uppercase block pt-2">
+          Swapnojatri Investment Platform Ltd • Institutional Transparency
+        </span>
       </div>
     </div>
   );

@@ -1,61 +1,143 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --font-outfit: 'Outfit', sans-serif;
-    --font-hind: 'Hind Siliguri', sans-serif;
-  }
-
   body {
-    @apply bg-canvas-light text-slate-900 font-sans antialiased selection:bg-brand-emerald selection:text-white;
+    @apply bg-[#F8FAFC] text-slate-800 antialiased selection:bg-[#0066FF] selection:text-white;
+    font-family: var(--font-hind), var(--font-noto-bengali), var(--font-jakarta), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
-/* Custom Gradients & Utilities */
-.bg-gradient-emerald {
-  background: linear-gradient(135deg, #041811 0%, #062319 50%, #0D3B2E 100%);
+/* =====================================================
+   Royal Cobalt Blue & Modern Fintech Design Tokens
+   ===================================================== */
+
+/* Ultra-Luxurious Hero Mesh Gradient */
+.hero-mesh-gradient {
+  background: 
+    radial-gradient(at 100% 0%, rgba(0, 180, 216, 0.18) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(0, 102, 255, 0.22) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(10, 37, 64, 0.96) 0px, #040D1A 100%);
 }
 
-.bg-gradient-gold {
-  background: linear-gradient(135deg, #DFBA46 0%, #C59B27 50%, #9E7A1C 100%);
+/* Elegant Light Canvas Ambient Gradient */
+.canvas-ambient-gradient {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(0, 180, 216, 0.04) 0%, transparent 40%),
+    #F8FAFC;
 }
 
-.text-gold-gradient {
-  background: linear-gradient(135deg, #FDE68A 0%, #C59B27 100%);
+/* Premium Frosted Glass Panels */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -10px rgba(0, 50, 120, 0.06);
+}
+
+.glass-card-dark {
+  background: rgba(10, 37, 64, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+/* Floating Glass Navbar */
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Gradient Text Shimmers */
+.text-shimmer-blue {
+  background: linear-gradient(135deg, #FFFFFF 30%, #70C5FF 70%, #00B4D8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+.text-gradient-primary {
+  background: linear-gradient(135deg, #0A2540 0%, #0066FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.glass-panel-dark {
-  background: rgba(13, 59, 46, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+/* Button Glows & Micro-Interactions */
+.btn-primary-glow {
+  background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+  box-shadow: 0 6px 20px -4px rgba(0, 102, 255, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-primary-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(0, 102, 255, 0.6);
+}
+
+.btn-secondary-glow {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.25s ease;
+}
+.btn-secondary-glow:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Gradient Utility Classes */
+.bg-gradient-brand {
+  background: linear-gradient(135deg, #040D1A 0%, #0A2540 50%, #0D3060 100%);
+}
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #2979FF 0%, #0066FF 50%, #0052CC 100%);
+}
+.bg-gradient-cyan {
+  background: linear-gradient(135deg, #48CAE4 0%, #00B4D8 100%);
+}
+.bg-gradient-jade {
+  background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
+}
+.bg-gradient-emerald {
+  background: linear-gradient(135deg, #040D1A 0%, #0A2540 50%, #0D3060 100%);
+}
+.bg-gradient-gold {
+  background: linear-gradient(135deg, #2979FF 0%, #0066FF 50%, #0052CC 100%);
+}
+.text-blue-gradient {
+  background: linear-gradient(135deg, #48CAE4 0%, #0066FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-cyan-gradient {
+  background: linear-gradient(135deg, #90E0F3 0%, #00B4D8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-gold-gradient {
+  background: linear-gradient(135deg, #48CAE4 0%, #00B4D8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #0066FF;
 }

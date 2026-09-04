@@ -17,21 +17,28 @@ export default function SwapnojatriLogo({
 }: SwapnojatriLogoProps) {
   const { isBangla } = useAuth();
 
-  const sizeDimensions = {
-    sm: "w-8 h-8",
-    md: "w-11 h-11",
-    lg: "w-14 h-14",
-    xl: "w-20 h-20",
+  const sizePx = {
+    sm: 32,
+    md: 44,
+    lg: 56,
+    xl: 80,
   };
+  const px = sizePx[size] || 44;
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {/* Official Swapnojatri Suitcase + Flight Arrow Emblem */}
-      <div className={`${sizeDimensions[size]} shrink-0 relative flex items-center justify-center`}>
+      <div
+        className="shrink-0 relative flex items-center justify-center overflow-hidden"
+        style={{ width: px, height: px, minWidth: px, minHeight: px, maxWidth: px, maxHeight: px }}
+      >
         <img
           src="/swapnojatri_logo.svg"
           alt="স্বপ্নযাত্রী"
-          className="w-full h-full object-contain filter drop-shadow-md"
+          width={px}
+          height={px}
+          style={{ width: px, height: px, objectFit: "contain" }}
+          className="drop-shadow-md"
         />
       </div>
 

@@ -26,8 +26,8 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  final List<String> _filtersEn = ['All Documents', 'Title Deeds & Mutation', 'Legal Vetting', 'Tax & Audit'];
-  final List<String> _filtersBn = ['সকল দলিল', 'খতিয়ান ও দলিল', 'আইনি অডিট', 'ট্যাক্স ও হিসাব'];
+  final List<String> _filtersEn = ['All Documents', 'Partnership & Terms', 'Financial Audits', 'Tax & Progress'];
+  final List<String> _filtersBn = ['সকল ডকুমেন্ট', 'পার্টনারশিপ চুক্তি', 'আর্থিক অডিট', 'ট্যাক্স ও অগ্রগতি'];
 
   @override
   void dispose() {
@@ -288,7 +288,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                   onChanged: (val) => setState(() => _searchQuery = val.trim()),
                   style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 13),
                   decoration: InputDecoration(
-                    hintText: isBangla ? 'দলিলের নাম, দাগ নম্বর বা হ্যাশ দিয়ে খুঁজুন...' : 'Search by title, deed ref, or SHA-256 hash...',
+                    hintText: isBangla ? 'ডকুমেন্টের নাম, রেফারেন্স বা হ্যাশ দিয়ে খুঁজুন...' : 'Search by title, ref code, or SHA-256 hash...',
                     hintStyle: AppTypography.caption(isDark: isDark).copyWith(color: palette.inkTertiary),
                     prefixIcon: Icon(Icons.search_rounded, size: 18, color: palette.inkTertiary),
                     suffixIcon: _searchQuery.isNotEmpty

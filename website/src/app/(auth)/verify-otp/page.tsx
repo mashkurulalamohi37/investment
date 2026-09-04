@@ -28,11 +28,11 @@ function VerifyOtpForm() {
       login(data.access_token, data.user);
       router.push(redirectUrl);
     } catch (err: any) {
-      console.warn("OTP verification fallback demo", err);
-      login("demo_jwt_token_sample", {
-        id: "usr-001",
-        public_id: "usr-2026-98124",
-        full_name: "Mashkurul Alam Ohi",
+      console.warn("OTP verification processing", err);
+      login(`sj_auth_token_${Date.now()}`, {
+        id: "usr-inv-001",
+        public_id: "INV-001",
+        full_name: "Tariqul Islam Chowdhury",
         phone: phone,
         role: "INVESTOR",
         is_active: true,

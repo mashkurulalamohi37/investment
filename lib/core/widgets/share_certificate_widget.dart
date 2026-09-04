@@ -213,8 +213,8 @@ class ShareCertificateWidget extends StatelessWidget {
                                   ),
                                   const Divider(height: 12),
                                   _certDataRow(
-                                    isBangla ? 'সাব-রেজিস্ট্রি দলিল' : 'Title Deed',
-                                    isBangla ? 'দলিল নং ৪৯৮২/২০২৬ (সাভার সাব-রেজিস্ট্রি)' : '#4982/2026 (Savar Sub-Registry)',
+                                    isBangla ? 'অংশীদারিত্ব রেফারেন্স' : 'Certificate Ref',
+                                    'CERT-LV100-${shareCount.toString().padLeft(2, '0')}',
                                     palette,
                                     isDark,
                                   ),

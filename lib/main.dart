@@ -25,6 +25,13 @@ class _SwapnojatriAppState extends State<SwapnojatriApp> {
   final AppState _appState = AppState();
 
   @override
+  void initState() {
+    super.initState();
+    // Connect and synchronize live data with the website backend on startup
+    _appState.syncWithWebsite(notify: false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppStateScope(
       notifier: _appState,

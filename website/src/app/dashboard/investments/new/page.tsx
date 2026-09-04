@@ -99,40 +99,43 @@ function InvestmentWizardForm() {
             </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map((num) => (
-              <button
-                key={num}
-                type="button"
-                onClick={() => setShares(num)}
-                className={`py-4 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all ${
-                  shares === num
-                    ? "bg-brand-forest text-white border-brand-forest shadow-md shadow-brand-forest/20"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
-                }`}
-              >
-                <span className="font-bold text-base">{num} Share{num > 1 ? "s" : ""}</span>
-                <span className={`text-[11px] ${shares === num ? "text-gold" : "text-slate-500"}`}>
-                  {formatBDT(num * pricePerShare, { isBangla })}
-                </span>
-              </button>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map((num) => {
+              const isSelected = shares === num;
+              return (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setShares(num)}
+                  className={`py-4 px-3 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[#0066FF] text-white border-[#0066FF] shadow-md shadow-[#0066FF]/25 scale-[1.02]"
+                      : "bg-[#F8FAFC] text-[#0F172A] border-[#E2E8F0] hover:bg-[#EBF3FF]/70 hover:border-[#0066FF]/40"
+                  }`}
+                >
+                  <span className="font-bold text-base">{num} Share{num > 1 ? "s" : ""}</span>
+                  <span className={`text-xs font-semibold ${isSelected ? "text-white/90" : "text-[#64748B]"}`}>
+                    {formatBDT(num * pricePerShare, { isBangla })}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Pricing Box */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-            <span className="text-xs text-slate-600 font-semibold">Total Investment Payable:</span>
-            <span className="text-2xl font-black text-brand-forest font-mono">
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
+            <span className="text-xs sm:text-sm text-[#64748B] font-semibold">Total Investment Payable:</span>
+            <span className="text-2xl font-bold text-[#0066FF] tracking-tight">
               {formatBDT(totalAmount, { isBangla })}
             </span>
           </div>
 
           <button
             onClick={() => setStep(2)}
-            className="w-full py-4 rounded-xl bg-gradient-emerald text-white font-bold text-sm hover:opacity-95 shadow-lg shadow-brand-forest/20 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-sm shadow-md shadow-[#0066FF]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Proceed to Confirmation</span>
-            <ArrowRight className="w-4 h-4 text-gold" />
+            <ArrowRight className="w-4 h-4 text-cyan-200" />
           </button>
         </div>
       )}
@@ -165,8 +168,8 @@ function InvestmentWizardForm() {
               <span className="font-black text-brand-forest text-base font-mono">{formatBDT(totalAmount, { isBangla })}</span>
             </div>
             <div className="flex justify-between pt-1">
-              <span className="text-slate-500">Title Deed Assignment:</span>
-              <span className="font-bold text-slate-900 font-mono">Sub-Registry Deed #4982/2026</span>
+              <span className="text-slate-500">{isBangla ? "মুনাফা বণ্টন পদ্ধতি:" : "Profit-Sharing Model:"}</span>
+              <span className="font-bold text-slate-900">{isBangla ? "প্রো-রাটা সরাসরি ব্যাংক বণ্টন" : "Direct Pro-Rata Distribution"}</span>
             </div>
           </div>
 

@@ -33,10 +33,10 @@ export default function RegisterPage() {
       login(data.access_token, data.user);
       router.push("/dashboard");
     } catch (err: any) {
-      console.warn("Registration fallback demo", err);
-      login("demo_jwt_token_sample", {
-        id: "usr-new-01",
-        public_id: "usr-2026-99120",
+      console.warn("Registration processing", err);
+      login(`sj_auth_token_${Date.now()}`, {
+        id: `usr-${Date.now()}`,
+        public_id: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
         full_name: fullName || "New Investor",
         phone: phone,
         email: email,

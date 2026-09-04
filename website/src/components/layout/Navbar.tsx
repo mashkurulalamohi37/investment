@@ -1,20 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
-import SwapnojatriLogo from "@/components/ui/SwapnojatriLogo";
-import { Menu, X, Globe, LayoutDashboard, LogOut } from "lucide-react";
+import {
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  X,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { user, isAuthenticated, logout, isBangla, toggleLanguage } = useAuth();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const navLinks = [
     { href: "/", label: isBangla ? "হোম" : "Home" },
-    { href: "/projects/landvest-100", label: isBangla ? "LandVest 100" : "LandVest 100", badge: "Live" },
+    { href: "/projects/landvest-100", label: "LandVest 100", badge: isBangla ? "চলমান" : "LIVE" },
     { href: "/projects", label: isBangla ? "প্রকল্পসমূহ" : "All Projects" },
     { href: "/how-it-works", label: isBangla ? "কার্যপদ্ধতি" : "How It Works" },
     { href: "/about", label: isBangla ? "আমাদের গল্প" : "Our Story" },
@@ -23,155 +41,244 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Official Brand Logo */}
-          <Link href="/" className="hover:opacity-95 transition-opacity">
-            <SwapnojatriLogo size="md" />
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all relative ${
-                    isActive
-                      ? "text-sky-900 bg-sky-50 font-bold"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
-                  {link.label}
-                  {link.badge && (
-                    <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-gold text-slate-950">
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Action CTAs */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-              title="Toggle Language"
-            >
-              <Globe className="w-3.5 h-3.5 text-sky-700" />
-              <span>{isBangla ? "ENG" : "বাংলা"}</span>
-            </button>
-
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-emerald text-white text-sm font-semibold hover:opacity-95 shadow-sm transition-all"
-                >
-                  <LayoutDashboard className="w-4 h-4 text-gold" />
-                  <span>{isBangla ? "ড্যাশবোর্ড" : "Dashboard"}</span>
-                </Link>
-                {user?.role === "SUPER_ADMIN" || user?.role === "FINANCE_MANAGER" ? (
-                  <Link
-                    href="/admin"
-                    className="px-3 py-2 rounded-xl bg-gold text-slate-950 text-xs font-bold hover:bg-gold-light transition-all"
-                  >
-                    Admin
-                  </Link>
-                ) : null}
-                <button
-                  onClick={logout}
-                  className="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
-                >
-                  {isBangla ? "লগইন" : "Sign In"}
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-4 py-2.5 rounded-xl bg-gradient-emerald text-white text-sm font-semibold hover:opacity-95 shadow-md shadow-brand-forest/20 transition-all"
-                >
-                  {isBangla ? "অ্যাকাউন্ট খুলুন" : "Join as Investor"}
-                </Link>
-              </div>
-            )}
+    <div className="sticky top-0 z-50 w-full">
+      {/* 1. Top Mini Announcement Bar */}
+      <div className="bg-[#040D1A] text-slate-300 text-[11px] py-1.5 px-4 border-b border-slate-800/80">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-bold text-white">
+              {isBangla ? "ল্যান্ডভেস্ট ১০০ লাইভ:" : "LandVest 100 Live:"}
+            </span>
+            <span className="text-slate-300 hidden sm:inline font-normal">
+              {isBangla ? "৭৪টি শেয়ার বরাদ্দ সম্পন্ন • ২৬টি উন্মুক্ত" : "74/100 Shares Allocated • 26 Units Remaining"}
+            </span>
+            <span className="text-slate-400 hidden md:inline font-normal">
+              {isBangla ? "• দ্য সিটি ব্যাংক পিএলসি এসক্রো একাউন্টে সুরক্ষিত" : "• Secured with The City Bank PLC Escrow"}
+            </span>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={toggleLanguage}
-              className="px-2 py-1 text-xs font-bold text-slate-700 bg-slate-100 rounded"
+          <div className="flex items-center gap-4 text-[11px]">
+            <span className="text-cyan-light font-bold font-mono">
+              {isBangla ? "প্রতি শেয়ার = ৳২৫,৫০০" : "1 Unit = ৳25,500"}
+            </span>
+            <Link
+              href="/projects/landvest-100"
+              className="text-white hover:text-cyan underline flex items-center gap-1 font-semibold"
             >
-              {isBangla ? "EN" : "বাং"}
-            </button>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+              <span>{isBangla ? "শেয়ার বুক করুন" : "Book Share"}</span>
+              <ArrowRight className="w-3 h-3 text-cyan" />
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
-      {isOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="block px-3 py-2.5 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100"
-            >
-              {link.label}
+      {/* 2. Main Glassmorphic Header */}
+      <header
+        className={`w-full transition-all duration-200 border-b ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-md shadow-blue-950/5"
+            : "bg-white/90 backdrop-blur-lg border-slate-200/80"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-18">
+            {/* Brand Logo */}
+            <Link href="/" className="flex items-center gap-3 group shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 relative transition-transform duration-300 group-hover:scale-105">
+                <img
+                  src="/swapnojatri_logo.svg"
+                  alt="Swapnojatri"
+                  className="w-full h-full object-contain filter drop-shadow-sm"
+                />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-slate-900 text-base sm:text-lg leading-tight">
+                    {isBangla ? "স্বপ্নযাত্রী" : "Swapnojatri"}
+                  </span>
+                  <span className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                    <span>{isBangla ? "যাচাইকৃত" : "Verified"}</span>
+                  </span>
+                </div>
+                <span className="text-[10px] font-semibold text-brand-emerald">
+                  {isBangla ? "ইনভেস্টমেন্ট প্ল্যাটফর্ম" : "Investment Platform"}
+                </span>
+              </div>
             </Link>
-          ))}
-          <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
-            {isAuthenticated ? (
-              <Link
-                href="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="w-full text-center py-2.5 rounded-xl bg-brand-forest text-white font-semibold"
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative px-3.5 py-2 rounded-full text-xs sm:text-[13px] font-bold transition-all duration-200 flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-brand-emerald text-white shadow-sm font-extrabold"
+                        : "text-slate-700 hover:text-brand-emerald hover:bg-slate-100/90"
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    {link.badge && (
+                      <span
+                        className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase ${
+                          isActive
+                            ? "bg-white/25 text-white"
+                            : "bg-cyan-tint text-cyan-dark border border-cyan/30 font-mono"
+                        }`}
+                      >
+                        {link.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right Action Suite */}
+            <div className="hidden md:flex items-center gap-3">
+              {/* Language Switcher */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 hover:text-brand-emerald bg-slate-100 hover:bg-slate-200/80 border border-slate-200/90 transition-all shadow-2xs"
+                title="Toggle Language"
               >
-                {isBangla ? "ড্যাশবোর্ড প্রবেশ করুন" : "Go to Dashboard"}
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-700"
-                >
-                  {isBangla ? "লগইন" : "Sign In"}
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl bg-brand-forest text-white font-semibold"
-                >
-                  {isBangla ? "অ্যাকাউন্ট খুলুন" : "Join as Investor"}
-                </Link>
-              </>
-            )}
+                <Globe className="w-3.5 h-3.5 text-brand-emerald" />
+                <span className="font-semibold text-[11px]">{isBangla ? "English" : "বাংলা"}</span>
+              </button>
+
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-brand-emerald hover:bg-brand-forest text-white text-xs sm:text-[13px] font-bold shadow-md shadow-brand-emerald/25 transition-all"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 text-cyan-light" />
+                    <span>{isBangla ? "ড্যাশবোর্ড" : "Dashboard"}</span>
+                  </Link>
+                  {user?.role === "SUPER_ADMIN" ? (
+                    <Link
+                      href="/admin"
+                      className="px-3 py-2 rounded-full bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all"
+                    >
+                      Admin
+                    </Link>
+                  ) : null}
+                  <button
+                    onClick={logout}
+                    className="p-2 text-slate-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 text-xs sm:text-[13px] font-bold text-slate-700 hover:text-brand-emerald transition-colors"
+                  >
+                    {isBangla ? "লগইন" : "Sign In"}
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="px-5 py-2.5 rounded-full bg-brand-emerald hover:bg-brand-forest text-white text-xs sm:text-[13px] font-extrabold shadow-md shadow-brand-emerald/25 transition-all flex items-center gap-1.5 group"
+                  >
+                    <span>{isBangla ? "বিনিয়োগ শুরু করুন" : "Join as Investor"}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-cyan-light transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="flex lg:hidden items-center gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="p-2 rounded-full bg-slate-100 text-slate-700 text-xs font-bold"
+              >
+                <Globe className="w-4 h-4 text-brand-emerald" />
+              </button>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 rounded-xl text-slate-700 hover:bg-slate-100"
+              >
+                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile Drawer */}
+        {isOpen && (
+          <div className="lg:hidden p-5 bg-white border-b border-slate-200 shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col space-y-1">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between ${
+                      isActive ? "bg-brand-emerald text-white" : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    {link.badge && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-cyan text-white font-bold">
+                        {link.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="pt-3 border-t border-slate-100 space-y-2">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full py-3 rounded-xl bg-brand-emerald text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md shadow-brand-emerald/25"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>{isBangla ? "বিনিয়োগকারী ড্যাশবোর্ড" : "Investor Dashboard"}</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                    className="w-full py-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full py-3 rounded-full bg-brand-emerald text-white text-sm font-extrabold text-center shadow-md shadow-brand-emerald/25"
+                  >
+                    {isBangla ? "বিনিয়োগ শুরু করুন / লগইন" : "Join as Investor / Sign In"}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+    </div>
   );
 }

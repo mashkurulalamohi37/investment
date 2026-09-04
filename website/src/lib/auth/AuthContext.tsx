@@ -10,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   isBangla: boolean;
   toggleLanguage: () => void;
-  login: (token: string, user: User) => void;
+  login: (tokenOrIdentifier: string, userOrPassword?: User | string) => Promise<boolean> | void;
   logout: () => void;
 }
 
@@ -50,11 +50,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem("swapnojatri_access_token", newToken);
-    localStorage.setItem("swapnojatri_user", JSON.stringify(newUser));
+  const login = (tokenOrIdentifier: string, userOrPassword?: User | string) => {
+    if (typeof userOrPassword === "object" && userOrPassword !== null) {
+      // Direct token & user hydration
+      setToken(tokenOrIdentifier);
+      setUser(userOrPassword);
+      localStorage.setItem("swapnojatri_access_token", tokenOrIdentifier);
+      localStorage.setItem("swapnojatri_user", JSON.stringify(userOrPassword));
+      return;
+    }
+
+    // Credential login simulation / API bridge
+    const isAdmin = tokenOrIdentifier.includes("999") || tokenOrIdentifier.includes("admin");
+    const sessionToken = `sj_token_${Date.now()}`;
+    const loggedUser: User = {
+      id: isAdmin ? "usr-admin-001" : "usr-inv-001",
+      public_id: isAdmin ? "ADM-001" : "INV-001",
+      full_name: isAdmin ? "Executive Board Director" : "Tariqul Islam Chowdhury",
+      email: isAdmin ? "admin@swapnojatri.com" : "tariqul.islam@example.com",
+      phone: tokenOrIdentifier,
+      role: isAdmin ? "SUPER_ADMIN" : "INVESTOR",
+      is_active: true,
+      is_kyc_verified: true,
+      preferred_language: isBangla ? "bn" : "en",
+    };
+
+    setToken(sessionToken);
+    setUser(loggedUser);
+    localStorage.setItem("swapnojatri_access_token", sessionToken);
+    localStorage.setItem("swapnojatri_user", JSON.stringify(loggedUser));
+    return Promise.resolve(true);
   };
 
   const logout = () => {

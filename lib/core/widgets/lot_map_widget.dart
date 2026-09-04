@@ -136,7 +136,7 @@ class _LotMapWidgetState extends State<LotMapWidget> {
               Divider(height: 1, color: palette.rule),
               const SizedBox(height: 14),
 
-              // Cadastral Specifications Table
+              // Share & Profit-Sharing Specifications Table
               Container(
                 decoration: BoxDecoration(
                   color: palette.surfaceSunken,
@@ -146,50 +146,23 @@ class _LotMapWidgetState extends State<LotMapWidget> {
                 padding: const EdgeInsets.all(14),
                 child: Column(
                   children: [
-                    _detailRow(isBangla ? 'ভূমির পরিমাণ' : 'Land Area', isBangla ? '০.২২৫ শতাংশ (০.১৩৬ কাঠা)' : '0.225 Decimals (0.136 Katha)', palette, isDark),
+                    _detailRow(isBangla ? 'শেয়ার ইকুইটি অংশ' : 'Share Equity', isBangla ? '১.০% মোট লভ্যাংশ অংশীদারিত্ব' : '1.0% Total Profit Equity', palette, isDark),
                     Divider(height: 16, color: palette.rule),
-                    _detailRow(isBangla ? 'মৌজা ও খতিয়ান' : 'Mouza & Khatian', isBangla ? 'বিরুলিয়া মৌজা, আরএস খতিয়ান ৯০২' : 'Birulia Mouza, RS Khatian 902', palette, isDark),
+                    _detailRow(isBangla ? 'নির্ধারিত ইউনিট মূল্য' : 'Fixed Unit Value', isBangla ? '৳ ২৫,৫০০ / ভাগ' : '৳ 25,500 / Share', palette, isDark),
                     Divider(height: 16, color: palette.rule),
-                    _detailRow(isBangla ? 'সাব-রেজিস্ট্রি অফিস' : 'Sub-Registry', isBangla ? 'সাভার সাব-রেজিস্ট্রি অফিস, ঢাকা' : 'Savar Sub-Registry Office, Dhaka', palette, isDark),
+                    _detailRow(isBangla ? 'লভ্যাংশ বণ্টন পদ্ধতি' : 'Payout Distribution', isBangla ? 'সরাসরি ব্যাংক / মোবাইল ওয়ালেট' : 'Direct Bank / Mobile Wallet', palette, isDark),
                     Divider(height: 16, color: palette.rule),
                     _detailRow(
-                      isBangla ? 'মালিকানা অবস্থা' : 'Status',
+                      isBangla ? 'শেয়ার স্ট্যাটাস' : 'Status',
                       isUserLot
-                          ? (isBangla ? 'আপনার সক্রিয় মালিকানা (দলিল ৪৯৮২/২৬)' : 'Your Ownership (Deed #4982/26)')
+                          ? (isBangla ? 'আপনার সক্রিয় বিনিয়োগকৃত শেয়ার' : 'Your Subscribed Share')
                           : (isAllocated
-                              ? (isBangla ? 'নিবন্ধিত অংশীদারের অংশ' : 'Allocated Investor Lot')
-                              : (isBangla ? 'ক্রয়ের জন্য সম্পূর্ণ প্রস্তুত' : 'Ready for Immediate Subscription')),
+                              ? (isBangla ? 'বিনিয়োগকারী কর্তৃক সংরক্ষিত' : 'Allocated Investor Share')
+                              : (isBangla ? 'বিনিয়োগের জন্য উন্মুক্ত' : 'Available for Subscription')),
                       palette,
                       isDark,
                       highlight: isUserLot,
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Legal Boundary Schedule (চৌহদ্দি)
-              Text(
-                isBangla ? 'চৌহদ্দি সীমানা তালিকা (Schedule of Boundaries)' : 'Schedule of Boundaries',
-                style: AppTypography.sectionLabel(isDark: isDark, isBangla: isBangla).copyWith(fontSize: 11),
-              ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  border: Border.all(color: palette.rule, width: 1.0),
-                  borderRadius: AppRadius.borderControl,
-                ),
-                child: Column(
-                  children: [
-                    _boundaryRow(isBangla ? 'উত্তর' : 'North', isBangla ? 'আরএস দাগ নং ৪১৭ (মৌজা সীমানা প্রাচীর)' : 'RS Plot #417 (Perimeter boundary wall)', palette),
-                    const SizedBox(height: 6),
-                    _boundaryRow(isBangla ? 'দক্ষিণ' : 'South', isBangla ? '২০ ফুট প্রশস্ত অভ্যন্তরীণ পাকা রাস্তা' : '20ft wide internal paved access road', palette),
-                    const SizedBox(height: 6),
-                    _boundaryRow(isBangla ? 'পূর্ব' : 'East', isBangla ? 'লট নং ${(index + 2).clamp(1, 100).toString().padLeft(3, '0')} (অভ্যন্তরীণ প্লট)' : 'Lot #${(index + 2).clamp(1, 100).toString().padLeft(3, '0')} (Internal parcel)', palette),
-                    const SizedBox(height: 6),
-                    _boundaryRow(isBangla ? 'পশ্চিম' : 'West', isBangla ? 'লট নং ${(index).clamp(1, 100).toString().padLeft(3, '0')} (অভ্যন্তরীণ প্লট)' : 'Lot #${(index).clamp(1, 100).toString().padLeft(3, '0')} (Internal parcel)', palette),
                   ],
                 ),
               ),
@@ -239,19 +212,6 @@ class _LotMapWidgetState extends State<LotMapWidget> {
     );
   }
 
-  Widget _boundaryRow(String dir, String desc, AppPalette palette) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 60,
-          child: Text(dir, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: palette.inkSecondary)),
-        ),
-        Expanded(
-          child: Text(desc, style: TextStyle(fontSize: 11, color: palette.ink)),
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

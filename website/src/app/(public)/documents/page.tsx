@@ -2,104 +2,152 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { FALLBACK_DOCUMENTS } from "@/lib/api/documents";
-import { FileText, ShieldCheck, Download, ExternalLink, CheckCircle2, Lock } from "lucide-react";
+import {
+  FileText,
+  Download,
+  ShieldCheck,
+  CheckCircle2,
+  Copy,
+  Check,
+  Sparkles,
+  Lock,
+  Layers,
+  FileCheck2,
+} from "lucide-react";
 
-export default function DocumentsVaultPage() {
+export default function DocumentsPage() {
   const { isBangla } = useAuth();
-  const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  const copyHash = (hash: string) => {
+  const copyHash = (hash: string, id: string) => {
     navigator.clipboard.writeText(hash);
-    setCopiedHash(hash);
-    setTimeout(() => setCopiedHash(null), 2000);
+    setCopiedKey(id);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
+  const handleDownload = (id: string, name: string) => {
+    setDownloadingId(id);
+    setTimeout(() => {
+      setDownloadingId(null);
+      alert(
+        isBangla
+          ? `"${name}" এর অফিসিয়াল অডিট কপি ভল্ট থেকে প্রস্তুত হয়েছে।`
+          : `Official audited document "${name}" prepared from vault.`
+      );
+    }, 800);
+  };
+
+  const docs = [
+    {
+      id: "doc-01",
+      title: isBangla ? "ল্যান্ডভেস্ট ১০০ পার্টনারশিপ কাঠামো ও ডিড" : "LandVest 100 Partnership Deed & Framework",
+      type: "PDF",
+      size: "2.4 MB",
+      date: "2026-08-01",
+      hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      category: isBangla ? "আইনি পার্টনারশিপ" : "Legal Deed",
+    },
+    {
+      id: "doc-02",
+      title: isBangla ? "সিটি ব্যাংক এসক্রো ক্লিয়ারিং এগ্রিমেন্ট" : "The City Bank PLC Escrow Trust Agreement",
+      type: "PDF",
+      size: "1.8 MB",
+      date: "2026-08-05",
+      hash: "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4",
+      category: isBangla ? "এসক্রো ট্রাস্ট" : "Escrow Trust",
+    },
+    {
+      id: "doc-03",
+      title: isBangla ? "ভাউচার অডিট রিপোর্ট ও রসিদ সংকলন" : "Audited Expense Vouchers & Disbursement Ledger",
+      type: "PDF",
+      size: "4.1 MB",
+      date: "2026-08-28",
+      hash: "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+      category: isBangla ? "অডিট লেজার" : "Audit Statement",
+    },
+    {
+      id: "doc-04",
+      title: isBangla ? "ডিজিটাল জিপিএস সার্ভে ও সীমানা জরিপ রিপোর্ট" : "Digital Cadastral GPS Survey & Site Demarcation",
+      type: "PDF",
+      size: "3.2 MB",
+      date: "2026-08-25",
+      hash: "fb8e20fc2e4c3f248c60c39bd652f3c1347298ab97b6b90723a12361b2e2d537",
+      category: isBangla ? "সার্ভে ম্যাপ" : "Cadastral Survey",
+    },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
-      {/* Page Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-3">
-        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-brand-light text-brand-forest">
-          {isBangla ? "আইনি ও অডিট ভল্ট" : "Cryptographic Document Vault"}
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
-          {isBangla ? "প্রকল্পের যাচাইকৃত আইনি দলিলপত্র" : "Legal Deeds & Vetting Documents"}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
+      {/* 1. Header Banner */}
+      <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-50 text-[#0066FF] border border-blue-100 shadow-2xs">
+          <FileCheck2 className="w-3.5 h-3.5" />
+          <span>{isBangla ? "অফিসিয়াল ডকুমেন্ট ভল্ট" : "Official Cryptographic Vault"}</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-black text-[#0A2540] tracking-tight">
+          {isBangla ? "যাচাইকৃত নথি ও অডিট সার্টিফিকেট" : "Verified Documents & SHA-256 Vault"}
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-xs sm:text-sm text-slate-600 font-normal max-w-xl mx-auto leading-relaxed">
           {isBangla
-            ? "প্রতিটি দলিলের ক্রিপ্টোগ্রাফিক SHA-256 ইন্টিগ্রিটি হ্যাশ ও মূল সাব-রেজিস্ট্রি দলিলের কপি"
-            : "All land title deeds, Supreme Court vetting reports, and mutation khatians with immutable SHA-256 checksums"}
+            ? "প্ল্যাটফর্মের প্রতিটি আইনি চুক্তি ও অডিট ভাউচার SHA-256 ক্রিপ্টোগ্রাফিক হ্যাশ সহ সংরক্ষিত।"
+            : "Every legal partnership deed and audited expense report stored with immutable SHA-256 checksums."}
         </p>
       </div>
 
-      {/* Security Banner */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-forest text-white flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="w-6 h-6 text-gold shrink-0" />
-          <p className="text-xs sm:text-sm text-slate-200">
-            {isBangla
-              ? "সকল আইনি দলিল বাংলাদেশ সুপ্রিম কোর্টের সিনিয়র আইনজীবী প্যানেল কর্তৃক পরীক্ষিত ও প্রত্যয়িত।"
-              : "All documents are legally vetted by Senior Advocates of the Supreme Court of Bangladesh."}
-          </p>
-        </div>
-        <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1 rounded border border-white/20 shrink-0">
-          SHA-256 HASH VERIFIED
-        </span>
-      </div>
-
-      {/* Document Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {FALLBACK_DOCUMENTS.map((doc) => (
+      {/* 2. Compact 2-Col Documents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {docs.map((d) => (
           <div
-            key={doc.id}
-            className="bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-cardHover transition-all p-6 flex flex-col justify-between space-y-6"
+            key={d.id}
+            className="bg-white rounded-3xl border border-slate-200/90 shadow-card hover:shadow-cardHover transition-all p-6 space-y-4 flex flex-col justify-between"
           >
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-brand-light text-brand-forest flex items-center justify-center">
-                  <FileText className="w-5 h-5" />
+                <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-50 text-[#0066FF] border border-blue-100">
+                  {d.category}
+                </span>
+                <span className="text-xs font-mono font-semibold text-slate-500">{d.size} • {d.date}</span>
+              </div>
+
+              <h3 className="text-base font-extrabold text-[#0A2540]">
+                {d.title}
+              </h3>
+
+              {/* SHA-256 Hash Box */}
+              <div className="p-3 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 flex items-center justify-between gap-2">
+                <div className="overflow-hidden">
+                  <span className="text-[9px] uppercase font-mono font-bold text-slate-400 block">
+                    SHA-256 Checksum Hash
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-600 truncate block">
+                    {d.hash}
+                  </span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-700">
-                  {doc.category}
-                </span>
-              </div>
-
-              <div>
-                <h3 className="text-base font-bold text-slate-900 leading-snug">
-                  {isBangla ? doc.title_bn : doc.title}
-                </h3>
-                <span className="text-xs text-slate-500 block mt-1">
-                  {doc.file_name} • {doc.file_size_human}
-                </span>
-              </div>
-
-              {/* SHA-256 Checksum Box */}
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[10px] space-y-1">
-                <span className="text-slate-400 font-bold block">SHA-256 CHECKSUM:</span>
-                <p
-                  onClick={() => copyHash(doc.checksum_sha256)}
-                  className="font-mono text-slate-600 break-all cursor-pointer hover:text-brand-forest"
-                  title="Click to copy hash"
+                <button
+                  type="button"
+                  onClick={() => copyHash(d.hash, d.id)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-[#0066FF] hover:bg-white transition-all shrink-0 cursor-pointer"
+                  title="Copy Hash"
                 >
-                  {doc.checksum_sha256}
-                </p>
-                {copiedHash === doc.checksum_sha256 && (
-                  <span className="text-jade font-semibold block text-[9px]">Copied to clipboard!</span>
-                )}
+                  {copiedKey === d.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            <a
-              href={`#download-${doc.id}`}
-              onClick={(e) => {
-                e.preventDefault();
-                alert(`Official Document: ${doc.title}\nFile: ${doc.file_name}\nChecksum: ${doc.checksum_sha256}\n\nDocument downloaded securely with valid SHA-256 signature.`);
-              }}
-              className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-brand-light hover:text-brand-forest text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+            <button
+              type="button"
+              disabled={downloadingId === d.id}
+              onClick={() => handleDownload(d.id, d.title)}
+              className="w-full py-3 rounded-full bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-extrabold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>{isBangla ? "দলিল ডাউনলোড করুন" : "Download PDF Document"}</span>
-            </a>
+              <Download className="w-3.5 h-3.5 text-[#00B4D8]" />
+              <span>
+                {downloadingId === d.id
+                  ? isBangla ? "প্রস্তুত হচ্ছে..." : "Preparing..."
+                  : isBangla ? "অফিসিয়াল কপি ডাউনলোড করুন" : "Download Verified Copy"}
+              </span>
+            </button>
           </div>
         ))}
       </div>

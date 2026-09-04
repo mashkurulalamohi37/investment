@@ -128,8 +128,8 @@ class _SealSuccessSheetState extends State<SealSuccessSheet> with SingleTickerPr
           const SizedBox(height: 4),
           Text(
             isBangla
-                ? 'ল্যান্ডভেস্ট ১০০ • সাব-রেজিস্ট্রি দলিল ৪৯৮২/২০২৬'
-                : 'LandVest 100 • Sub-Registry Title Deed #4982/2026',
+                ? 'ল্যান্ডভেস্ট ১০০ • সরাসরি লভ্যাংশ বণ্টন অংশীদারিত্ব'
+                : 'LandVest 100 • Pro-Rata Profit-Sharing Partner',
             style: AppTypography.caption(isDark: isDark, isBangla: isBangla).copyWith(
               color: palette.inkSecondary,
             ),

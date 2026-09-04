@@ -13,6 +13,7 @@ import 'package:swapnojatri/data/models/kyc_model.dart';
 import 'package:swapnojatri/data/models/audit_log_model.dart';
 import 'package:swapnojatri/data/models/user_model.dart';
 import 'package:swapnojatri/core/constants/project_seeds.dart';
+import 'package:swapnojatri/core/services/api_service.dart';
 
 /// Central reactive state store for Swapnojatri Investment Platform
 class AppState extends ChangeNotifier {
@@ -21,6 +22,11 @@ class AppState extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   AppPaletteFlavor _paletteFlavor = AppPaletteFlavor.paddyField; // "Paddy Field" (Wise-inspired)
   UserRole _activeRole = UserRole.investor;
+
+  // Website Backend Connection State
+  bool _isSyncing = false;
+  bool _isWebsiteConnected = false;
+  DateTime? _lastSyncedAt;
 
   // Active Users
   UserModel _currentUser = ProjectSeeds.defaultInvestor;
@@ -81,8 +87,65 @@ class AppState extends ChangeNotifier {
   List<NotificationModel> get notifications => List.unmodifiable(_notifications);
   List<AuditLogModel> get auditLogs => List.unmodifiable(_auditLogs);
   KycModel get kyc => _kyc;
+  bool get isSyncing => _isSyncing;
+  bool get isWebsiteConnected => _isWebsiteConnected;
+  DateTime? get lastSyncedAt => _lastSyncedAt;
 
   int get unreadNotificationCount => _notifications.where((n) => !n.isRead).length;
+
+  /// Asynchronously fetch live data from the website backend (Next.js / cPanel)
+  Future<void> syncWithWebsite({bool notify = true}) async {
+    _isSyncing = true;
+    if (notify) notifyListeners();
+
+    try {
+      final api = ApiService();
+      final isHealthy = await api.checkConnection();
+      _isWebsiteConnected = isHealthy;
+
+      if (isHealthy) {
+        // 1. Fetch live projects
+        final liveProjects = await api.getProjects();
+        if (liveProjects.isNotEmpty) {
+          _projects.clear();
+          _projects.addAll(liveProjects);
+          final lv100Match = liveProjects.firstWhere(
+            (p) => p.code == 'LV100' || p.id == 'proj-lv100',
+            orElse: () => liveProjects.first,
+          );
+          _landVest100 = lv100Match;
+        }
+
+        // 2. Fetch live investments
+        final liveInvestments = await api.getInvestments();
+        if (liveInvestments.isNotEmpty) {
+          _investments.clear();
+          _investments.addAll(liveInvestments);
+        }
+
+        // 3. Fetch live distributions
+        final liveDistributions = await api.getDistributions();
+        if (liveDistributions.isNotEmpty) {
+          _distributions.clear();
+          _distributions.addAll(liveDistributions);
+        }
+
+        // 4. Fetch live verified KYC
+        final liveKyc = await api.getKyc();
+        if (liveKyc != null) {
+          _kyc = liveKyc;
+        }
+
+        _lastSyncedAt = DateTime.now();
+        debugPrint('[AppState] Successfully synced state with Swapnojatri website backend!');
+      }
+    } catch (e) {
+      debugPrint('[AppState] Sync error (using offline cache): $e');
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
+  }
 
   // Financial Computations for Active Investor
   double get totalInvested => _investments

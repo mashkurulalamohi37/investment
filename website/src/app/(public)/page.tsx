@@ -23,100 +23,148 @@ import {
   Award,
   Sprout,
   Layers,
+  Lock,
+  Receipt,
 } from "lucide-react";
 
 export default function HomePage() {
   const { isBangla } = useAuth();
 
+  const trustPillars = [
+    {
+      icon: Layers,
+      title: isBangla ? "১০০ নির্দিষ্ট শেয়ার" : "Fixed 100 Unit Equity",
+      desc: isBangla
+        ? "প্রতিটি প্রজেক্ট কঠোরভাবে ১০০টি নির্দিষ্ট শেয়ারে সীমাবদ্ধ। অতিরিক্ত শেয়ার ইস্যুর কোনো ঝুঁকি নেই।"
+        : "Strictly fixed at 100 units per project. Prevents dilution and guarantees transparent 1.0% equity per share.",
+      color: "text-brand-emerald",
+      bg: "bg-brand-light/60",
+    },
+    {
+      icon: Building2,
+      title: isBangla ? "সিটি ব্যাংক এসক্রো হিসাব" : "City Bank Escrow Safety",
+      desc: isBangla
+        ? "সকল বিনিয়োগ সুরক্ষিত দ্য সিটি ব্যাংক পিএলসি এসক্রো একাউন্টে জমা হয়। অনুমোদিত ব্যয় ছাড়া ফান্ড উত্তোলন অসম্ভব।"
+        : "Direct institutional clearing through The City Bank PLC. Disbursed only against vetted project milestones.",
+      color: "text-cyan-dark",
+      bg: "bg-cyan-tint/60",
+    },
+    {
+      icon: Receipt,
+      title: isBangla ? "১০০% অডিটকৃত ব্যয় ভাউচার" : "100% Audited Fund Ledger",
+      desc: isBangla
+        ? "জমির উন্নয়ন ও প্রজেক্টের প্রতিটি খরচের ভাউচার ও রসিদ ২৪/৭ লাইভ লেজারে উন্মুক্ত থাকে।"
+        : "Complete transparent real-time expense book with vendor receipts and independent audit trail.",
+      color: "text-amber-600",
+      bg: "bg-amber-50",
+    },
+    {
+      icon: Scale,
+      title: isBangla ? "সরাসরি প্রো-রাটা লভ্যাংশ" : "Mathematical Pro-Rata Returns",
+      desc: isBangla
+        ? "প্রজেক্টের যাবতীয় নিট মুনাফা গাণিতিক প্রো-রাটা সূত্রে সরাসরি আপনার ব্যাংক একাউন্টে জমা হয়।"
+        : "Net commercial and agro profits are automatically calculated and distributed directly into your account.",
+      color: "text-jade-dark",
+      bg: "bg-jade-light/60",
+    },
+  ];
+
   return (
-    <div className="space-y-20 pb-20">
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-emerald text-white pt-16 pb-24 lg:pt-24 lg:pb-32">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,155,39,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.12),transparent_50%)]" />
+    <div className="space-y-24 pb-24">
+      {/* =========================================================================
+          1. HERO SECTION — Ultra-Luxurious Deep Mesh Gradient
+          ========================================================================= */}
+      <section className="relative overflow-hidden hero-mesh-gradient text-white pt-16 pb-24 lg:pt-24 lg:pb-32 rounded-3xl mx-2 sm:mx-4 lg:mx-8 mt-2 shadow-2xl border border-slate-800/80">
+        {/* Ambient Glows */}
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-cyan/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-emerald/25 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-gold-light">
-                <Sparkles className="w-4 h-4 text-gold" />
+            <div className="lg:col-span-7 space-y-7 text-center lg:text-left">
+              {/* Live Badge Pill */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-semibold text-cyan-light shadow-inner">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <Sparkles className="w-3.5 h-3.5 text-cyan" />
                 <span>
                   {isBangla
-                    ? "স্বপ্নযাত্রী — বহুমুখী প্রজেক্টে সহজ বিনিয়োগ ও মুনাফা বণ্টন প্ল্যাটফর্ম"
-                    : "Swapnojatri — Multi-Project Crowdfunding & Profit-Sharing Platform"}
+                    ? "ল্যান্ডভেস্ট ১০০ লাইভ • ৭৪টি শেয়ার বরাদ্দ সম্পন্ন"
+                    : "LandVest 100 Live • 74 Shares Subscribed (74%)"}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
+              {/* Main Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.12]">
                 {isBangla ? (
                   <>
-                    পরিকল্পিত প্রজেক্টে বিনিয়োগ। <br />
-                    <span className="text-gold-gradient">সরাসরি মুনাফা লাভ।</span>
+                    পরিকল্পিত প্রজেক্টে বিনিয়োগ। <br />
+                    <span className="text-shimmer-blue">সরাসরি মুনাফা বণ্টন।</span>
                   </>
                 ) : (
                   <>
-                    Invest in High-Value Projects. <br />
-                    <span className="text-gold-gradient">Share Tangible Profits.</span>
+                    Invest in High-Value Assets. <br />
+                    <span className="text-shimmer-blue">Share Verified Profits.</span>
                   </>
                 )}
               </h1>
 
+              {/* Sub-Headline */}
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 {isBangla
-                  ? "স্বপ্নযাত্রী একটি বহুমুখী ইনভেস্টমেন্ট প্ল্যাটফর্ম। জমি, কৃষি ও লাভজনক বিভিন্ন প্রজেক্টে অংশ নিয়ে ঘরে বসেই অর্জিত মুনাফা লাভ করুন। কোনো প্রজেক্টের মালিকানা নয়—সহজ ইনভেস্টমেন্ট ও লাভ ভাগাভাগির নির্ভরযোগ্য মাধ্যম।"
-                  : "Swapnojatri enables you to invest in vetted land, smart agro, and high-potential projects to earn distributed profits. Simple, transparent profit-sharing without operational complexities."}
+                  ? "স্বপ্নযাত্রী জমি, স্মার্ট এগ্রো এবং উচ্চ-সম্ভাবনাময় উদ্যোগে সাধারণ মানুষকে অল্প পুঁজিতে অংশ নেওয়ার আধুনিক প্ল্যাটফর্ম। কোনো প্রজেক্টের ব্যক্তিগত জটিল ঝামেলা নয়—সহজে ইনভেস্ট করুন এবং শতভাগ স্বচ্ছতায় অর্জিত নিট মুনাফা লাভ করুন।"
+                  : "Swapnojatri enables everyday investors to participate in vetted prime land, smart agro, and commercial businesses. No property management headaches—invest securely and earn distributed pro-rata profits."}
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-1">
                 <Link
                   href="/projects/landvest-100"
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-gold text-slate-950 font-bold text-base hover:opacity-95 shadow-goldGlow flex items-center justify-center gap-2 transition-all"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full btn-primary-glow text-white font-extrabold text-sm flex items-center justify-center gap-2 group"
                 >
-                  <span>{isBangla ? "চলমান LandVest 100 দেখুন" : "Explore LandVest 100"}</span>
-                  <ArrowRight className="w-5 h-5 text-slate-950" />
+                  <span>{isBangla ? "ল্যান্ডভেস্ট ১০০ প্রজেক্ট দেখুন" : "Explore LandVest 100"}</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-cyan-light" />
                 </Link>
 
                 <Link
                   href="/projects"
-                  className="w-full sm:w-auto px-6 py-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-base transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 py-4 rounded-full btn-secondary-glow text-white font-bold text-sm transition-all flex items-center justify-center gap-2"
                 >
-                  <Layers className="w-4 h-4 text-slate-300" />
-                  <span>{isBangla ? "সকল প্রজেক্ট" : "All Projects"}</span>
+                  <Layers className="w-4 h-4 text-cyan" />
+                  <span>{isBangla ? "সকল প্রজেক্ট স্পেকট্রাম" : "View All Projects"}</span>
                 </Link>
               </div>
 
-              {/* Quick Platform Metrics */}
-              <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/10 max-w-xl mx-auto lg:mx-0">
-                <div>
-                  <span className="block text-2xl sm:text-3xl font-black text-gold font-mono">
+              {/* Trust Metrics Ribbon */}
+              <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/15 max-w-xl mx-auto lg:mx-0">
+                <div className="space-y-0.5">
+                  <span className="block text-2xl sm:text-3xl font-black text-cyan font-mono">
                     {isBangla ? "৪টি প্রজেক্ট" : "4 Projects"}
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {isBangla ? "সফল টিম অভিজ্ঞতা" : "Proven Track Record"}
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    {isBangla ? "বাস্তবায়িত ট্র্যাক রেকর্ড" : "Delivered Track Record"}
                   </span>
                 </div>
-                <div>
+                <div className="space-y-0.5">
                   <span className="block text-2xl sm:text-3xl font-black text-white font-mono">
-                    {isBangla ? "১০০ ভাগ" : "100 Parts"}
+                    100 Units
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {isBangla ? "LandVest 100 উদ্যোগ" : "LandVest 100"}
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    {isBangla ? "নির্দিষ্ট ১০০টি শেয়ার" : "Fixed Project Shares"}
                   </span>
                 </div>
-                <div>
-                  <span className="block text-2xl sm:text-3xl font-black text-jade font-mono">
-                    {isBangla ? "প্রো-রাটা" : "Pro-Rata"}
+                <div className="space-y-0.5">
+                  <span className="block text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
+                    100% Pro-Rata
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {isBangla ? "সরাসরি লভ্যাংশ বণ্টন" : "Profit Distribution"}
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    {isBangla ? "সরাসরি ব্যাংক লভ্যাংশ" : "Direct Bank Payouts"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Right Calculator */}
+            {/* Right Interactive Calculator Card */}
             <div className="lg:col-span-5 text-slate-900">
               <InvestmentCalculator />
             </div>
@@ -124,138 +172,96 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. OFFICIAL LANDVEST 100 STORY & TRACK RECORD */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <LandVestStoryCard />
-      </section>
-
-      {/* 3. MULTI-PROJECT PORTFOLIO PREVIEW */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-brand-light text-brand-forest">
-              {isBangla ? "বহুমুখী উদ্যোগ" : "Diverse Project Spectrum"}
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
-              {isBangla ? "স্বপ্নযাত্রীর বর্তমান ও আসন্ন প্রজেক্টসমূহ" : "Current & Upcoming Investment Projects"}
-            </h2>
-          </div>
-          <Link href="/projects" className="text-xs font-bold text-brand-forest hover:underline flex items-center gap-1">
-            <span>{isBangla ? "সকল প্রজেক্ট ক্যাটালগ" : "View All Projects"}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Project 1: LandVest 100 */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-card p-6 sm:p-8 space-y-5 flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-gold/15 text-gold-dark">
-                  LV100 • CURRENT PROJECT
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                  OPEN (74% BOOKED)
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900">
-                {isBangla ? "LandVest 100 (ওয়াশপুর টাওয়ার রোড, ঢাকা)" : "LandVest 100 (Washpur, Dhaka)"}
-              </h3>
-              <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-forest shrink-0" />
-                <span>{isBangla ? "ওয়াশপুর (বসিলা ব্রীজ পার হয়ে) টাওয়ার রোড, ঢাকা" : "Washpur Tower Road, Bosila Bridge, Dhaka"}</span>
-              </p>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isBangla
-                  ? "ঢাকায় জমিতে বিনিয়োগ করে মুনাফা ভাগাভাগি করার ১০০টি ভাগের উদ্যোগ। প্রতিভাগ মাত্র ২৫,৫০০ টাকা।"
-                  : "Dhaka land investment profit-sharing initiative divided into 100 fixed parts of ৳25,500 each."}
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="font-mono font-black text-brand-forest text-sm">৳ ২৫,৫০০ / ভাগ</span>
-              <Link
-                href="/projects/landvest-100"
-                className="px-4 py-2 rounded-xl bg-brand-forest text-white text-xs font-bold hover:bg-brand-primary"
-              >
-                {isBangla ? "বিস্তারিত দেখুন" : "View Details"}
-              </Link>
-            </div>
-          </div>
-
-          {/* Project 2: Smart Agro Farming (Upcoming) */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-card p-6 sm:p-8 space-y-5 flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-emerald-100 text-emerald-800">
-                  AGRO-01 • UPCOMING
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                  COMING SOON
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Sprout className="w-5 h-5 text-jade" />
-                <span>{isBangla ? "স্বপ্নযাত্রী স্মার্ট কৃষি ও ডেইরি প্রজেক্ট" : "Swapnojatri Smart Agro Farm"}</span>
-              </h3>
-              <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-forest shrink-0" />
-                <span>{isBangla ? "সিংগাইর এগ্রো বেল্ট, মানিকগঞ্জ (ঢাকা সংলগ্ন)" : "Singair Agro Belt, Manikganj"}</span>
-              </p>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {isBangla
-                  ? "উচ্চ ফলনশীল আধুনিক গ্রিনহাউস ও সমন্বিত পশুপালন প্রকল্প। প্রতি সিজনে সরাসরি বিনিয়োগকারীদের মুনাফা বণ্টন।"
-                  : "Modern greenhouse organic agro cultivation with seasonal profit payouts to participating investors."}
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="font-mono font-bold text-slate-500 text-xs">আসন্ন প্রজেক্ট</span>
-              <span className="text-xs font-bold text-brand-forest">Pre-Registration Open</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. 10x10 SHARE MATRIX MAP */}
+      {/* =========================================================================
+          2. LIVE SHARE ALLOCATION & SUMMARY CARD
+          ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ShareMatrixGrid />
       </section>
 
-      {/* 5. TRANSPARENCY & FUND UTILIZATION LEDGER */}
+      {/* =========================================================================
+          3. 4 INSTITUTIONAL TRUST PILLARS (BENTO GRID)
+          ========================================================================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <span className="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-light text-brand-emerald">
+            {isBangla ? "কেন স্বপ্নযাত্রী?" : "Core Trust Architecture"}
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            {isBangla ? "শতভাগ স্বচ্ছতা ও সুরক্ষার ৪টি ভিত্তি" : "Four Pillars of Transparent Crowdfunding"}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500">
+            {isBangla
+              ? "সাধারণ বিনিয়োগকারীদের আস্থা ও সুরক্ষার জন্য তৈরি আধুনিক ফিনটেক ফ্রেমওয়ার্ক"
+              : "Institutional grade fund security, audited records, and automated pro-rata profit mechanics"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {trustPillars.map((tp, idx) => (
+            <div
+              key={idx}
+              className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card hover:shadow-cardHover hover:-translate-y-1 transition-all duration-300 space-y-4 flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <div className={`w-12 h-12 rounded-2xl ${tp.bg} ${tp.color} flex items-center justify-center`}>
+                  <tp.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-slate-900">{tp.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{tp.desc}</p>
+              </div>
+
+              <div className="pt-2 flex items-center gap-1 text-[11px] font-bold text-brand-emerald">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{isBangla ? "যাচাইকৃত সুবিধা" : "Verified Protocol"}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* =========================================================================
+          4. OFFICIAL TRACK RECORD & LANDVEST 100 STORY
+          ========================================================================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LandVestStoryCard />
+      </section>
+
+      {/* =========================================================================
+          5. LIVE FUND LEDGER & AUDITED EXPENSE VOUCHERS
+          ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <TransparencyLedger />
       </section>
 
-      {/* 6. CALL TO ACTION BANNER */}
+      {/* =========================================================================
+          6. CALL TO ACTION RIBBON
+          ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-gradient-emerald text-white p-8 sm:p-14 text-center space-y-6 shadow-2xl shadow-brand-forest/30">
-          <div className="max-w-2xl mx-auto space-y-4">
-            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-gold/20 text-gold-light border border-gold/30">
-              {isBangla ? "আগে পরিকল্পনা বুঝুন, তারপর সিদ্ধান্ত নিন" : "Understand First, Then Invest"}
+        <div className="p-8 sm:p-12 rounded-3xl bg-[#0A2540] hero-mesh-gradient text-white text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden border border-slate-800">
+          <div className="space-y-3 max-w-xl relative z-10">
+            <span className="px-3.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white/10 text-cyan uppercase tracking-wider border border-white/15">
+              LIMITED 100 UNITS
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white">
-              {isBangla ? "স্বপ্নযাত্রীর সাথে আপনার আর্থিক যাত্রায় যুক্ত হোন" : "Join the Swapnojatri Profit-Sharing Journey"}
-            </h2>
-            <p className="text-sm text-slate-300">
+            <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               {isBangla
-                ? "কোনো জটিলতা ছাড়া সাধ্য অনুযায়ী ছোট অঙ্কে বিভিন্ন সম্ভাবনাময় প্রজেক্টে যুক্ত হয়ে মুনাফা লাভ করুন।"
-                : "Invest small, participate in proven projects, and receive regular profit distributions directly."}
+                ? "আজই ল্যান্ডভেস্ট ১০০-এ আপনার শেয়ার নিশ্চিত করুন"
+                : "Secure Your Pro-Rata Shares in LandVest 100"}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+              {isBangla
+                ? "প্রতি শেয়ার মাত্র ৳২৫,৫০০। EPS গেটওয়ে (বিকাশ/কার্ড) বা সিটি ব্যাংক এসক্রো অ্যাকাউন্টে সরাসরি জমা দিয়ে আজই বিনিয়োগ সম্পন্ন করুন।"
+                : "Starting at ৳25,500 per share. Instant payment via EPS Gateway or direct City Bank Escrow deposit."}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              href="/register"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-gold text-slate-950 font-bold text-base hover:opacity-95 shadow-goldGlow transition-all"
-            >
-              {isBangla ? "বিনিয়োগকারী অ্যাকাউন্ট খুলুন" : "Create Investor Account"}
-            </Link>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto relative z-10 shrink-0">
             <Link
               href="/projects/landvest-100"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-base transition-all"
+              className="px-8 py-4 rounded-full bg-brand-emerald hover:bg-brand-forest text-white font-extrabold text-sm text-center shadow-lg shadow-brand-emerald/30 transition-all flex items-center justify-center gap-2 group"
             >
-              {isBangla ? "LandVest 100 পরিকল্পনা দেখুন" : "View LandVest 100 Details"}
+              <span>{isBangla ? "অনলাইনে শেয়ার বুক করুন" : "Invest Now"}</span>
+              <ArrowRight className="w-4 h-4 text-cyan-light transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
