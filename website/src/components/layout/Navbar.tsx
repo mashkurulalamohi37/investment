@@ -261,7 +261,7 @@ export default function Navbar() {
                     className="w-full py-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
+                    <span>{isBangla ? "লগআউট" : "Sign Out"}</span>
                   </button>
                 </>
               ) : (

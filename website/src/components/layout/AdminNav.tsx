@@ -241,7 +241,7 @@ export default function AdminNav() {
 
         <div className="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center gap-2 text-[10px] text-slate-400">
           <ShieldCheck className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
-          <span className="truncate">City Bank Escrow Vault</span>
+          <span className="truncate">{isBangla ? "সিটি ব্যাংক এসক্রো ভল্ট" : "City Bank Escrow Vault"}</span>
         </div>
       </div>
     </div>

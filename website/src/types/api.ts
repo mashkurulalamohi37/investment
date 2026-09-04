@@ -41,6 +41,7 @@ export interface ProjectMilestone {
   title: string;
   title_bn: string;
   description: string;
+  description_bn?: string;
   milestone_date: string;
   is_completed: boolean;
   sequence: number;

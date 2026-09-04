@@ -115,7 +115,7 @@ export default function MyInvestmentsPage() {
                   {isBangla ? "শেয়ার সংখ্যা:" : "Shares Owned:"}
                 </span>
                 <span className="font-bold text-slate-900">
-                  {inv.shares} {isBangla ? "টি শেয়ার" : "Shares"} ({formatBDT(inv.unitPrice, { isBangla })}/ভাগ)
+                  {inv.shares} {isBangla ? "টি শেয়ার" : "Shares"} ({formatBDT(inv.unitPrice, { isBangla })}/{isBangla ? "ভাগ" : "Share"})
                 </span>
               </div>
               <div>

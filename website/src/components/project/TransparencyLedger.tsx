@@ -261,33 +261,33 @@ export default function TransparencyLedger() {
 
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Voucher No:</span>
+                <span className="text-slate-400">{isBangla ? "ভাউচার নং:" : "Voucher No:"}</span>
                 <span className="font-mono font-bold text-brand-emerald">{selectedVoucher.no}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Purpose / Title:</span>
+                <span className="text-slate-400">{isBangla ? "উদ্দেশ্য / বিবরণী:" : "Purpose / Title:"}</span>
                 <span className="font-bold text-slate-900 text-right">{selectedVoucher.title}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Payee:</span>
+                <span className="text-slate-400">{isBangla ? "প্রাপক:" : "Payee:"}</span>
                 <span className="font-medium text-slate-700">{selectedVoucher.payee}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Audited Amount:</span>
+                <span className="text-slate-400">{isBangla ? "অডিটকৃত পরিমাণ:" : "Audited Amount:"}</span>
                 <span className="font-mono font-black text-slate-900 text-sm">
                   {formatBDT(selectedVoucher.amount, { isBangla })}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Bank Settlement Ref:</span>
+                <span className="text-slate-400">{isBangla ? "ব্যাংক রেফারেন্স:" : "Bank Settlement Ref:"}</span>
                 <span className="font-mono text-slate-700">{selectedVoucher.bankRef}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Audited By:</span>
+                <span className="text-slate-400">{isBangla ? "নিরীক্ষক:" : "Audited By:"}</span>
                 <span className="font-semibold text-emerald-800">{selectedVoucher.auditedBy}</span>
               </div>
               <div className="pt-2 border-t border-slate-200/60">
-                <span className="text-slate-400 block mb-0.5">Remarks / Details:</span>
+                <span className="text-slate-400 block mb-0.5">{isBangla ? "মন্তব্য / বিবরণ:" : "Remarks / Details:"}</span>
                 <span className="text-slate-600 font-normal">{selectedVoucher.remarks}</span>
               </div>
             </div>

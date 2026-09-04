@@ -33,7 +33,7 @@ export default function KycProfilePage() {
   const [branchName, setBranchName] = useState("Gulshan-1 Branch");
   const [nomineeName, setNomineeName] = useState("Fatema Tuz Zohra");
   const [nomineeNid, setNomineeNid] = useState("8192840192849");
-  const [nomineeRelation, setNomineeRelation] = useState("Spouse (স্ত্রী)");
+  const [nomineeRelation, setNomineeRelation] = useState(isBangla ? "স্ত্রী / স্বামী" : "Spouse");
   const [nomineeShare, setNomineeShare] = useState("100%");
   const [savedSuccess, setSavedSuccess] = useState(false);
 

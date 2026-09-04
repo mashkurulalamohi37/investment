@@ -428,7 +428,9 @@ export default function ContactPage() {
               <span className="font-medium text-slate-600">
                 {isBangla ? "লেভেল ৭, রোড ১১" : "Level 7, Road 11"}
               </span>
-              <span className="font-bold text-emerald-600 font-mono">● Active Desk</span>
+              <span className="font-bold text-emerald-600 font-mono">
+                {isBangla ? "● সক্রিয় ডেস্ক" : "● Active Desk"}
+              </span>
             </div>
           </div>
         </div>

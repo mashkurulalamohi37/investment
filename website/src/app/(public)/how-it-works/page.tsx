@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
       phaseTitle: isBangla ? "পরিচিতি ও নিরাপদ নিবন্ধন" : "Investor Onboarding & KYC",
       steps: [
         {
-          num: "১",
+          num: isBangla ? "১" : "1",
           title: isBangla ? "মোবাইল OTP ভেরিফিকেশন" : "Mobile OTP Verification",
           desc: isBangla
             ? "বাংলাদেশি মোবাইল নম্বরে তাৎক্ষণিক SMS কোডের মাধ্যমে এনক্রিপ্টেড অ্যাকাউন্ট সক্রিয় করুন।"
@@ -37,7 +37,7 @@ export default function HowItWorksPage() {
           icon: Users,
         },
         {
-          num: "২",
+          num: isBangla ? "২" : "2",
           title: isBangla ? "স্মার্ট এনআইডি ও নমিনি কেওয়াইসি" : "Smart NID & Nominee KYC",
           desc: isBangla
             ? "আইনি নিরাপত্তা ও উত্তরাধিকার সংরক্ষণে আপনার জাতীয় পরিচয়পত্র ও নমিনির তথ্য জমা দিন।"
@@ -51,7 +51,7 @@ export default function HowItWorksPage() {
       phaseTitle: isBangla ? "শেয়ার নির্বাচন ও এসক্রো পেমেন্ট" : "Share Booking & Escrow",
       steps: [
         {
-          num: "৩",
+          num: isBangla ? "৩" : "3",
           title: isBangla ? "শেয়ার সংখ্যা নির্বাচন (১-৪টি)" : "Share Selection (1 to 4 Units)",
           desc: isBangla
             ? "ল্যান্ডভেস্ট ১০০ প্রকল্পে ১ থেকে ৪টি শেয়ার নির্বাচন করুন (প্রতি শেয়ার মাত্র ৳২৫,৫০০)।"
@@ -59,7 +59,7 @@ export default function HowItWorksPage() {
           icon: Coins,
         },
         {
-          num: "৪",
+          num: isBangla ? "৪" : "4",
           title: isBangla ? "সিটি ব্যাংক এসক্রো ক্লিয়ারিং" : "City Bank Escrow Clearing",
           desc: isBangla
             ? "EPS গেটওয়ে (বিকাশ/কার্ড) অথবা সরাসরি সিটি ব্যাংক এসক্রো অ্যাকাউন্টে অর্থ জমা দিন।"
@@ -73,7 +73,7 @@ export default function HowItWorksPage() {
       phaseTitle: isBangla ? "ডিজিটাল সার্টিফিকেট ও লভ্যাংশ" : "Digital Asset & Profit Payout",
       steps: [
         {
-          num: "৫",
+          num: isBangla ? "৫" : "5",
           title: isBangla ? "SHA-256 ডিজিটাল সার্টিফিকেট" : "Cryptographic Share Certificate",
           desc: isBangla
             ? "পেমেন্ট নিশ্চিতের সাথে সাথে সিকোয়েনশিয়াল লট নম্বর ও হ্যাশযুক্ত সার্টিফিকেট ইস্যু।"
@@ -81,7 +81,7 @@ export default function HowItWorksPage() {
           icon: FileCheck2,
         },
         {
-          num: "৬",
+          num: isBangla ? "৬" : "6",
           title: isBangla ? "প্রো-রাটা ব্যাংক লভ্যাংশ জমা" : "Pro-Rata Profit Payout",
           desc: isBangla
             ? "প্রকল্প থেকে অর্জিত নিট মুনাফা সরাসরি আপনার ব্যাংক অ্যাকাউন্টে প্রো-রাটা হারে জমা হবে।"
@@ -151,7 +151,7 @@ export default function HowItWorksPage() {
 
             <div className="pt-2 text-[11px] font-mono text-slate-400 flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>100% Verified Step</span>
+              <span>{isBangla ? "১০০% যাচাইকৃত ধাপ" : "100% Verified Step"}</span>
             </div>
           </div>
         ))}

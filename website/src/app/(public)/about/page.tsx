@@ -91,7 +91,7 @@ export default function AboutPage() {
 
               <div className="pt-2 text-[11px] font-mono text-emerald-700 flex items-center gap-1 font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Verified Pillar</span>
+                <span>{isBangla ? "যাচাইকৃত ভিত্তি" : "Verified Pillar"}</span>
               </div>
             </div>
           );

@@ -147,7 +147,7 @@ export default function HomePage() {
                 </div>
                 <div className="space-y-0.5">
                   <span className="block text-2xl sm:text-3xl font-black text-white font-mono">
-                    100 Units
+                    {isBangla ? "১০০টি শেয়ার" : "100 Units"}
                   </span>
                   <span className="text-[11px] text-slate-400 font-medium">
                     {isBangla ? "নির্দিষ্ট ১০০টি শেয়ার" : "Fixed Project Shares"}
@@ -155,7 +155,7 @@ export default function HomePage() {
                 </div>
                 <div className="space-y-0.5">
                   <span className="block text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
-                    100% Pro-Rata
+                    {isBangla ? "১০০% প্রো-রাটা" : "100% Pro-Rata"}
                   </span>
                   <span className="text-[11px] text-slate-400 font-medium">
                     {isBangla ? "সরাসরি ব্যাংক লভ্যাংশ" : "Direct Bank Payouts"}

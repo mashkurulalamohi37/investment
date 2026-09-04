@@ -150,7 +150,9 @@ export default function LandVestStoryCard() {
             <span className="text-xs text-slate-400 font-bold uppercase font-mono">
               {isBangla ? "স্থির শেয়ার সংখ্যা" : "Fixed Total Shares"}
             </span>
-            <p className="text-2xl font-black text-[#0A2540] font-mono">১০০ টি ভাগ</p>
+            <p className="text-2xl font-black text-[#0A2540] font-mono">
+              {isBangla ? "১০০ টি ভাগ" : "100 Units"}
+            </p>
             <span className="text-[11px] text-slate-500 font-medium block">
               {isBangla ? "কোনো অতিরিক্ত শেয়ার তৈরি হবে না" : "Hard cap of exactly 100 units"}
             </span>
@@ -160,7 +162,9 @@ export default function LandVestStoryCard() {
             <span className="text-xs text-slate-400 font-bold uppercase font-mono">
               {isBangla ? "ইউনিট মূল্য" : "Unit Share Price"}
             </span>
-            <p className="text-2xl font-black text-[#0066FF] font-mono">৳ ২৫,৫০০</p>
+            <p className="text-2xl font-black text-[#0066FF] font-mono">
+              {isBangla ? "৳ ২৫,৫০০" : "৳ 25,500"}
+            </p>
             <span className="text-[11px] text-slate-500 font-medium block">
               {isBangla ? "১ থেকে সর্বোচ্চ ৪টি শেয়ার সীমা" : "Investor limit: 1 to 4 units"}
             </span>
@@ -170,7 +174,9 @@ export default function LandVestStoryCard() {
             <span className="text-xs text-slate-400 font-bold uppercase font-mono">
               {isBangla ? "লভ্যাংশ বণ্টন" : "Profit Payout"}
             </span>
-            <p className="text-2xl font-black text-emerald-700 font-mono">প্রো-রাটা</p>
+            <p className="text-2xl font-black text-emerald-700 font-mono">
+              {isBangla ? "প্রো-রাটা" : "Pro-Rata"}
+            </p>
             <span className="text-[11px] text-slate-500 font-medium block">
               {isBangla ? "সিটি ব্যাংক এসক্রো থেকে সরাসরি ব্যাংক জমা" : "Direct payout to verified bank account"}
             </span>

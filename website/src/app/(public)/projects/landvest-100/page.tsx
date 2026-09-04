@@ -85,28 +85,52 @@ export default function LandVest100Page() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 text-xs">
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">মোট ভাগ (Total Parts)</span>
-                <span className="text-sm font-extrabold text-slate-900">১০০টি নির্দিষ্ট ভাগ</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "মোট ভাগ" : "Total Project Parts"}
+                </span>
+                <span className="text-sm font-extrabold text-slate-900">
+                  {isBangla ? "১০০টি নির্দিষ্ট ভাগ" : "Fixed 100 Units"}
+                </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">প্রতি ভাগের মূল্য</span>
-                <span className="text-sm font-black text-brand-emerald font-mono">৳ ২৫,৫০০</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "প্রতি ভাগের মূল্য" : "Price Per Unit"}
+                </span>
+                <span className="text-sm font-black text-brand-emerald font-mono">
+                  {isBangla ? "৳ ২৫,৫০০" : "৳ 25,500"}
+                </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">অংশগ্রহণ সীমা</span>
-                <span className="text-sm font-extrabold text-slate-900">১ থেকে ৪টি ভাগ</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "অংশগ্রহণ সীমা" : "Investor Ceiling"}
+                </span>
+                <span className="text-sm font-extrabold text-slate-900">
+                  {isBangla ? "১ থেকে ৪টি ভাগ" : "1 to 4 Shares"}
+                </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">মালিকানা নীতি</span>
-                <span className="text-sm font-extrabold text-emerald-700">মুনাফা ভাগাভাগি</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "মালিকানা নীতি" : "Ownership Structure"}
+                </span>
+                <span className="text-sm font-extrabold text-emerald-700">
+                  {isBangla ? "প্রো-রাটা লভ্যাংশ" : "Pro-Rata Returns"}
+                </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">প্রকল্পের অবস্থান</span>
-                <span className="text-sm font-extrabold text-slate-900">ওয়াশপুর টাওয়ার রোড</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "প্রকল্পের অবস্থান" : "Project Location"}
+                </span>
+                <span className="text-sm font-extrabold text-slate-900">
+                  {isBangla ? "ওয়াশপুর টাওয়ার রোড" : "Washpur Tower Road"}
+                </span>
               </div>
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-1">
-                <span className="text-[11px] text-slate-400 block font-normal">বর্তমান স্ট্যাটাস</span>
-                <span className="text-sm font-extrabold text-brand-emerald">৭৪টি ভাগ বুকড</span>
+                <span className="text-[11px] text-slate-400 block font-normal">
+                  {isBangla ? "বর্তমান স্ট্যাটাস" : "Subscription Status"}
+                </span>
+                <span className="text-sm font-extrabold text-brand-emerald">
+                  {isBangla ? "৭৪টি ভাগ বুকড" : "74 Units Booked"}
+                </span>
               </div>
             </div>
           </div>
@@ -135,11 +159,13 @@ export default function LandVest100Page() {
                       <h4 className="text-sm font-bold text-slate-900">{isBangla ? m.title_bn : m.title}</h4>
                       {m.is_completed && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          COMPLETED
+                          {isBangla ? "সম্পন্ন" : "COMPLETED"}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-600 font-normal">{m.description}</p>
+                    <p className="text-xs text-slate-600 font-normal">
+                      {isBangla ? (m as any).description_bn || m.description : m.description}
+                    </p>
                   </div>
                 </div>
               ))}

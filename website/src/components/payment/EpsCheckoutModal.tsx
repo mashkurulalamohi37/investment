@@ -50,20 +50,23 @@ export default function EpsCheckoutModal({
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="bg-gradient-emerald text-white p-6 relative">
+        <div className="bg-[#0A2540] text-white p-6 relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gold/20 text-gold-light text-[10px] font-bold">
-              <ShieldCheck className="w-3.5 h-3.5" /> EPS GATEWAY SECURED
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0066FF]/20 text-cyan-light text-[10px] font-bold">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00B4D8]" />
+              <span>{isBangla ? "EPS গেটওয়ে সুরক্ষিত" : "EPS GATEWAY SECURED"}</span>
             </div>
-            <h3 className="text-xl font-bold">EPS Payment Gateway Checkout</h3>
+            <h3 className="text-xl font-bold">
+              {isBangla ? "EPS অনলাইন পেমেন্ট গেটওয়ে" : "EPS Payment Gateway Checkout"}
+            </h3>
             <p className="text-xs text-slate-300">
-              LandVest 100 • {shares} Share{shares > 1 ? "s" : ""} Subscription
+              LandVest 100 • {isBangla ? `${shares}টি শেয়ার সাবস্ক্রিপশন` : `${shares} Share${shares > 1 ? "s" : ""} Subscription`}
             </p>
           </div>
         </div>
@@ -73,20 +76,22 @@ export default function EpsCheckoutModal({
           {/* Amount Badge */}
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="text-xs text-slate-500 block">Total Payable Amount:</span>
-              <span className="text-xl font-black text-brand-forest font-mono">
+              <span className="text-xs text-slate-500 block">
+                {isBangla ? "মোট পরিশোধযোগ্য পরিমাণ:" : "Total Payable Amount:"}
+              </span>
+              <span className="text-xl font-black text-[#0066FF] font-mono">
                 {formatBDT(totalAmount, { isBangla })}
               </span>
             </div>
             <span className="text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-              {shares} × ৳ 25,500
+              {shares} × {isBangla ? "৳ ২৫,৫০০" : "৳ 25,500"}
             </span>
           </div>
 
           {/* Payment Channel Options */}
           <div className="space-y-2.5">
             <label className="text-xs font-bold text-slate-700 block">
-              Choose Payment Method:
+              {isBangla ? "পেমেন্ট মাধ্যম বেছে নিন:" : "Choose Payment Method:"}
             </label>
             <div className="space-y-2">
               {channels.map((ch) => {
@@ -96,9 +101,9 @@ export default function EpsCheckoutModal({
                     key={ch.id}
                     type="button"
                     onClick={() => setSelectedChannel(ch.id as any)}
-                    className={`w-full p-3.5 rounded-xl border text-left flex items-center justify-between transition-all ${
+                    className={`w-full p-3.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-brand-light border-brand-forest ring-1 ring-brand-forest shadow-sm"
+                        ? "bg-blue-50/70 border-[#0066FF] ring-1 ring-[#0066FF] shadow-sm"
                         : "bg-white border-slate-200 hover:bg-slate-50"
                     }`}
                   >
@@ -106,10 +111,12 @@ export default function EpsCheckoutModal({
                       <span className="text-xl">{ch.icon}</span>
                       <div>
                         <span className="font-bold text-sm text-slate-900 block">{ch.name}</span>
-                        <span className="text-[11px] text-slate-500">{ch.desc}</span>
+                        <span className="text-[11px] text-slate-500">
+                          {isBangla ? "তাৎক্ষণিক নিরাপদ পেমেন্ট" : ch.desc}
+                        </span>
                       </div>
                     </div>
-                    {isSelected && <CheckCircle2 className="w-5 h-5 text-brand-forest" />}
+                    {isSelected && <CheckCircle2 className="w-5 h-5 text-[#0066FF]" />}
                   </button>
                 );
               })}
@@ -120,17 +127,21 @@ export default function EpsCheckoutModal({
           <button
             onClick={handlePayNow}
             disabled={loading}
-            className="w-full py-4 rounded-xl bg-gradient-emerald text-white font-bold text-sm hover:opacity-95 shadow-lg shadow-brand-forest/20 flex items-center justify-center gap-2 transition-all"
+            className="w-full py-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-sm shadow-lg shadow-[#0066FF]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Processing via EPS Gateway...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-cyan-light" />
+                <span>{isBangla ? "EPS গেটওয়েতে সংযোগ হচ্ছে..." : "Processing via EPS Gateway..."}</span>
               </>
             ) : (
               <>
-                <span>Pay {formatBDT(totalAmount, { isBangla })} via {selectedChannel}</span>
-                <ArrowRight className="w-4 h-4 text-gold" />
+                <span>
+                  {isBangla
+                    ? `${selectedChannel} দিয়ে ${formatBDT(totalAmount, { isBangla })} পরিশোধ করুন`
+                    : `Pay ${formatBDT(totalAmount, { isBangla })} via ${selectedChannel}`}
+                </span>
+                <ArrowRight className="w-4 h-4 text-cyan-200" />
               </>
             )}
           </button>
