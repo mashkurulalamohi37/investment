@@ -10,6 +10,7 @@ from app.models.document import Document, DocumentCategory, DocumentVisibility
 from app.models.kyc import KycProfile, KycStatus, Nominee
 from app.models.notification import Notification, NotificationCategory, SupportTicket, SupportMessage
 from app.models.audit_log import AuditLog, OutboxEvent, IdempotencyKeyRecord
+from app.models.withdrawal import WithdrawalRequest, WithdrawalType, WithdrawalStatus, PayoutChannel
 
 __all__ = [
     "Base",
@@ -54,4 +55,8 @@ __all__ = [
     "AuditLog",
     "OutboxEvent",
     "IdempotencyKeyRecord",
+    "WithdrawalRequest",
+    "WithdrawalType",
+    "WithdrawalStatus",
+    "PayoutChannel",
 ]

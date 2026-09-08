@@ -53,6 +53,13 @@ export default function AdminNav() {
       badge: "2",
       badgeColor: "bg-cyan-400/20 text-cyan-300 border border-cyan-400/30",
     },
+    {
+      href: "/admin/withdrawals",
+      label: isBangla ? "উত্তোলন অনুমোদন কিউ" : "Withdrawal Queue",
+      icon: Receipt,
+      badge: "1",
+      badgeColor: "bg-amber-400/20 text-amber-300 border border-amber-400/30",
+    },
   ];
 
   const ledgerLinks = [

@@ -12,6 +12,7 @@ import 'package:swapnojatri/data/models/notification_model.dart';
 import 'package:swapnojatri/data/models/kyc_model.dart';
 import 'package:swapnojatri/data/models/audit_log_model.dart';
 import 'package:swapnojatri/data/models/user_model.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 import 'package:swapnojatri/core/constants/project_seeds.dart';
 import 'package:swapnojatri/core/services/api_service.dart';
 
@@ -44,6 +45,7 @@ class AppState extends ChangeNotifier {
   final List<DocumentModel> _documents = [];
   final List<NotificationModel> _notifications = [];
   final List<AuditLogModel> _auditLogs = [];
+  final List<WithdrawalModel> _withdrawals = [];
   late KycModel _kyc;
 
   AppState() {
@@ -64,6 +66,7 @@ class AppState extends ChangeNotifier {
     _documents.addAll(ProjectSeeds.defaultDocuments);
     _notifications.addAll(ProjectSeeds.defaultNotifications);
     _auditLogs.addAll(ProjectSeeds.defaultAuditLogs);
+    _withdrawals.addAll(ProjectSeeds.defaultWithdrawals);
     _kyc = ProjectSeeds.defaultKyc;
   }
 
@@ -86,6 +89,7 @@ class AppState extends ChangeNotifier {
   List<DocumentModel> get documents => List.unmodifiable(_documents);
   List<NotificationModel> get notifications => List.unmodifiable(_notifications);
   List<AuditLogModel> get auditLogs => List.unmodifiable(_auditLogs);
+  List<WithdrawalModel> get withdrawals => List.unmodifiable(_withdrawals);
   KycModel get kyc => _kyc;
   bool get isSyncing => _isSyncing;
   bool get isWebsiteConnected => _isWebsiteConnected;
@@ -164,6 +168,31 @@ class AppState extends ChangeNotifier {
       .where((d) => d.status == DistributionStatus.approved || d.status == DistributionStatus.processing)
       .fold(0.0, (sum, d) => sum + d.amount);
 
+  List<WithdrawalModel> get pendingWithdrawals => _withdrawals
+      .where((w) =>
+          w.status == WithdrawalStatus.pending ||
+          w.status == WithdrawalStatus.underReview ||
+          w.status == WithdrawalStatus.processing)
+      .toList();
+
+  double get pendingWithdrawalAmount => pendingWithdrawals.fold(0.0, (sum, w) => sum + w.amount);
+
+  double get totalWithdrawnAmount => _withdrawals
+      .where((w) => w.status == WithdrawalStatus.completed)
+      .fold(0.0, (sum, w) => sum + w.amount);
+
+  double get availableDividendBalance {
+    final lockedOrWithdrawnDividends = _withdrawals
+        .where((w) =>
+            w.type == WithdrawalType.dividend &&
+            w.status != WithdrawalStatus.rejected &&
+            w.status != WithdrawalStatus.cancelled)
+        .fold(0.0, (sum, w) => sum + w.amount);
+    return (totalRealizedProfit - lockedOrWithdrawnDividends).clamp(0.0, double.infinity);
+  }
+
+  double get withdrawableCapitalAmount => totalInvested;
+
   // Fund Transparency Computations
   double get totalProjectCollected => _landVest100.collectedFund;
   double get totalProjectExpenses => _expenses
@@ -184,6 +213,7 @@ class AppState extends ChangeNotifier {
       .toList();
   int get adminPendingPaymentsCount => pendingBankDeposits.length;
   int get adminPendingKycCount => _kyc.status == KycStatus.underReview || _kyc.status == KycStatus.pending ? 1 : 0;
+  int get adminPendingWithdrawalsCount => pendingWithdrawals.length;
 
   // State Modifiers
   void toggleLanguage() {
@@ -856,6 +886,242 @@ class AppState extends ChangeNotifier {
     );
 
     notifyListeners();
+  }
+
+  // --- Withdrawal Actions ---
+
+  /// Shareholder: Submit a new withdrawal request (Dividend or Capital Exit)
+  bool submitWithdrawalRequest({
+    required WithdrawalType type,
+    required double amount,
+    required PayoutChannel payoutChannel,
+    String? projectId,
+    String? projectName,
+    String? projectNameBn,
+    String? investmentId,
+    int? sharesToLiquidate,
+    String? bankName,
+    String? accountHolderName,
+    String? accountNumber,
+    String? branchName,
+    String? routingNumber,
+    String? mfsNumber,
+    String? userNote,
+  }) {
+    if (amount <= 0) return false;
+
+    if (type == WithdrawalType.dividend && amount > availableDividendBalance) {
+      return false;
+    }
+    if (type == WithdrawalType.capitalExit && amount > withdrawableCapitalAmount) {
+      return false;
+    }
+
+    final newWithdrawal = WithdrawalModel(
+      id: 'wth-${DateTime.now().millisecondsSinceEpoch}',
+      userId: _currentUser.id,
+      userName: _currentUser.name,
+      projectId: projectId ?? _landVest100.id,
+      projectName: projectName ?? _landVest100.name,
+      projectNameBn: projectNameBn ?? _landVest100.nameBn,
+      investmentId: investmentId,
+      sharesToLiquidate: sharesToLiquidate,
+      type: type,
+      amount: amount,
+      fee: 0.0,
+      netAmount: amount,
+      payoutChannel: payoutChannel,
+      bankName: bankName ?? (payoutChannel == PayoutChannel.bankTransfer ? _kyc.bankName : null),
+      accountHolderName: accountHolderName ?? (payoutChannel == PayoutChannel.bankTransfer ? _currentUser.name : null),
+      accountNumber: accountNumber ?? (payoutChannel == PayoutChannel.bankTransfer ? _kyc.bankAccountNumber : null),
+      branchName: branchName,
+      routingNumber: routingNumber ?? (payoutChannel == PayoutChannel.bankTransfer ? _kyc.routingNumber : null),
+      mfsNumber: mfsNumber,
+      status: WithdrawalStatus.pending,
+      userNote: userNote,
+      createdAt: DateTime.now(),
+    );
+
+    _withdrawals.insert(0, newWithdrawal);
+
+    final typeBn = type == WithdrawalType.dividend ? 'লভ্যাংশ' : 'মূলধন';
+    final typeEn = type == WithdrawalType.dividend ? 'Dividend' : 'Capital';
+
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+        title: '$typeEn Withdrawal Requested',
+        titleBn: '$typeBn উত্তোলনের অনুরোধ গৃহীত হয়েছে',
+        body: 'Your request to withdraw ৳$amount is queued for compliance verification.',
+        bodyBn: 'আপনার ৳$amount উত্তোলনের অনুরোধটি নিরীক্ষার জন্য জমা নেওয়া হয়েছে।',
+        category: NotificationCategory.payment,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Shareholder: Cancel a pending withdrawal request
+  bool cancelWithdrawalRequest(String id) {
+    final index = _withdrawals.indexWhere((w) => w.id == id);
+    if (index == -1) return false;
+
+    final existing = _withdrawals[index];
+    if (existing.status != WithdrawalStatus.pending) return false;
+
+    _withdrawals[index] = existing.copyWith(
+      status: WithdrawalStatus.cancelled,
+      processedAt: DateTime.now(),
+      adminFeedback: 'Cancelled by investor',
+    );
+
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Withdrawal Request Cancelled',
+        titleBn: 'উত্তোলন অনুরোধ প্রত্যাহার করা হয়েছে',
+        body: 'Your withdrawal request for ৳${existing.amount} was cancelled.',
+        bodyBn: 'আপনার ৳${existing.amount} উত্তোলনের অনুরোধটি বাতিল করা হয়েছে।',
+        category: NotificationCategory.payment,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Admin: Approve and settle withdrawal request
+  bool adminApproveWithdrawal(
+    String id, {
+    required String transactionRef,
+    String? adminFeedback,
+  }) {
+    final index = _withdrawals.indexWhere((w) => w.id == id);
+    if (index == -1) return false;
+
+    final item = _withdrawals[index];
+    final now = DateTime.now();
+
+    _withdrawals[index] = item.copyWith(
+      status: WithdrawalStatus.completed,
+      transactionRef: transactionRef,
+      adminFeedback: adminFeedback ?? 'Funds successfully disbursed via ${item.channelLabelEn}',
+      processedAt: now,
+    );
+
+    // Record formal debit transaction
+    _transactions.insert(
+      0,
+      TransactionModel(
+        id: 'txn-${now.millisecondsSinceEpoch}',
+        investmentId: item.investmentId,
+        projectId: item.projectId,
+        projectName: item.projectName ?? 'Swapnojatri',
+        projectNameBn: item.projectNameBn ?? 'স্বপ্নযাত্রী',
+        userId: item.userId,
+        type: TransactionType.withdrawal,
+        direction: TransactionDirection.debit,
+        amount: item.amount,
+        balanceAfter: (totalInvested + totalRealizedProfit - item.amount).clamp(0.0, double.infinity),
+        reference: transactionRef,
+        paymentMethod: item.destinationSummary,
+        status: TransactionStatus.completed,
+        createdAt: now,
+        description: '${item.typeLabelEn} disbursement to ${item.destinationSummary}',
+        descriptionBn: '${item.destinationSummary} একাউন্টে ${item.typeLabelBn} পরিশোধ সম্পন্ন',
+      ),
+    );
+
+    // Record Audit Log
+    _auditLogs.insert(
+      0,
+      AuditLogModel(
+        id: 'aud-${now.millisecondsSinceEpoch}',
+        actorName: _adminUser.name,
+        actorRole: 'Finance & Treasury Admin',
+        action: 'APPROVE_WITHDRAWAL',
+        actionBn: 'উত্তোলন অনুমোদন ও নিষ্পত্তি',
+        entityType: 'Withdrawal',
+        entityId: item.id,
+        details: 'Approved ${item.typeLabelEn} ৳${item.amount} for ${item.userName} (${item.destinationSummary})',
+        detailsBn: '${item.userName}-এর ৳${item.amount} ${item.typeLabelBn} অনুরোধ অনুমোদিত এবং পরিশোধিত',
+        ipAddress: '103.145.118.22',
+        timestamp: now,
+      ),
+    );
+
+    // Push notification to user
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${now.millisecondsSinceEpoch}',
+        title: 'Withdrawal Settled Successfully',
+        titleBn: 'তহবিল উত্তোলন সফলভাবে সম্পন্ন হয়েছে',
+        body: '৳${item.amount} transferred to ${item.destinationSummary}. Reference: $transactionRef',
+        bodyBn: 'আপনার ৳${item.amount} টাকা ${item.destinationSummary} হিসাবে সফলভাবে পাঠানো হয়েছে। রেফারেন্স: $transactionRef',
+        category: NotificationCategory.payment,
+        createdAt: now,
+      ),
+    );
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Admin: Reject withdrawal request with mandatory feedback
+  bool adminRejectWithdrawal(
+    String id, {
+    required String reason,
+  }) {
+    final index = _withdrawals.indexWhere((w) => w.id == id);
+    if (index == -1) return false;
+
+    final item = _withdrawals[index];
+    final now = DateTime.now();
+
+    _withdrawals[index] = item.copyWith(
+      status: WithdrawalStatus.rejected,
+      adminFeedback: reason,
+      processedAt: now,
+    );
+
+    _auditLogs.insert(
+      0,
+      AuditLogModel(
+        id: 'aud-${now.millisecondsSinceEpoch}',
+        actorName: _adminUser.name,
+        actorRole: 'Compliance Officer',
+        action: 'REJECT_WITHDRAWAL',
+        actionBn: 'উত্তোলন আবেদন প্রত্যাখ্যান',
+        entityType: 'Withdrawal',
+        entityId: item.id,
+        details: 'Rejected ${item.typeLabelEn} ৳${item.amount} for ${item.userName}. Reason: $reason',
+        detailsBn: '${item.userName}-এর ৳${item.amount} ${item.typeLabelBn} আবেদন বাতিলকৃত। কারণ: $reason',
+        ipAddress: '103.145.118.22',
+        timestamp: now,
+      ),
+    );
+
+    _notifications.insert(
+      0,
+      NotificationModel(
+        id: 'notif-${now.millisecondsSinceEpoch}',
+        title: 'Withdrawal Request Declined',
+        titleBn: 'উত্তোলন আবেদনটি বাতিল করা হয়েছে',
+        body: 'Your withdrawal request for ৳${item.amount} was rejected: $reason',
+        bodyBn: 'আপনার ৳${item.amount} উত্তোলনের আবেদনটি বাতিল করা হয়েছে। কারণ: $reason',
+        category: NotificationCategory.payment,
+        createdAt: now,
+      ),
+    );
+
+    notifyListeners();
+    return true;
   }
 
   void markNotificationAsRead(String id) {

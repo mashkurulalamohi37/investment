@@ -5,7 +5,10 @@ import 'package:swapnojatri/core/theme/app_typography.dart';
 import 'package:swapnojatri/core/localization/currency_formatter.dart';
 import 'package:swapnojatri/core/widgets/status_chip.dart';
 import 'package:swapnojatri/data/models/distribution_model.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
+import 'package:swapnojatri/features/investor/portfolio/widgets/withdrawal_request_sheet.dart';
+import 'package:swapnojatri/features/investor/portfolio/withdrawals_history_screen.dart';
 
 class ProfitDistributionScreen extends StatelessWidget {
   final AppState state;
@@ -71,6 +74,112 @@ class ProfitDistributionScreen extends StatelessWidget {
                         ? 'আপনার ৪টি শেয়ারের জন্য ল্যান্ডভেস্ট ১০০ এর মোট লভ্যাংশ পুলের ৪% সরাসরি বরাদ্দ হবে।'
                         : 'Your 4 shares earn exactly 4% of the audited realized distribution pool.',
                     style: AppTypography.caption(isDark: isDark, isBangla: isBangla),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Quick Withdrawal CTA Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0066FF), Color(0xFF004ECC)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: AppRadius.borderCard,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0066FF).withValues(alpha: 0.25),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isBangla ? 'উত্তোলনযোগ্য অবশিষ্ট লভ্যাংশ' : 'Withdrawable Dividend Balance',
+                            style: AppTypography.caption(isDark: false, isBangla: isBangla).copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            CurrencyFormatter.format(state.availableDividendBalance, isBangla: isBangla),
+                            style: AppTypography.amountLarge(isDark: false, isBangla: isBangla).copyWith(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          WithdrawalRequestSheet.show(
+                            context,
+                            state: state,
+                            initialType: WithdrawalType.dividend,
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_upward_rounded, size: 15, color: Color(0xFF0066FF)),
+                        label: Text(
+                          isBangla ? 'উত্তোলন করুন' : 'Withdraw',
+                          style: AppTypography.button(isDark: false, isBangla: isBangla).copyWith(
+                            color: const Color(0xFF0066FF),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isBangla ? 'ভেরিফাইড ব্যাংক / বিকাশ ওয়ালেটে সরাসরি জমা' : 'Disbursed directly to Bank / bKash',
+                        style: AppTypography.caption(isDark: false, isBangla: isBangla).copyWith(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          fontSize: 11,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WithdrawalsHistoryScreen(state: state)),
+                          );
+                        },
+                        child: Text(
+                          isBangla ? 'উত্তোলন খতিয়ান →' : 'Ledger History →',
+                          style: AppTypography.caption(isDark: false, isBangla: isBangla).copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11.5,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

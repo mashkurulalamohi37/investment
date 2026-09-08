@@ -16,7 +16,7 @@ import {
   Home,
   Lock,
   ChevronRight,
-  Globe,
+  ArrowUpRight,
   Menu,
   X,
 } from "lucide-react";
@@ -51,6 +51,11 @@ export default function DashboardNav() {
       href: "/dashboard/distributions",
       label: isBangla ? "লভ্যাংশ ও লেনদেন" : "Transactions & Profit",
       icon: TrendingUp,
+    },
+    {
+      href: "/dashboard/withdrawals",
+      label: isBangla ? "টাকা উত্তোলন ও প্রস্থান" : "Withdraw Funds",
+      icon: ArrowUpRight,
     },
   ];
 

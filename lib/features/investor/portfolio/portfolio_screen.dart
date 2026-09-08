@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
+import 'package:swapnojatri/core/localization/currency_formatter.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/investor/portfolio/my_investment_screen.dart';
+import 'package:swapnojatri/features/investor/portfolio/widgets/withdrawal_request_sheet.dart';
+import 'package:swapnojatri/features/investor/portfolio/withdrawals_history_screen.dart';
 
 class PortfolioScreen extends StatelessWidget {
   final AppState state;
@@ -164,7 +168,130 @@ class PortfolioScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // Withdrawal Quick Action Row
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00C853).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF00C853), size: 18),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isBangla ? 'উত্তোলনযোগ্য ব্যালেন্স' : 'Available for Payout',
+                                  style: GoogleFonts.hindSiliguri(fontSize: 11.5, color: palette.inkSecondary),
+                                ),
+                                Text(
+                                  CurrencyFormatter.format(state.availableDividendBalance, isBangla: isBangla),
+                                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: palette.ink),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        // Quick Withdraw Button
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            WithdrawalRequestSheet.show(
+                              context,
+                              state: state,
+                              initialType: WithdrawalType.dividend,
+                            );
+                          },
+                          icon: const Icon(Icons.arrow_upward_rounded, size: 14),
+                          label: Text(
+                            isBangla ? 'টাকা তুলুন' : 'Withdraw',
+                            style: GoogleFonts.hindSiliguri(fontSize: 12.5, fontWeight: FontWeight.w700),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0066FF),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Divider(color: palette.rule, height: 1),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            WithdrawalRequestSheet.show(
+                              context,
+                              state: state,
+                              initialType: WithdrawalType.capitalExit,
+                            );
+                          },
+                          child: Text(
+                            isBangla ? 'মূলধন প্রত্যাহারের আবেদন →' : 'Request Capital Exit →',
+                            style: GoogleFonts.hindSiliguri(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF0066FF),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => WithdrawalsHistoryScreen(state: state)),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                isBangla ? 'উত্তোলন খতিয়ান' : 'Withdrawal Ledger',
+                                style: GoogleFonts.hindSiliguri(fontSize: 12, fontWeight: FontWeight.w600, color: palette.inkSecondary),
+                              ),
+                              if (state.pendingWithdrawals.isNotEmpty) ...[
+                                const SizedBox(width: 5),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF59E0B),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${state.pendingWithdrawals.length}',
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
 
               // 2. "আমার প্রকল্পগুলো" Section
               Text(

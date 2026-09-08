@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/data/models/project_model.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/investor/transactions/transactions_screen.dart';
+import 'package:swapnojatri/features/investor/portfolio/widgets/withdrawal_request_sheet.dart';
 
 class MyInvestmentScreen extends StatelessWidget {
   final ProjectModel project;
@@ -142,7 +144,36 @@ class MyInvestmentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Button: View Transactions
+              // Button 1: Request Capital Exit / Share Liquidation
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    WithdrawalRequestSheet.show(
+                      context,
+                      state: state,
+                      initialType: WithdrawalType.capitalExit,
+                    );
+                  },
+                  icon: const Icon(Icons.exit_to_app_rounded, size: 18, color: Color(0xFF0066FF)),
+                  label: Text(
+                    isBangla ? 'মূলধন প্রত্যাহারের আবেদন' : 'Request Capital Exit',
+                    style: GoogleFonts.hindSiliguri(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF0066FF),
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF0066FF), width: 1.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Button 2: View Transactions
               SizedBox(
                 width: double.infinity,
                 height: 48,

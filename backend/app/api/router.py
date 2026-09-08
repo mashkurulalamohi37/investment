@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, projects, investments, payments, admin, kyc, documents
+from app.api.v1 import auth, projects, investments, payments, admin, kyc, documents, withdrawals
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -10,3 +10,4 @@ api_router.include_router(payments.router)
 api_router.include_router(admin.router)
 api_router.include_router(kyc.router)
 api_router.include_router(documents.router)
+api_router.include_router(withdrawals.router)

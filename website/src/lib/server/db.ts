@@ -38,6 +38,32 @@ export interface ServerDistribution {
   returnRoiPercent: number;
 }
 
+export interface ServerWithdrawal {
+  id: string;
+  userId: string;
+  userName: string;
+  projectId?: string;
+  projectName?: string;
+  projectNameBn?: string;
+  type: "DIVIDEND" | "CAPITAL_EXIT";
+  amount: number;
+  fee: number;
+  netAmount: number;
+  payoutChannel: "BANK_TRANSFER" | "BKASH" | "NAGAD" | "ROCKET";
+  bankName?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+  branchName?: string;
+  routingNumber?: string;
+  mfsNumber?: string;
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "REJECTED" | "CANCELLED";
+  userNote?: string;
+  adminFeedback?: string;
+  transactionRef?: string;
+  createdAt: string;
+  processedAt?: string;
+}
+
 export interface ServerKyc {
   investorId: string;
   fullName: string;
@@ -161,6 +187,49 @@ class DataStore {
     verifiedAt: "2026-08-06T14:00:00Z",
     tier: "VIP_DIRECTOR",
   };
+
+  withdrawals: ServerWithdrawal[] = [
+    {
+      id: "wth-001",
+      userId: "usr-inv-001",
+      userName: "Tariqul Islam Chowdhury",
+      projectId: "proj-lv100",
+      projectName: "LandVest 100 (Washpur, Dhaka)",
+      projectNameBn: "ল্যান্ডভেস্ট ১০০ (ওয়াশপুর, ঢাকা)",
+      type: "DIVIDEND",
+      amount: 8500,
+      fee: 0,
+      netAmount: 8500,
+      payoutChannel: "BANK_TRANSFER",
+      bankName: "The City Bank Limited",
+      accountHolderName: "Tariqul Islam Chowdhury",
+      accountNumber: "1102948192001",
+      branchName: "Uttara Branch, Dhaka",
+      routingNumber: "225275394",
+      status: "COMPLETED",
+      transactionRef: "CBL-EFT-99182301",
+      adminFeedback: "Disbursed via City Bank Escrow BEFTN.",
+      createdAt: "2026-08-01T10:00:00Z",
+      processedAt: "2026-08-02T12:30:00Z",
+    },
+    {
+      id: "wth-002",
+      userId: "usr-inv-001",
+      userName: "Tariqul Islam Chowdhury",
+      projectId: "proj-lv100",
+      projectName: "LandVest 100 (Washpur, Dhaka)",
+      projectNameBn: "ল্যান্ডভেস্ট ১০০ (ওয়াশপুর, ঢাকা)",
+      type: "DIVIDEND",
+      amount: 4000,
+      fee: 0,
+      netAmount: 4000,
+      payoutChannel: "BKASH",
+      mfsNumber: "01711-000000",
+      status: "PENDING",
+      userNote: "Profit withdrawal to bKash personal",
+      createdAt: "2026-09-07T08:30:00Z",
+    },
+  ];
 
   adminStats = {
     totalRaised: 18450000,

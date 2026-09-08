@@ -11,6 +11,7 @@ import 'package:swapnojatri/data/models/notification_model.dart';
 import 'package:swapnojatri/data/models/kyc_model.dart';
 import 'package:swapnojatri/data/models/audit_log_model.dart';
 import 'package:swapnojatri/data/models/user_model.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 
 /// Seed data representing real-world Swapnojatri operations and LandVest 100
 class ProjectSeeds {
@@ -608,4 +609,51 @@ class ProjectSeeds {
       timestamp: DateTime(2026, 2, 13, 10, 16),
     ),
   ];
+
+  static final List<WithdrawalModel> defaultWithdrawals = [
+    WithdrawalModel(
+      id: 'wth-001',
+      userId: 'usr-investor-01',
+      userName: 'Mashkurul Alam Ohi',
+      projectId: 'proj-lv-100',
+      projectName: 'LandVest 100',
+      projectNameBn: 'ল্যান্ডভেস্ট ১০০',
+      investmentId: 'inv-101',
+      type: WithdrawalType.dividend,
+      amount: 4500.0,
+      fee: 0.0,
+      netAmount: 4500.0,
+      payoutChannel: PayoutChannel.bankTransfer,
+      bankName: 'City Bank PLC',
+      accountHolderName: 'Mashkurul Alam Ohi',
+      accountNumber: '1102938475001',
+      branchName: 'Banani Branch, Dhaka',
+      routingNumber: '225261890',
+      status: WithdrawalStatus.completed,
+      userNote: 'Withdrawal of Q2 profit distribution',
+      adminFeedback: 'Transferred via City Bank BEFTN clearing.',
+      transactionRef: 'BEFTN-CBL-8829410',
+      createdAt: DateTime(2026, 8, 20, 11, 30),
+      processedAt: DateTime(2026, 8, 21, 15, 00),
+    ),
+    WithdrawalModel(
+      id: 'wth-002',
+      userId: 'usr-investor-01',
+      userName: 'Mashkurul Alam Ohi',
+      projectId: 'proj-lv-100',
+      projectName: 'LandVest 100',
+      projectNameBn: 'ল্যান্ডভেস্ট ১০০',
+      investmentId: 'inv-101',
+      type: WithdrawalType.dividend,
+      amount: 3000.0,
+      fee: 0.0,
+      netAmount: 3000.0,
+      payoutChannel: PayoutChannel.bkash,
+      mfsNumber: '01712-345678',
+      status: WithdrawalStatus.pending,
+      userNote: 'Urgent dividend withdrawal to bKash personal',
+      createdAt: DateTime(2026, 9, 7, 14, 15),
+    ),
+  ];
 }
+

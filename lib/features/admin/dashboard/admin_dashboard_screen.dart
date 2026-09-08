@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:swapnojatri/core/theme/app_colors.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/admin/modules/admin_payment_verification_screen.dart';
+import 'package:swapnojatri/features/admin/modules/admin_withdrawals_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   final AppState state;
@@ -449,6 +450,95 @@ class AdminDashboardScreen extends StatelessWidget {
                         ),
                         child: Text(
                           isBangla ? 'যাচাই করুন' : 'Review',
+                          style: GoogleFonts.hindSiliguri(fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Withdrawal Approvals Queue Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: palette.rule, width: 1.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  isBangla ? 'উত্তোলন অনুমোদন কিউ' : 'Withdrawal Approvals Queue',
+                                  style: GoogleFonts.hindSiliguri(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: palette.ink,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0066FF),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '${state.adminPendingWithdrawalsCount} ${isBangla ? 'টি আবেদন' : 'Pending'}',
+                                    style: GoogleFonts.hindSiliguri(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isBangla
+                                  ? 'শেয়ারহোল্ডারদের লভ্যাংশ ও মূলধন উত্তোলন অনুরোধ নিষ্পত্তি করুন।'
+                                  : 'Review shareholder dividend and capital payout requests.',
+                              style: GoogleFonts.hindSiliguri(
+                                fontSize: 11.5,
+                                color: palette.inkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminWithdrawalsScreen(state: state),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0066FF),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          isBangla ? 'অনুমোদন' : 'Review',
                           style: GoogleFonts.hindSiliguri(fontSize: 12, fontWeight: FontWeight.w700),
                         ),
                       ),
