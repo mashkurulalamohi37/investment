@@ -1069,19 +1069,66 @@ export default function MasterCmsAdminPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cms.about.storyImages.map((img) => (
-                  <div key={img.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="w-full h-32 rounded-lg overflow-hidden bg-slate-950 mb-2.5">
-                        <img src={img.imageUrl} alt={img.title} className="w-full h-full object-cover" />
-                      </div>
-                      <h4 className="text-xs font-bold text-white">{isBangla ? img.titleBn : img.title}</h4>
-                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{isBangla ? img.captionBn : img.caption}</p>
+                  <div key={img.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col gap-3">
+                    {/* Image Preview */}
+                    <div className="w-full rounded-lg overflow-hidden bg-slate-950 relative" style={{ minHeight: "8rem" }}>
+                      {img.imageUrl ? (
+                        <img
+                          src={img.imageUrl}
+                          alt={img.title || "Gallery image"}
+                          className="w-full object-cover"
+                          style={{ height: "8rem" }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                            const parent = (e.target as HTMLImageElement).parentElement;
+                            if (parent && !parent.querySelector(".img-fallback")) {
+                              const fb = document.createElement("div");
+                              fb.className = "img-fallback flex items-center justify-center h-32 text-slate-600 text-xs font-mono";
+                              fb.textContent = "Image not found: " + img.imageUrl;
+                              parent.appendChild(fb);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-32 text-slate-600 text-xs font-mono">
+                          No image URL set
+                        </div>
+                      )}
+                      {/* Category badge overlay */}
+                      <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-900/90 text-cyan-300 border border-cyan-700/60">
+                        {isBangla ? img.categoryBn || img.category : img.category}
+                      </span>
                     </div>
-                    <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-end gap-2">
+                    {/* Title + Caption */}
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-bold text-white leading-snug">
+                        {isBangla ? (img.titleBn || img.title) : img.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                        {isBangla ? (img.captionBn || img.caption) : img.caption}
+                      </p>
+                    </div>
+                    {/* URL input for quick editing */}
+                    <input
+                      type="text"
+                      value={img.imageUrl}
+                      onChange={(e) => {
+                        updateAbout((prev) => ({
+                          ...prev,
+                          storyImages: prev.storyImages.map((i) =>
+                            i.id === img.id ? { ...i, imageUrl: e.target.value } : i
+                          ),
+                        }));
+                      }}
+                      placeholder="Image URL (e.g. /images/gallery_land.jpg)"
+                      className="w-full bg-black/40 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-300 font-mono focus:outline-none focus:border-cyan-500"
+                    />
+                    {/* Actions */}
+                    <div className="pt-1 border-t border-slate-800 flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setEditingImage(img)}
-                        className="text-xs font-semibold text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/30"
+                        className="text-xs font-semibold text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20"
                       >
                         Edit
                       </button>
@@ -1095,7 +1142,7 @@ export default function MasterCmsAdminPage() {
                             }));
                           }
                         }}
-                        className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30"
+                        className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
