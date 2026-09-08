@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { SWAPNOJATRI_PROJECTS } from "@/lib/api/projects";
 import ShareMatrixGrid from "@/components/project/ShareMatrixGrid";
 import TransparencyLedger from "@/components/project/TransparencyLedger";
 import LandVestStoryCard from "@/components/project/LandVestStoryCard";
@@ -28,6 +29,8 @@ import {
 
 export default function HomePage() {
   const { isBangla, isAuthenticated } = useAuth();
+
+  const ongoingProjects = SWAPNOJATRI_PROJECTS.filter((p) => p.status === "OPEN");
 
   const trustPillars = [
     {
@@ -195,7 +198,163 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          2. LIVE SHARE ALLOCATION & SUMMARY CARD
+          2. ONGOING PROJECTS (চলমান প্রকল্পসমূহ)
+          ========================================================================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Section Header with View All Link */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-slate-200/80">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{isBangla ? "সক্রিয় বিনিয়োগ সুযোগ" : "Active Investment Opportunities"}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+              {isBangla ? "চলমান প্রকল্পসমূহ" : "Ongoing Projects"}
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
+              {isBangla
+                ? "১০০টি নির্দিষ্ট ভাগে বিভক্ত যাচাইকৃত প্রাইম জমি ও লাভজনক এগ্রো প্রকল্পে অংশ নিন।"
+                : "Explore vetted prime land and commercial agro assets structured into 100 fixed shares with escrow protection."}
+            </p>
+          </div>
+
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 hover:text-brand-emerald shadow-2xs transition-all self-start sm:self-auto group cursor-pointer"
+          >
+            <span>{isBangla ? "সকল প্রকল্প দেখুন" : "View All Projects"}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-brand-emerald transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* Project Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {ongoingProjects.map((proj) => {
+            const isLandVest = proj.code === "LV100";
+            const progressPercent = Math.round((proj.allocated_shares / proj.total_shares) * 100);
+            const detailUrl = isLandVest ? "/projects/landvest-100" : `/projects/${proj.code}`;
+
+            return (
+              <div
+                key={proj.id}
+                className="bg-white rounded-3xl border border-slate-200/90 shadow-card hover:shadow-cardHover transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+              >
+                {/* Image Header with Badges */}
+                <div className="relative h-48 sm:h-56 overflow-hidden bg-slate-900">
+                  <img
+                    src={proj.hero_image_url || "/images/landvest_hero.jpg"}
+                    alt={proj.name}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
+
+                  {/* Top Badges */}
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-black bg-[#040D1A]/80 backdrop-blur-md text-cyan-light border border-white/20 shadow-sm">
+                      {proj.code}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/90 backdrop-blur-md text-white border border-emerald-400/40 shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                      <span>{isBangla ? "চলমান" : "OPEN"}</span>
+                    </span>
+                  </div>
+
+                  {/* Bottom Image Overlay Info */}
+                  <div className="absolute bottom-3.5 left-3.5 right-3.5">
+                    <span className="text-[11px] font-mono text-cyan-light font-bold flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-cyan shrink-0" />
+                      <span className="truncate">{isBangla ? proj.location_bn : proj.location}</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
+                        {proj.category === "REAL_ESTATE"
+                          ? isBangla ? "🏢 জমি ও আবাসন" : "Real Estate"
+                          : isBangla ? "🌱 স্মার্ট এগ্রো" : "Smart Agro"}
+                      </span>
+                      <span className="text-[11px] font-mono font-bold text-slate-500">
+                        {proj.total_shares - proj.allocated_shares} {isBangla ? "ভাগ বাকি" : "Units Left"}
+                      </span>
+                    </div>
+
+                    <Link href={detailUrl} className="block group-hover:text-[#0066FF] transition-colors">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
+                        {isBangla ? proj.name_bn : proj.name}
+                      </h3>
+                    </Link>
+
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 font-normal">
+                      {isBangla ? proj.description_bn : proj.description}
+                    </p>
+                  </div>
+
+                  {/* Key Metrics 2-Col Box */}
+                  <div className="grid grid-cols-2 gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase font-mono block">
+                        {isBangla ? "প্রতি শেয়ার মূল্য" : "Per Share Price"}
+                      </span>
+                      <span className="font-mono font-black text-[#0066FF] text-base block mt-0.5">
+                        {formatBDT(proj.price_per_share, { isBangla })}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase font-mono block">
+                        {isBangla ? "প্রত্যাশিত বার্ষিক ROI" : "Projected ROI"}
+                      </span>
+                      <span className="font-mono font-black text-emerald-600 text-base block mt-0.5">
+                        {proj.projected_roi_min}% - {proj.projected_roi_max}%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Share Subscription Progress Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+                      <span>
+                        {isBangla
+                          ? `${proj.allocated_shares} / ${proj.total_shares} শেয়ার বরাদ্দ`
+                          : `${proj.allocated_shares} / ${proj.total_shares} Shares Subscribed`}
+                      </span>
+                      <span className="text-brand-emerald font-mono font-black">{progressPercent}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-brand-forest via-brand-emerald to-cyan rounded-full transition-all duration-700"
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Action Footer */}
+                <div className="p-4 sm:px-6 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-3">
+                  <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>{isBangla ? "সিটি ব্যাংক এসক্রো হিসাব" : "City Bank Escrow"}</span>
+                  </span>
+
+                  <Link
+                    href={detailUrl}
+                    className="px-5 py-2 rounded-full bg-brand-emerald hover:bg-brand-forest text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm shadow-brand-emerald/20 transition-all group-hover:scale-[1.02] cursor-pointer"
+                  >
+                    <span>{isBangla ? "প্রজেক্ট দেখুন" : "View Project"}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-cyan-light transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3. LIVE SHARE ALLOCATION & SUMMARY CARD
           ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ShareMatrixGrid />
