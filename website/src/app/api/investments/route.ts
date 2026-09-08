@@ -41,9 +41,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { projectId, lotUnits, paymentMethod, transactionRef } = body;
 
-    if (!projectId || !lotUnits || lotUnits <= 0) {
+    const parsedUnits = parseInt(String(lotUnits), 10);
+    if (!projectId || isNaN(parsedUnits) || parsedUnits <= 0) {
       return NextResponse.json(
-        { success: false, message: "Project ID and valid lot units required" },
+        { success: false, message: "Project ID and valid integer lot units required" },
         { status: 400 }
       );
     }
@@ -56,13 +57,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const startLotNum = (project.allocated_shares || 74) + 1;
+    // 1. Status Validation
+    if (
+      project.status === "COMPLETED" ||
+      (project.status as string) === "CLOSED" ||
+      (project.status as string) === "SOLD_OUT"
+    ) {
+      return NextResponse.json(
+        { success: false, message: "This project is currently closed for new share subscriptions" },
+        { status: 400 }
+      );
+    }
+
+    // 2. Minimum / Maximum Allocation Cap per Investor
+    const minCap = project.min_shares || 1;
+    const maxCap = project.max_shares || 4;
+    if (parsedUnits < minCap) {
+      return NextResponse.json(
+        { success: false, message: `Minimum subscription is ${minCap} share lot(s)` },
+        { status: 400 }
+      );
+    }
+    if (parsedUnits > maxCap) {
+      return NextResponse.json(
+        { success: false, message: `Maximum subscription limit is ${maxCap} share lot(s) per individual investor` },
+        { status: 400 }
+      );
+    }
+
+    // 3. Project Remaining Availability Check (Prevent Overselling)
+    const currentAllocated = project.allocated_shares || 0;
+    const totalCap = project.total_shares || 100;
+    const available = Math.max(0, totalCap - currentAllocated);
+    if (parsedUnits > available) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Requested ${parsedUnits} lot(s) exceeds total remaining project availability (${available} lots remaining)`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const startLotNum = currentAllocated + 1;
     const assignedLots: string[] = [];
-    for (let i = 0; i < lotUnits; i++) {
+    for (let i = 0; i < parsedUnits; i++) {
       assignedLots.push(`LOT-${String(startLotNum + i).padStart(3, "0")}`);
     }
 
-    const totalAmount = Number(lotUnits) * Number(project.price_per_share || 25500);
+    const totalAmount = parsedUnits * Number(project.price_per_share || 25500);
 
     const newInvestment: ServerInvestment = {
       id: `inv-${Date.now()}`,

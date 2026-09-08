@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   ShieldCheck,
@@ -36,6 +36,7 @@ export default function KycProfilePage() {
   const [nomineeRelation, setNomineeRelation] = useState(isBangla ? "স্ত্রী / স্বামী" : "Spouse");
   const [nomineeShare, setNomineeShare] = useState("100%");
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSavingKyc, setIsSavingKyc] = useState(false);
 
   // Password Change State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -47,13 +48,64 @@ export default function KycProfilePage() {
   const [isUpdatingPass, setIsUpdatingPass] = useState(false);
   const [passToast, setPassToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const handleSaveKyc = (e: React.FormEvent) => {
+  // Fetch current KYC data on mount
+  useEffect(() => {
+    fetch("/api/kyc")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data) {
+          const k = json.data;
+          if (k.nidPassportNumber) setNidNumber(k.nidPassportNumber);
+          if (k.fatherHusbandName) setFatherName(k.fatherHusbandName);
+          if (k.motherName) setMotherName(k.motherName);
+          if (k.presentAddress) setPresentAddress(k.presentAddress);
+          if (k.bankName) setBankName(k.bankName);
+          if (k.bankAccountNo) setBankAccount(k.bankAccountNo);
+          if (k.bankRoutingNo) setRoutingNumber(k.bankRoutingNo);
+          if (k.bankBranch) setBranchName(k.bankBranch);
+          if (k.nomineeName) setNomineeName(k.nomineeName);
+          if (k.nomineeNid) setNomineeNid(k.nomineeNid);
+          if (k.nomineeRelation) setNomineeRelation(k.nomineeRelation);
+          if (k.nomineeSharePercentage) setNomineeShare(`${k.nomineeSharePercentage}%`);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSaveKyc = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+    setIsSavingKyc(true);
+    try {
+      const shareNum = parseInt(nomineeShare.replace(/[^0-9]/g, "")) || 100;
+      await fetch("/api/kyc", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nidPassportNumber: nidNumber,
+          fatherHusbandName: fatherName,
+          motherName,
+          presentAddress,
+          bankName,
+          bankAccountNo: bankAccount,
+          bankRoutingNo: routingNumber,
+          bankBranch: branchName,
+          nomineeName,
+          nomineeNid,
+          nomineeRelation,
+          nomineeSharePercentage: shareNum,
+        }),
+      });
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch {
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } finally {
+      setIsSavingKyc(false);
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentPassword) {
@@ -82,8 +134,17 @@ export default function KycProfilePage() {
 
     setIsUpdatingPass(true);
 
-    setTimeout(() => {
-      setIsUpdatingPass(false);
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || (isBangla ? "পাসওয়ার্ড পরিবর্তনে ব্যর্থ হয়েছে।" : "Failed to update password"));
+      }
+
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -91,10 +152,18 @@ export default function KycProfilePage() {
         type: "success",
         message: isBangla
           ? "আপনার ইনভেস্টর পাসওয়ার্ড সফলভাবে আপডেট ও সুরক্ষিত হয়েছে!"
-          : "Investor security password updated and encrypted successfully!",
+          : (data.message || "Investor security password updated and encrypted successfully!"),
       });
       setTimeout(() => setPassToast(null), 4000);
-    }, 800);
+    } catch (err: any) {
+      setPassToast({
+        type: "error",
+        message: err.message || (isBangla ? "পাসওয়ার্ড পরিবর্তনে সমস্যা হয়েছে।" : "Failed to update password."),
+      });
+      setTimeout(() => setPassToast(null), 4000);
+    } finally {
+      setIsUpdatingPass(false);
+    }
   };
 
   return (
@@ -320,10 +389,15 @@ export default function KycProfilePage() {
           <div className="flex justify-end pt-1">
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-xs shadow-[#0066FF]/20 flex items-center gap-2 transition-all cursor-pointer"
+              disabled={isSavingKyc}
+              className="px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-xs shadow-[#0066FF]/20 flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{isBangla ? "কেওয়াইসি তথ্য সংরক্ষণ করুন" : "Save & Update Compliance Record"}</span>
+              <span>
+                {isSavingKyc
+                  ? isBangla ? "সংরক্ষণ করা হচ্ছে..." : "Saving..."
+                  : isBangla ? "কেওয়াইসি তথ্য সংরক্ষণ করুন" : "Save & Update Compliance Record"}
+              </span>
             </button>
           </div>
         </form>

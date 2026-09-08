@@ -1,28 +1,59 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { TrendingUp, ShieldCheck, CheckCircle2, Download, Building2, Coins, Calendar, ArrowUpRight } from "lucide-react";
+import { TrendingUp, ShieldCheck, CheckCircle2, Download, Building2, Coins, Calendar, ArrowUpRight, Loader2 } from "lucide-react";
+
+const FALLBACK_DISTRIBUTIONS = [
+  {
+    id: "dist-01",
+    periodTitle: "LandVest 100 — Q2 2026 Commercial Dividend",
+    periodTitleBn: "ল্যান্ডভেস্ট ১০০ — কিউ২ ২০২৬ বাণিজ্যিক লভ্যাংশ",
+    eligibleShares: 4,
+    perSharePayout: 2500,
+    totalGross: 10000,
+    status: "PAID",
+    paidAt: "2026-08-28",
+    channel: "City Bank Direct Deposit (A/C: ****7710)",
+    channelBn: "সিটি ব্যাংক সরাসরি জমা (A/C: ****৭৭১০)",
+  },
+];
 
 export default function DistributionsPage() {
   const { isBangla } = useAuth();
+  const [distributions, setDistributions] = useState<any[]>(FALLBACK_DISTRIBUTIONS);
+  const [loading, setLoading] = useState(true);
 
-  const distributions = [
-    {
-      id: "dist-01",
-      periodTitle: "LandVest 100 — Q2 2026 Commercial Dividend",
-      periodTitleBn: "ল্যান্ডভেস্ট ১০০ — কিউ২ ২০২৬ বাণিজ্যিক লভ্যাংশ",
-      eligibleShares: 4,
-      perSharePayout: 2500,
-      totalGross: 10000,
-      status: "PAID",
-      paidAt: "2026-08-28",
-      channel: "City Bank Direct Deposit (A/C: ****7710)",
-      channelBn: "সিটি ব্যাংক সরাসরি জমা (A/C: ****৭৭১০)",
-    },
-  ];
+  useEffect(() => {
+    async function loadDistributions() {
+      try {
+        const res = await fetch("/api/distributions");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map((d: any) => ({
+            id: d.id,
+            periodTitle: d.period || "Quarterly Dividend Distribution",
+            periodTitleBn: d.periodBn || "ত্রৈমাসিক মুনাফা বণ্টন",
+            eligibleShares: d.eligibleLots || 4,
+            perSharePayout: Math.round(d.amount / (d.eligibleLots || 4)),
+            totalGross: d.grossAmount || d.amount,
+            status: d.status,
+            paidAt: d.date ? d.date.split("T")[0] : "2026-08-28",
+            channel: d.paymentChannel || "City Bank Direct Deposit",
+            channelBn: d.paymentChannel || "সিটি ব্যাংক সরাসরি জমা",
+          }));
+          setDistributions(mapped);
+        }
+      } catch (e) {
+        console.error("Error loading distributions", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDistributions();
+  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-5 font-sans">

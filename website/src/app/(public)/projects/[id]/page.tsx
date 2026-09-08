@@ -25,20 +25,12 @@ export default function DynamicProjectPage() {
           setProject(json.data);
         } else {
           const localMatch = findProject(idOrCode);
-          if (localMatch) {
-            setProject(localMatch);
-          } else if (!project) {
-            setProject(FALLBACK_LANDVEST_100);
-          }
+          setProject(localMatch || null);
         }
       } catch (err) {
         console.error("Error fetching project:", err);
         const localMatch = findProject(idOrCode);
-        if (localMatch) {
-          setProject(localMatch);
-        } else if (!project) {
-          setProject(FALLBACK_LANDVEST_100);
-        }
+        setProject(localMatch || null);
       } finally {
         setLoading(false);
       }

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
+import { validateAdminAuth } from "@/lib/server/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authError = validateAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const withdrawals = db.withdrawals;
     const pendingCount = withdrawals.filter((w) => w.status === "PENDING" || w.status === "PROCESSING").length;
@@ -27,6 +31,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = validateAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { id, action, transactionRef, adminFeedback } = body;

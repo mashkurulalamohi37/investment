@@ -17,9 +17,15 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authMode, setAuthMode] = useState<"PASSWORD" | "OTP">("PASSWORD");
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (authMode === "OTP") {
+      router.push(`/verify-otp?phone=${encodeURIComponent(phone || "+8801700000000")}&redirect=${encodeURIComponent(redirect)}`);
+      return;
+    }
     setLoading(true);
     const success = await login(phone, password);
     setLoading(false);
@@ -98,9 +104,13 @@ function LoginForm() {
                 <label className="text-xs font-bold text-slate-700 block">
                   {isBangla ? "পাসওয়ার্ড" : "Password"}
                 </label>
-                <a href="#forgot" className="text-[11px] font-bold text-[#0066FF] hover:underline">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotModal(true)}
+                  className="text-[11px] font-bold text-[#0066FF] hover:underline cursor-pointer"
+                >
                   {isBangla ? "পাসওয়ার্ড ভুলে গেছেন?" : "Forgot?"}
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -161,6 +171,89 @@ function LoginForm() {
           </p>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="text-base font-bold text-slate-900">
+                {isBangla ? "পাসওয়ার্ড পুনরুদ্ধার" : "Password Recovery"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForgotModal(false);
+                  setForgotSent(false);
+                }}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {forgotSent ? (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-2">
+                <p className="font-bold">
+                  {isBangla ? "রিকভারি নির্দেশিকা পাঠানো হয়েছে!" : "Recovery Instructions Dispatched!"}
+                </p>
+                <p>
+                  {isBangla
+                    ? "আপনার মোবাইল নম্বরে একটি ভেরিফিকেশন ওয়ান-টাইম পিন কোড পাঠানো হয়েছে।"
+                    : "A one-time verification PIN has been dispatched to your registered phone number."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotModal(false);
+                    setForgotSent(false);
+                    router.push(`/verify-otp?phone=${encodeURIComponent(phone || "+8801700000000")}`);
+                  }}
+                  className="w-full py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs cursor-pointer hover:bg-emerald-700 mt-2"
+                >
+                  {isBangla ? "ওটিপি পেজে যান" : "Enter Verification OTP"}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {isBangla
+                    ? "আপনার নিবন্ধিত মোবাইল নম্বরটি লিখুন। আমরা আপনাকে পাসওয়ার্ড রিসেটের ওটিপি পাঠাব।"
+                    : "Enter your registered mobile phone number. We will dispatch a reset OTP."}
+                </p>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    {isBangla ? "মোবাইল নম্বর" : "Registered Phone"}
+                  </label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+880 1700-000000"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:border-[#0066FF]"
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  >
+                    {isBangla ? "বাতিল" : "Cancel"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForgotSent(true)}
+                    className="flex-1 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-bold shadow-md cursor-pointer"
+                  >
+                    {isBangla ? "কোড পাঠান" : "Send Reset Code"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

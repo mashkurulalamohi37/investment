@@ -32,8 +32,10 @@ export default function DocumentsPage() {
     setDownloadingId(id);
     setTimeout(() => {
       setDownloadingId(null);
-      if (url && url.startsWith("http")) {
+      if (url && (url.startsWith("http") || url.startsWith("/"))) {
         window.open(url, "_blank");
+      } else if (url) {
+        window.open(`/documents/${url}`, "_blank");
       } else {
         alert(
           isBangla
@@ -41,7 +43,7 @@ export default function DocumentsPage() {
             : `Official audited document "${name}" prepared from vault.`
         );
       }
-    }, 600);
+    }, 400);
   };
 
   const docs = docsConfig.documents || [];

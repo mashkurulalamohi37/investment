@@ -1001,6 +1001,62 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       )}
 
       {/* =========================================================================
+          6B. VERIFIED PROJECT DOCUMENTS VAULT
+          ========================================================================= */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-black bg-blue-50 text-[#0066FF] border border-blue-200">
+              <FolderDown className="w-3.5 h-3.5" />
+              <span>{isBangla ? "অফিসিয়াল ডকুমেন্টস ও অডিট" : "VERIFIED PROJECT DOCUMENTS"}</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              {isBangla ? "প্রকল্প পরিচিতি, চুক্তি ও আইনি ফাইলসমূহ" : "Official Legal Prospectus & Audit Vault"}
+            </h3>
+          </div>
+          <Link
+            href="/documents"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[#0066FF] hover:underline"
+          >
+            <span>{isBangla ? "সকল ভল্ট ফাইল দেখুন" : "View All Documents"}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {docList.map((doc, idx) => (
+            <div
+              key={idx}
+              className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0066FF] flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                    {doc.title}
+                  </h4>
+                  <span className="text-[11px] font-mono text-slate-500">
+                    PDF • {doc.size || "1.8 MB"}
+                  </span>
+                </div>
+              </div>
+              <a
+                href={doc.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#0066FF] border border-slate-200 hover:border-blue-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isBangla ? "ডাউনলোড / দেখুন" : "Download Verified Copy"}</span>
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* =========================================================================
           7. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
           ========================================================================= */}
       <section className="space-y-6 pt-4">

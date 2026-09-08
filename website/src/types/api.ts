@@ -13,7 +13,7 @@ export interface StandardResponse<T> {
   };
 }
 
-export type UserRole = "SUPER_ADMIN" | "PROJECT_MANAGER" | "FINANCE_MANAGER" | "COMPLIANCE" | "SUPPORT" | "INVESTOR";
+export type UserRole = "SUPER_ADMIN" | "ADMIN" | "PROJECT_MANAGER" | "FINANCE_MANAGER" | "COMPLIANCE" | "SUPPORT" | "INVESTOR";
 
 export interface User {
   id: string;

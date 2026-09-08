@@ -174,7 +174,7 @@ export default function Navbar() {
                     {isBangla ? "লগইন" : "Sign In"}
                   </Link>
                   <Link
-                    href="/login"
+                    href="/register"
                     className="px-5 py-2.5 rounded-full bg-brand-emerald hover:bg-brand-forest text-white text-xs sm:text-[13px] font-extrabold shadow-md shadow-brand-emerald/30 hover:shadow-brand-emerald/50 transition-all flex items-center gap-1.5 group cursor-pointer hover:scale-[1.02]"
                   >
                     <span>{isBangla ? "বিনিয়োগ শুরু করুন" : "Join as Investor"}</span>

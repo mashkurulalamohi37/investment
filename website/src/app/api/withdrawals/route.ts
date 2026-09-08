@@ -49,9 +49,51 @@ export async function POST(request: NextRequest) {
     } = body;
 
     const numAmount = Number(amount);
-    if (!numAmount || numAmount <= 0) {
+    if (isNaN(numAmount) || numAmount <= 0) {
       return NextResponse.json(
-        { success: false, message: "Valid withdrawal amount is required" },
+        { success: false, message: "Valid positive withdrawal amount is required" },
+        { status: 400 }
+      );
+    }
+
+    if (numAmount < 500) {
+      return NextResponse.json(
+        { success: false, message: "Minimum withdrawal settlement amount is ৳ 500" },
+        { status: 400 }
+      );
+    }
+
+    // Financial balance verification
+    const targetUserId = body.userId || "usr-inv-001";
+    const userDistributions = db.distributions.filter((d) => d.status === "PAID");
+    const totalDividendsEarned = userDistributions.reduce((sum, d) => sum + d.amount, 0);
+
+    const userInvestments = db.investments.filter((i) => i.status === "ALLOCATED");
+    const totalInvestedCapital = userInvestments.reduce((sum, i) => sum + i.amount, 0);
+
+    const existingWithdrawals = db.withdrawals
+      .filter((w) => w.userId === targetUserId && w.status !== "REJECTED" && w.status !== "CANCELLED")
+      .reduce((sum, w) => sum + w.amount, 0);
+
+    const maxEligible = type === "CAPITAL_EXIT"
+      ? Math.max(0, totalInvestedCapital - existingWithdrawals)
+      : Math.max(0, totalDividendsEarned - existingWithdrawals);
+
+    // If existing withdrawals already consume the available balance or requested exceeds balance
+    if (numAmount > maxEligible && maxEligible > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Insufficient withdrawable balance. Maximum available for settlement is ৳ ${maxEligible.toLocaleString("en-IN")}`,
+        },
+        { status: 400 }
+      );
+    } else if (maxEligible === 0 && numAmount > 10000) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Insufficient withdrawable balance in investor portfolio",
+        },
         { status: 400 }
       );
     }

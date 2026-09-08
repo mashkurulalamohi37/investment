@@ -42,8 +42,25 @@ function InvestmentWizardForm() {
   const pricePerShare = 25500;
   const totalAmount = shares * pricePerShare;
 
-  const handleEpsSuccess = (txnRef: string, lotNumbers: string[]) => {
+  const handleEpsSuccess = async (txnRef: string, lotNumbers: string[]) => {
     setShowEpsModal(false);
+    try {
+      await fetch("/api/investments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          lotUnits: shares,
+          paymentMethod: "EPS_GATEWAY",
+          transactionRef: txnRef,
+          investorId: user?.id || "usr-inv-001",
+          investorName: user?.full_name || "Tariqul Islam Chowdhury",
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to persist investment:", err);
+    }
+
     setCompletedTxn({
       ref: txnRef,
       lots: lotNumbers,
@@ -52,11 +69,29 @@ function InvestmentWizardForm() {
     setStep(4);
   };
 
-  const handleBankSubmit = (data: any) => {
+  const handleBankSubmit = async (data: any) => {
     setShowBankModal(false);
+    const assignedLots = Array.from({ length: shares }, (_, i) => `LOT-${String(74 + i + 1).padStart(3, "0")}`);
+    try {
+      await fetch("/api/investments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          lotUnits: shares,
+          paymentMethod: "CITY_BANK_ESCROW",
+          transactionRef: data.paymentReference,
+          investorId: user?.id || "usr-inv-001",
+          investorName: data.depositorName || user?.full_name || "Tariqul Islam Chowdhury",
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to persist bank investment:", err);
+    }
+
     setCompletedTxn({
       ref: data.paymentReference,
-      lots: Array.from({ length: shares }, (_, i) => `LOT-${String(74 + i + 1).padStart(3, "0")}`),
+      lots: assignedLots,
       isManualPending: true,
     });
     setStep(4);

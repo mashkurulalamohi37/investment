@@ -1,7 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
+import { validateAdminAuth } from "@/lib/server/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authError = validateAdminAuth(request);
+  if (authError) return authError;
+
   try {
     const totalRaised = db.investments
       .filter((i) => i.status === "ALLOCATED")

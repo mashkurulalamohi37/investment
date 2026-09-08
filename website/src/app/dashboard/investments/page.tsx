@@ -1,32 +1,68 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
 import TransparencyLedger from "@/components/project/TransparencyLedger";
-import { Coins, PlusCircle, ShieldCheck, Download, Award, CheckCircle2, FileText, ArrowUpRight } from "lucide-react";
+import { Coins, PlusCircle, ShieldCheck, Download, Award, CheckCircle2, FileText, ArrowUpRight, Loader2 } from "lucide-react";
+
+const FALLBACK_INVESTMENTS = [
+  {
+    id: "inv-lv100-01",
+    investmentNo: "INV-2026-LV100-0041",
+    projectName: "LandVest 100 (Savar, Dhaka)",
+    projectName_bn: "ল্যান্ডভেস্ট ১০০ (সাভার, ঢাকা)",
+    shares: 4,
+    unitPrice: 25500,
+    totalAmount: 102000,
+    status: "ALLOCATED",
+    lots: ["LOT-041", "LOT-042", "LOT-043", "LOT-044"],
+    paymentMethod: "City Bank Escrow Clearing",
+    paymentMethod_bn: "সিটি ব্যাংক এসক্রো ক্লিয়ারেন্স",
+    date: "2026-08-15",
+    deedRef: "Deed #4982/2026",
+  },
+];
 
 export default function MyInvestmentsPage() {
   const { isBangla } = useAuth();
+  const [investments, setInvestments] = useState<any[]>(FALLBACK_INVESTMENTS);
+  const [loading, setLoading] = useState(true);
 
-  const investments = [
-    {
-      id: "inv-lv100-01",
-      investmentNo: "INV-2026-LV100-0041",
-      projectName: "LandVest 100 (Savar, Dhaka)",
-      projectName_bn: "ল্যান্ডভেস্ট ১০০ (সাভার, ঢাকা)",
-      shares: 4,
-      unitPrice: 25500,
-      totalAmount: 102000,
-      status: "ALLOCATED",
-      lots: ["LOT-041", "LOT-042", "LOT-043", "LOT-044"],
-      paymentMethod: "City Bank Escrow Clearing",
-      paymentMethod_bn: "সিটি ব্যাংক এসক্রো ক্লিয়ারেন্স",
-      date: "2026-08-15",
-      deedRef: "Deed #4982/2026",
-    },
-  ];
+  useEffect(() => {
+    async function loadInvestments() {
+      try {
+        const res = await fetch("/api/investments");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped = json.data.map((i: any) => ({
+            id: i.id,
+            investmentNo: i.certificateNumber || i.id,
+            projectName: i.projectName,
+            projectName_bn: i.projectNameBn || i.projectName,
+            shares: i.lotUnits,
+            unitPrice: Math.round(i.amount / (i.lotUnits || 1)),
+            totalAmount: i.amount,
+            status: i.status,
+            lots: i.lotNumbers || [],
+            paymentMethod: i.paymentMethod,
+            paymentMethod_bn: i.paymentMethod === "CITY_BANK_ESCROW" ? "সিটি ব্যাংক এসক্রো ক্লিয়ারেন্স" : i.paymentMethod,
+            date: i.subscribedAt ? i.subscribedAt.split("T")[0] : "2026-08-15",
+            deedRef: `Deed #${i.certificateNumber || "4982/2026"}`,
+          }));
+          setInvestments(mapped);
+        }
+      } catch (err) {
+        console.error("Error loading investments", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadInvestments();
+  }, []);
+
+  const totalShares = investments.reduce((acc, i) => acc + (i.shares || 0), 0);
 
   return (
     <div className="space-y-4 sm:space-y-5 font-sans">
@@ -35,7 +71,7 @@ export default function MyInvestmentsPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#EBF3FF] text-[#0066FF] border border-[#0066FF]/20">
-              {isBangla ? "৪টি সক্রিয় শেয়ার লট" : "4 ACTIVE LOTS"}
+              {isBangla ? `${totalShares}টি সক্রিয় শেয়ার লট` : `${totalShares} ACTIVE LOTS`}
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
@@ -98,7 +134,7 @@ export default function MyInvestmentsPage() {
                 <span>{isBangla ? "বরাদ্দকৃত শেয়ার লট সমূহ:" : "Assigned Share Lots:"}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {inv.lots.map((lot) => (
+                {inv.lots.map((lot: string) => (
                   <span
                     key={lot}
                     className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 font-mono font-bold text-xs"
