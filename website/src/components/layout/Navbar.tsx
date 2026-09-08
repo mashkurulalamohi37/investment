@@ -42,41 +42,7 @@ export default function Navbar() {
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      {/* 1. Top Mini Announcement Bar */}
-      <div className="bg-[#040D1A] text-slate-300 text-[11px] py-1.5 px-4 border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 relative shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="font-bold text-white">
-              {isBangla ? "ল্যান্ডভেস্ট ১০০ লাইভ:" : "LandVest 100 Live:"}
-            </span>
-            <span className="text-slate-300 hidden sm:inline font-normal">
-              {isBangla ? "৭৪টি শেয়ার বরাদ্দ সম্পন্ন • ২৬টি উন্মুক্ত" : "74/100 Shares Allocated • 26 Units Remaining"}
-            </span>
-            <span className="text-slate-400 hidden md:inline font-normal">
-              {isBangla ? "• দ্য সিটি ব্যাংক পিএলসি এসক্রো একাউন্টে সুরক্ষিত" : "• Secured with The City Bank PLC Escrow"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px]">
-            <span className="text-cyan-light font-bold font-mono">
-              {isBangla ? "প্রতি শেয়ার = ৳২৫,৫০০" : "1 Unit = ৳25,500"}
-            </span>
-            <Link
-              href="/projects/landvest-100"
-              className="text-white hover:text-cyan underline flex items-center gap-1 font-semibold"
-            >
-              <span>{isBangla ? "শেয়ার বুক করুন" : "Book Share"}</span>
-              <ArrowRight className="w-3 h-3 text-cyan" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Main Glassmorphic Header */}
+      {/* Main Glassmorphic Header */}
       <header
         className={`w-full transition-all duration-200 border-b ${
           scrolled

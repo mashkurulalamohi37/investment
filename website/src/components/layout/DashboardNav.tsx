@@ -17,6 +17,7 @@ import {
   Lock,
   ChevronRight,
   ArrowUpRight,
+  Globe,
   Menu,
   X,
 } from "lucide-react";
