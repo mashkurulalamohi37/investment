@@ -699,11 +699,11 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
         </div>
 
         {/* =======================================================================
-            RIGHT COLUMN (4 COLS - UNCONSTRAINED FLUID SCROLL)
+            RIGHT COLUMN (4 COLS - NATURAL FLUID SCROLL)
             ======================================================================= */}
-        <div className="lg:col-span-4 space-y-6 lg:self-start">
-          {/* Card 1: Calculator Widget (Sleek sticky top for instant access) */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-5 relative overflow-hidden lg:sticky lg:top-24 z-10">
+        <div className="lg:col-span-4 space-y-6">
+          {/* Card 1: Calculator Widget */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-5 relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#0066FF]" />
 
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
