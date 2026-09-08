@@ -159,31 +159,35 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Trust Metrics Ribbon */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-6 border-t border-white/15 max-w-xl mx-auto lg:mx-0">
-              <div className="space-y-0.5">
-                <span className="block text-lg sm:text-2xl lg:text-3xl font-black text-cyan font-mono">
-                  {isBangla ? "৪টি প্রজেক্ট" : "4 Projects"}
-                </span>
-                <span className="text-[10px] sm:text-xs text-slate-400 font-medium">
-                  {isBangla ? "বাস্তবায়িত ট্র্যাক রেকর্ড" : "Delivered Track Record"}
-                </span>
-              </div>
-              <div className="space-y-0.5">
-                <span className="block text-lg sm:text-2xl lg:text-3xl font-black text-white font-mono">
-                  {isBangla ? "১০০টি শেয়ার" : "100 Units"}
-                </span>
-                <span className="text-[10px] sm:text-xs text-slate-400 font-medium">
-                  {isBangla ? "নির্দিষ্ট ১০০টি শেয়ার" : "Fixed Project Shares"}
-                </span>
-              </div>
-              <div className="space-y-0.5">
-                <span className="block text-lg sm:text-2xl lg:text-3xl font-black text-emerald-400 font-mono">
-                  {isBangla ? "১০০% প্রদেয়" : "100% Pro-Rata"}
-                </span>
-                <span className="text-[10px] sm:text-xs text-slate-400 font-medium">
-                  {isBangla ? "সরাসরি ব্যাংক লভ্যাংশ" : "Direct Bank Payouts"}
-                </span>
+            {/* Trust Metrics Ribbon — Sleek Solid Frosted Glass Bar */}
+            <div className="pt-6 border-t border-white/15 max-w-2xl mx-auto lg:mx-0">
+              <div className="p-3 sm:p-4 rounded-2xl bg-[#040D1A]/75 backdrop-blur-xl border border-white/20 shadow-xl grid grid-cols-3 divide-x divide-white/15 text-center">
+                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
+                  <span className="text-xs sm:text-base lg:text-xl font-black text-cyan font-mono whitespace-nowrap block">
+                    {isBangla ? "৪টি প্রজেক্ট" : "4 Projects"}
+                  </span>
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium whitespace-nowrap block mt-0.5">
+                    {isBangla ? "ট্র্যাক রেকর্ড" : "Track Record"}
+                  </span>
+                </div>
+
+                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
+                  <span className="text-xs sm:text-base lg:text-xl font-black text-white font-mono whitespace-nowrap block">
+                    {isBangla ? "১০০টি শেয়ার" : "100 Units"}
+                  </span>
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium whitespace-nowrap block mt-0.5">
+                    {isBangla ? "নির্দিষ্ট ইকুইটি" : "Fixed Equity"}
+                  </span>
+                </div>
+
+                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
+                  <span className="text-xs sm:text-base lg:text-xl font-black text-emerald-400 font-mono whitespace-nowrap block">
+                    {isBangla ? "১০০% প্রদেয়" : "100% Pro-Rata"}
+                  </span>
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-medium whitespace-nowrap block mt-0.5">
+                    {isBangla ? "ব্যাংক লভ্যাংশ" : "Bank Payouts"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
