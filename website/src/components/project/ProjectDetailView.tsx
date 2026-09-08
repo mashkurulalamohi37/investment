@@ -33,6 +33,10 @@ import {
   Scale,
   BadgeCheck,
   Sprout,
+  Landmark,
+  Phone,
+  MessageCircle,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface ProjectDetailViewProps {
@@ -287,13 +291,13 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       </div>
 
       {/* =========================================================================
-          3. MAIN CONTENT: 2-COLUMN GRID (8 COLS LEFT / 4 COLS RIGHT)
+          3. MAIN CONTENT: 2-COLUMN BALANCED DECISION GRID (7 COLS LEFT / 5 COLS RIGHT)
           ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
         {/* =======================================================================
-            LEFT COLUMN (8 COLS)
+            LEFT COLUMN (7 COLS)
             ======================================================================= */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-7 space-y-8">
           {/* 1. About Project & 4 Bento Trust Cards */}
           <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
             <div className="space-y-2">
@@ -478,190 +482,12 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               </span>
             </div>
           </div>
-
-          {/* 4. Project Potential Images (Active Stage & Carousel Slider) */}
-          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-5 shadow-sm">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                  {isBangla ? "প্রকল্পের সম্ভাব্য চিত্র ও গ্যালারি" : "Project Potential & Gallery"}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {isBangla
-                    ? "জমির বর্তমান অবস্থা, অবকাঠামো ও ভবিষ্যৎ রূপরেখা"
-                    : "Current site condition, infrastructure, and vision"}
-                </p>
-              </div>
-
-              {/* Slider Nav Controls */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                  {activeSlide + 1} / {galleryList.length}
-                </span>
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
-                  aria-label="Previous slide"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
-                  aria-label="Next slide"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Featured Stage Image */}
-            <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md h-64 sm:h-80 lg:h-96 bg-slate-950 group">
-              <img
-                src={galleryList[activeSlide]?.image_url}
-                alt={galleryList[activeSlide]?.title}
-                className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
-
-              {/* Title & Badge Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                <span className="px-3.5 py-1.5 rounded-xl bg-black/70 backdrop-blur-md text-xs sm:text-sm font-bold text-white shadow-lg border border-white/20">
-                  {galleryList[activeSlide]?.title}
-                </span>
-              </div>
-
-              {/* Prev / Next On-Image Buttons */}
-              <button
-                type="button"
-                onClick={prevSlide}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-70 hover:opacity-100 shadow-lg"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={nextSlide}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-70 hover:opacity-100 shadow-lg"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Interactive Thumbnail Strip */}
-            <div className="grid grid-cols-3 gap-3 pt-1">
-              {galleryList.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setActiveSlide(idx)}
-                  className={`relative rounded-2xl overflow-hidden border-2 transition-all h-20 sm:h-24 group cursor-pointer text-left ${
-                    activeSlide === idx
-                      ? "border-[#0066FF] shadow-md ring-2 ring-[#0066FF]/25 scale-[1.02]"
-                      : "border-slate-200 opacity-70 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-1.5 left-1.5 right-1.5">
-                    <span className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-[10px] font-bold text-white block text-center truncate">
-                      {item.title}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Pagination Dots */}
-            <div className="flex items-center justify-center gap-1.5 pt-1">
-              {galleryList.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setActiveSlide(i)}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    activeSlide === i ? "w-6 bg-[#0066FF]" : "w-2 bg-slate-200 hover:bg-slate-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* 5. Project Roadmap & Key Milestones */}
-          {project.milestones && project.milestones.length > 0 && (
-            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-5 shadow-sm">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-[#0066FF]" />
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                    {isBangla ? "প্রকল্পের রোডম্যাপ ও মাইলস্টোন" : "Roadmap & Key Milestones"}
-                  </h3>
-                </div>
-                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-[#0066FF]">
-                  {project.milestones.length} {isBangla ? "টি ধাপ" : "Stages"}
-                </span>
-              </div>
-
-              <div className="space-y-4 pt-1">
-                {project.milestones.map((m, idx) => (
-                  <div key={m.id || idx} className="relative flex items-start gap-3.5 group">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
-                          m.is_completed
-                            ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
-                            : "bg-blue-50 text-[#0066FF] border border-blue-200"
-                        }`}
-                      >
-                        {m.is_completed ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        ) : (
-                          <span>{m.sequence || idx + 1}</span>
-                        )}
-                      </div>
-                      {idx < (project.milestones?.length || 0) - 1 && (
-                        <div className="w-0.5 h-12 bg-slate-200 mt-1" />
-                      )}
-                    </div>
-
-                    <div className="flex-1 bg-slate-50/80 rounded-2xl p-3.5 border border-slate-200/80 space-y-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-xs sm:text-sm font-bold text-slate-900">
-                          {isBangla ? m.title_bn || m.title : m.title}
-                        </span>
-                        {m.is_completed ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            {isBangla ? "সম্পন্ন" : "Completed"}
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                            {isBangla ? "পরিকল্পিত / চলমান" : "In Progress"}
-                          </span>
-                        )}
-                      </div>
-                      {(m.description_bn || m.description) && (
-                        <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                          {isBangla ? m.description_bn || m.description : m.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* =======================================================================
-            RIGHT COLUMN (4 COLS - NATURAL FLUID SCROLL)
+            RIGHT COLUMN (5 COLS - BALANCED COMPACT DECISION SUITE)
             ======================================================================= */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-5 space-y-6">
           {/* Card 1: Calculator Widget */}
           <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-5 relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#0066FF]" />
@@ -862,11 +688,307 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               ))}
             </div>
           </div>
+
+          {/* Card 4: Bank Escrow & Fiduciary Safety Guarantee */}
+          <div className="bg-gradient-to-br from-[#0A2540] to-[#040D1A] rounded-3xl p-5 sm:p-6 text-white space-y-4 shadow-lg border border-slate-800">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-white/10">
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                <Landmark className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm sm:text-base text-white">
+                  {isBangla ? "ব্যাংক এসক্রো ও নিরাপত্তা নিশ্চয়তা" : "Bank Escrow & Investor Protection"}
+                </h3>
+                <span className="text-[10px] text-cyan-300 font-mono">The City Bank PLC • Segregated Account</span>
+              </div>
+            </div>
+
+            <div className="space-y-2.5 text-xs text-slate-300">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-snug">
+                  {isBangla
+                    ? "সকল সাবস্ক্রিপশন তহবিল সরাসরি দ্য সিটি ব্যাংক পিএলসি এসক্রো অ্যাকাউন্টে সংরক্ষিত থাকে।"
+                    : "All investor subscriptions held securely in segregated City Bank PLC escrow account."}
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-snug">
+                  {isBangla
+                    ? "আইনি দলিল ও রেজিস্ট্রি যাচাইয়ের পরেই কেবল ধাপে ধাপে ফান্ড রিলিজ করা হয়।"
+                    : "Funds released strictly milestone-by-milestone upon verified sub-registry execution."}
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-snug">
+                  {isBangla
+                    ? "ন্যূনতম শেয়ার লক্ষ্যমাত্রা অপূর্ণ থাকলে ১০০% মূলধন সরাসরি ফেরত পাওয়ার নিশ্চয়তা।"
+                    : "100% principal refund protection if subscription threshold is not fully met."}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 5: Guided Site Visit Booking & Advisor Support */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+              <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
+                <Phone className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                  {isBangla ? "সাইট ভিজিট ও বিনিয়োগ পরামর্শ" : "Guided Site Visit & Advisory"}
+                </h3>
+                <span className="text-[10px] text-slate-500 font-medium">
+                  {isBangla ? "সরাসরি প্রতিনিধি ও সাইট পরিদর্শন" : "Free chauffeur visit & advisor hotline"}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {isBangla
+                ? "বিনিয়োগের পূর্বে স্বচক্ষে জমি দেখতে চান? প্রতি শুক্র ও শনিবার আমাদের নিজস্ব ব্যবস্থাপনায় বিনামূল্যে সাইট পরিদর্শনের সুবিধা রয়েছে।"
+                : "Want to inspect the site before investing? We organize complimentary chauffeur-guided site tours every Friday and Saturday."}
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <a
+                href="https://wa.me/8801700000000?text=Hello%20I%20am%20interested%20in%20a%20site%20visit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 border border-emerald-200/70 transition-all cursor-pointer"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{isBangla ? "হোয়াটসঅ্যাপ" : "WhatsApp"}</span>
+              </a>
+              <a
+                href="tel:+8801700000000"
+                className="py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0066FF] font-bold text-xs flex items-center justify-center gap-1.5 border border-blue-200/70 transition-all cursor-pointer"
+              >
+                <Phone className="w-3.5 h-3.5 text-[#0066FF]" />
+                <span>{isBangla ? "হটলাইন কল" : "Call Advisor"}</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* =========================================================================
-          4. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
+          4. FULL-WIDTH PROJECT POTENTIAL & VISUAL GALLERY SHOWCASE (12 COLS)
+          ========================================================================= */}
+      <div className="w-full bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
+              <ImageIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                {isBangla ? "প্রকল্পের সম্ভাব্য চিত্র ও গ্যালারি" : "Project Potential & Visual Gallery"}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isBangla
+                  ? "জমির বর্তমান অবস্থা, অবকাঠামোগত অগ্রগতি ও ভবিষ্যৎ রূপরেখা"
+                  : "Current site condition, infrastructure progress, and development masterplan"}
+              </p>
+            </div>
+          </div>
+
+          {/* Slider Nav Controls */}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-xs font-mono font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              {activeSlide + 1} / {galleryList.length}
+            </span>
+            <button
+              type="button"
+              onClick={prevSlide}
+              className="w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={nextSlide}
+              className="w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Featured Cinema-Stage Image (Wide Full Width) */}
+        <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md h-72 sm:h-96 lg:h-[460px] bg-slate-950 group">
+          <img
+            src={galleryList[activeSlide]?.image_url}
+            alt={galleryList[activeSlide]?.title}
+            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent pointer-events-none" />
+
+          {/* Title & Badge Overlay */}
+          <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between pointer-events-none">
+            <div className="px-4 py-2 rounded-xl bg-black/70 backdrop-blur-md text-xs sm:text-sm font-bold text-white shadow-lg border border-white/20">
+              <span>{galleryList[activeSlide]?.title}</span>
+            </div>
+            <span className="hidden sm:inline px-3 py-1.5 rounded-xl bg-white/20 backdrop-blur-md text-xs font-mono font-bold text-white border border-white/30">
+              Slide {activeSlide + 1} of {galleryList.length}
+            </span>
+          </div>
+
+          {/* Prev / Next On-Image Buttons */}
+          <button
+            type="button"
+            onClick={prevSlide}
+            className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-80 hover:opacity-100 shadow-lg"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={nextSlide}
+            className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-80 hover:opacity-100 shadow-lg"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Interactive Thumbnail Strip */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-1">
+          {galleryList.map((item, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setActiveSlide(idx)}
+              className={`relative rounded-2xl overflow-hidden border-2 transition-all h-20 sm:h-28 group cursor-pointer text-left ${
+                activeSlide === idx
+                  ? "border-[#0066FF] shadow-md ring-2 ring-[#0066FF]/25 scale-[1.01]"
+                  : "border-slate-200 opacity-70 hover:opacity-100"
+              }`}
+            >
+              <img
+                src={item.image_url}
+                alt={item.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2">
+                <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-xs text-[11px] font-bold text-white block text-center truncate">
+                  {item.title}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex items-center justify-center gap-1.5 pt-1">
+          {galleryList.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveSlide(i)}
+              className={`h-2 rounded-full transition-all cursor-pointer ${
+                activeSlide === i ? "w-6 bg-[#0066FF]" : "w-2 bg-slate-200 hover:bg-slate-300"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* =========================================================================
+          5. FULL-WIDTH PROJECT ROADMAP & KEY MILESTONES (12 COLS)
+          ========================================================================= */}
+      {project.milestones && project.milestones.length > 0 && (
+        <div className="w-full bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                  {isBangla ? "প্রকল্পের রোডম্যাপ ও মাইলস্টোন" : "Project Roadmap & Key Milestones"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {isBangla
+                    ? "বাস্তবায়নের প্রতিটি ধাপ, ভূমি নিবন্ধন এবং হস্তান্তর সময়সীমা"
+                    : "Transparent execution milestones, land registration, and handover timeline"}
+                </p>
+              </div>
+            </div>
+            <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-[#0066FF] border border-blue-200/60 self-start sm:self-auto">
+              {project.milestones.length} {isBangla ? "টি ধাপ বাস্তবায়নাধীন" : "Execution Phases"}
+            </span>
+          </div>
+
+          {/* Responsive Multi-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-1">
+            {project.milestones.map((m, idx) => (
+              <div
+                key={m.id || idx}
+                className="bg-slate-50/90 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-blue-200 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-3"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                          m.is_completed
+                            ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
+                            : "bg-blue-100 text-[#0066FF] border border-blue-200"
+                        }`}
+                      >
+                        {m.is_completed ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <span>{m.sequence || idx + 1}</span>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-mono font-bold text-slate-400 uppercase">
+                        {isBangla ? `ধাপ 0${idx + 1}` : `Phase 0${idx + 1}`}
+                      </span>
+                    </div>
+
+                    {m.is_completed ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        {isBangla ? "সম্পন্ন" : "Completed"}
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                        {isBangla ? "চলমান / পরিকল্পিত" : "In Progress"}
+                      </span>
+                    )}
+                  </div>
+
+                  <h4 className="text-sm sm:text-base font-black text-slate-900 leading-snug">
+                    {isBangla ? m.title_bn || m.title : m.title}
+                  </h4>
+
+                  {(m.description_bn || m.description) && (
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {isBangla ? m.description_bn || m.description : m.description}
+                    </p>
+                  )}
+                </div>
+
+                {m.milestone_date && (
+                  <div className="pt-2 border-t border-slate-200/60 flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{m.milestone_date}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          6. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
           ========================================================================= */}
       <section className="space-y-6 pt-4">
         <ShareMatrixGrid
@@ -881,7 +1003,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       </section>
 
       {/* =========================================================================
-          5. BOTTOM CONVERSION BANNER
+          7. BOTTOM CONVERSION BANNER
           ========================================================================= */}
       <div className="rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/60 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
