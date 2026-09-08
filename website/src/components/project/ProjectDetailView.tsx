@@ -33,6 +33,9 @@ import {
   Scale,
   BadgeCheck,
   Sprout,
+  Lock,
+  Unlock,
+  Navigation,
 } from "lucide-react";
 
 interface ProjectDetailViewProps {
@@ -91,6 +94,22 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
     setActiveSlide((prev) => (prev === galleryList.length - 1 ? 0 : prev + 1));
   };
 
+  // Map interactive state to prevent mouse-wheel scroll trapping
+  const [mapInteractive, setMapInteractive] = useState(false);
+  const [mapTab, setMapTab] = useState<"LIVE" | "PLAN">("LIVE");
+
+  const mapQuery = project.code === "LV100"
+    ? "Washpur, Bosila Bridge, Dhaka, Bangladesh"
+    : project.code === "AGRO-S1"
+    ? "Singair, Manikganj, Dhaka Division, Bangladesh"
+    : project.code === "DAIRY-01"
+    ? "Savar Dairy Zone, Savar, Dhaka, Bangladesh"
+    : `${project.location || "Dhaka"}, Bangladesh`;
+
+  const googleMapsEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(
+    mapQuery
+  )}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+
   // Documents list
   const defaultDocuments = [
     {
@@ -124,7 +143,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
     : `/login?redirect=/dashboard/investments/new?project=${project.id || project.code}&shares=${shares}`;
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-10 font-sans">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-10 font-sans overflow-x-clip">
       {/* =========================================================================
           1. HERO HEADER WITH LANDSCAPE GRAPHIC
           ========================================================================= */}
@@ -368,97 +387,234 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
             </div>
           </div>
 
-          {/* 3. Location & Stylized Map Graphic */}
+          {/* 3. Location & Interactive Map */}
           <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-5 shadow-sm">
-            <h3 className="text-base sm:text-lg font-bold text-slate-900">
-              {isBangla ? "লোকেশন" : "Project Location"}
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                    {isBangla ? "প্রকল্পের অবস্থান ও ম্যাপ" : "Project Location & Map"}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {isBangla ? project.location_bn || project.location : project.location}
+                  </p>
+                </div>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              {/* Left Address Box */}
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold block">
-                      {isBangla ? "প্রকল্পের সঠিক অবস্থান:" : "Physical Coordinates:"}
-                    </span>
-                    <span className="text-sm font-bold text-slate-900 leading-snug block mt-0.5">
-                      {isBangla ? project.location_bn || project.location : project.location}
-                    </span>
-                  </div>
+              {/* View Switcher Tabs & External Link */}
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <div className="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setMapTab("LIVE")}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      mapTab === "LIVE"
+                        ? "bg-white text-[#0066FF] shadow-xs font-extrabold"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {isBangla ? "লাইভ গুগল ম্যাপ" : "Live Map"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapTab("PLAN")}
+                    className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                      mapTab === "PLAN"
+                        ? "bg-white text-[#0066FF] shadow-xs font-extrabold"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {isBangla ? "সাইট রুট প্ল্যান" : "Route Plan"}
+                  </button>
                 </div>
 
                 <a
-                  href={project.map_url || "https://maps.google.com/?q=Washpur,Bosila,Dhaka"}
+                  href={project.map_url || `https://maps.google.com/?q=${encodeURIComponent(mapQuery)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-[#0066FF] font-bold text-xs border border-slate-200 shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                  title="Open in Google Maps"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-[#0066FF]" />
-                  <span>{isBangla ? "ম্যাপে দেখুন →" : "View on Google Maps →"}</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{isBangla ? "ম্যাপে খুলুন" : "Google Maps"}</span>
                 </a>
               </div>
+            </div>
 
-              {/* Right Stylized Map SVG/Image */}
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xs h-48 sm:h-52 bg-slate-100">
-                <img
-                  src={project.map_image_url || "/images/washpur_map.svg"}
-                  alt="Location Map"
-                  className="w-full h-full object-cover"
-                />
+            {/* Map Frame Container with Anti-Scroll-Trap Protection */}
+            <div
+              className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-inner h-64 sm:h-80 lg:h-88 bg-slate-100 group"
+              onMouseLeave={() => setMapInteractive(false)}
+            >
+              {mapTab === "LIVE" ? (
+                <>
+                  <iframe
+                    title="Project Location Map"
+                    src={googleMapsEmbedUrl}
+                    className={`w-full h-full border-0 transition-opacity duration-300 ${
+                      mapInteractive ? "pointer-events-auto" : "pointer-events-none"
+                    }`}
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+
+                  {/* Anti-Scroll Trap Overlay when not actively interacting */}
+                  {!mapInteractive ? (
+                    <div
+                      onClick={() => setMapInteractive(true)}
+                      className="absolute inset-0 bg-slate-950/10 hover:bg-slate-950/20 backdrop-blur-[1px] flex items-center justify-center cursor-pointer transition-all group/btn"
+                    >
+                      <button
+                        type="button"
+                        className="px-4 py-2 rounded-xl bg-white/95 hover:bg-white text-slate-800 text-xs font-extrabold shadow-lg border border-slate-200 flex items-center gap-2 transform group-hover/btn:scale-105 transition-all cursor-pointer"
+                      >
+                        <MapPin className="w-4 h-4 text-[#0066FF]" />
+                        <span>
+                          {isBangla
+                            ? "👆 ক্লিক করে ম্যাপ নেভিগেট ও জুম করুন"
+                            : "👆 Click to activate map navigation"}
+                        </span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setMapInteractive(false)}
+                      className="absolute top-3 right-3 px-3 py-1.5 rounded-xl bg-slate-900/85 hover:bg-slate-900 text-white text-[11px] font-bold backdrop-blur-md shadow-md flex items-center gap-1.5 transition-all cursor-pointer z-10"
+                    >
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>{isBangla ? "স্ক্রোল লক করুন" : "Lock map scroll"}</span>
+                    </button>
+                  )}
+                </>
+              ) : (
+                <div className="relative w-full h-full flex items-center justify-center bg-slate-50 p-2">
+                  <img
+                    src={project.map_image_url || "/images/washpur_map.svg"}
+                    alt="Site Route Plan"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Map Footnote & Direction Badges */}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 pt-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-semibold text-slate-700">
+                  {isBangla ? "যাচাইকৃত অবস্থান:" : "Verified Site:"}{" "}
+                  <strong className="text-slate-900 font-bold">
+                    {isBangla ? project.location_bn || project.location : project.location}
+                  </strong>
+                </span>
               </div>
+              <span className="text-[11px] font-mono text-slate-400">
+                GPS Verified • Sub-Registry Jurisdiction
+              </span>
             </div>
           </div>
 
-          {/* 4. Project Potential Images (Carousel Slider) */}
+          {/* 4. Project Potential Images (Active Stage & Carousel Slider) */}
           <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                {isBangla ? "প্রকল্পের সম্ভাব্য চিত্র" : "Project Potential & Gallery"}
-              </h3>
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  {isBangla ? "প্রকল্পের সম্ভাব্য চিত্র ও গ্যালারি" : "Project Potential & Gallery"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {isBangla
+                    ? "জমির বর্তমান অবস্থা, অবকাঠামো ও ভবিষ্যৎ রূপরেখা"
+                    : "Current site condition, infrastructure, and vision"}
+                </p>
+              </div>
+
+              {/* Slider Nav Controls */}
               <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                  {activeSlide + 1} / {galleryList.length}
+                </span>
                 <button
                   type="button"
                   onClick={prevSlide}
-                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
+                  aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
                   onClick={nextSlide}
-                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-700 transition-all cursor-pointer hover:border-[#0066FF] hover:text-[#0066FF] shadow-2xs"
+                  aria-label="Next slide"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Gallery Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            {/* Featured Stage Image */}
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-md h-64 sm:h-80 lg:h-96 bg-slate-950 group">
+              <img
+                src={galleryList[activeSlide]?.image_url}
+                alt={galleryList[activeSlide]?.title}
+                className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+
+              {/* Title & Badge Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                <span className="px-3.5 py-1.5 rounded-xl bg-black/70 backdrop-blur-md text-xs sm:text-sm font-bold text-white shadow-lg border border-white/20">
+                  {galleryList[activeSlide]?.title}
+                </span>
+              </div>
+
+              {/* Prev / Next On-Image Buttons */}
+              <button
+                type="button"
+                onClick={prevSlide}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-70 hover:opacity-100 shadow-lg"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={nextSlide}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer opacity-70 hover:opacity-100 shadow-lg"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Interactive Thumbnail Strip */}
+            <div className="grid grid-cols-3 gap-3 pt-1">
               {galleryList.map((item, idx) => (
-                <div
+                <button
                   key={idx}
-                  className={`relative rounded-2xl overflow-hidden border transition-all h-48 sm:h-44 group cursor-pointer ${
-                    activeSlide === idx ? "border-[#0066FF] ring-2 ring-[#0066FF]/20" : "border-slate-200"
-                  }`}
+                  type="button"
                   onClick={() => setActiveSlide(idx)}
+                  className={`relative rounded-2xl overflow-hidden border-2 transition-all h-20 sm:h-24 group cursor-pointer text-left ${
+                    activeSlide === idx
+                      ? "border-[#0066FF] shadow-md ring-2 ring-[#0066FF]/25 scale-[1.02]"
+                      : "border-slate-200 opacity-70 hover:opacity-100"
+                  }`}
                 >
                   <img
                     src={item.image_url}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-2.5 left-2.5 right-2.5">
-                    <span className="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[11px] font-bold text-white block text-center truncate">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-1.5 left-1.5 right-1.5">
+                    <span className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-[10px] font-bold text-white block text-center truncate">
                       {item.title}
                     </span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
 
@@ -543,11 +699,11 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
         </div>
 
         {/* =======================================================================
-            RIGHT COLUMN (4 COLS - STICKY SIDEBAR)
+            RIGHT COLUMN (4 COLS - UNCONSTRAINED FLUID SCROLL)
             ======================================================================= */}
-        <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-          {/* Card 1: Calculator Widget */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-5 relative overflow-hidden">
+        <div className="lg:col-span-4 space-y-6 lg:self-start">
+          {/* Card 1: Calculator Widget (Sleek sticky top for instant access) */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-6 space-y-5 relative overflow-hidden lg:sticky lg:top-24 z-10">
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#0066FF]" />
 
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">

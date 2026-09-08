@@ -167,8 +167,8 @@ export default function ShareMatrixGrid({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-slate-700">
           <span>
             {isBangla
-              ? `তহবিল সংগ্রহের সার্বিক অগ্রগতি: ৭৪ / ১০০ শেয়ার (৭৪% সম্পন্ন)`
-              : `Overall Capital Allocation Progress: 74 / 100 Shares (74% Complete)`}
+              ? `তহবিল সংগ্রহের সার্বিক অগ্রগতি: ${allocatedShares} / ${totalShares} শেয়ার (${allocatedPercent.toFixed(0)}% সম্পন্ন)`
+              : `Overall Capital Allocation Progress: ${allocatedShares} / ${totalShares} Shares (${allocatedPercent.toFixed(0)}% Complete)`}
           </span>
           <span className="font-mono text-brand-emerald">
             {formatBDT(collectedFund, { isBangla })} / {formatBDT(totalFund, { isBangla })}
