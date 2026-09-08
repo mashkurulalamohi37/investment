@@ -687,41 +687,48 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               ))}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Card 4: Bank Escrow & Fiduciary Safety Guarantee */}
-          <div className="bg-gradient-to-br from-[#0A2540] to-[#040D1A] rounded-3xl p-5 sm:p-6 text-white space-y-4 shadow-lg border border-slate-800">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-white/10">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
-                <Landmark className="w-4 h-4" />
+      {/* =========================================================================
+          4. TRUST ASSURANCE & ADVISORY ROW (2 BALANCED CARDS: 50% / 50%)
+          ========================================================================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        {/* Card 1: Bank Escrow & Fiduciary Safety Guarantee */}
+        <div className="bg-gradient-to-br from-[#0A2540] to-[#040D1A] rounded-3xl p-6 sm:p-7 text-white space-y-5 shadow-lg border border-slate-800 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-white/10">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                <Landmark className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-sm sm:text-base text-white">
+                <h3 className="font-bold text-base sm:text-lg text-white">
                   {isBangla ? "ব্যাংক এসক্রো ও নিরাপত্তা নিশ্চয়তা" : "Bank Escrow & Investor Protection"}
                 </h3>
-                <span className="text-[10px] text-cyan-300 font-mono">The City Bank PLC • Segregated Account</span>
+                <span className="text-xs text-cyan-300 font-mono">The City Bank PLC • Segregated Account</span>
               </div>
             </div>
 
-            <div className="space-y-2.5 text-xs text-slate-300">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="leading-snug">
+            <div className="space-y-3 text-xs sm:text-sm text-slate-300">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
                   {isBangla
                     ? "সকল সাবস্ক্রিপশন তহবিল সরাসরি দ্য সিটি ব্যাংক পিএলসি এসক্রো অ্যাকাউন্টে সংরক্ষিত থাকে।"
                     : "All investor subscriptions held securely in segregated City Bank PLC escrow account."}
                 </span>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="leading-snug">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
                   {isBangla
                     ? "আইনি দলিল ও রেজিস্ট্রি যাচাইয়ের পরেই কেবল ধাপে ধাপে ফান্ড রিলিজ করা হয়।"
                     : "Funds released strictly milestone-by-milestone upon verified sub-registry execution."}
                 </span>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="leading-snug">
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
                   {isBangla
                     ? "ন্যূনতম শেয়ার লক্ষ্যমাত্রা অপূর্ণ থাকলে ১০০% মূলধন সরাসরি ফেরত পাওয়ার নিশ্চয়তা।"
                     : "100% principal refund protection if subscription threshold is not fully met."}
@@ -730,52 +737,59 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
             </div>
           </div>
 
-          {/* Card 5: Guided Site Visit Booking & Advisor Support */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
-            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
-              <div className="w-8 h-8 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4" />
+          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 font-mono">
+            <span>Fiduciary Escrow Protocol</span>
+            <span className="text-emerald-400 font-bold">100% Capital Safeguard</span>
+          </div>
+        </div>
+
+        {/* Card 2: Guided Site Visit Booking & Advisor Support */}
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center shrink-0">
+                <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg">
                   {isBangla ? "সাইট ভিজিট ও বিনিয়োগ পরামর্শ" : "Guided Site Visit & Advisory"}
                 </h3>
-                <span className="text-[10px] text-slate-500 font-medium">
+                <span className="text-xs text-slate-500 font-medium">
                   {isBangla ? "সরাসরি প্রতিনিধি ও সাইট পরিদর্শন" : "Free chauffeur visit & advisor hotline"}
                 </span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               {isBangla
                 ? "বিনিয়োগের পূর্বে স্বচক্ষে জমি দেখতে চান? প্রতি শুক্র ও শনিবার আমাদের নিজস্ব ব্যবস্থাপনায় বিনামূল্যে সাইট পরিদর্শনের সুবিধা রয়েছে।"
-                : "Want to inspect the site before investing? We organize complimentary chauffeur-guided site tours every Friday and Saturday."}
+                : "Want to inspect the site before investing? We organize complimentary chauffeur-guided site tours every Friday and Saturday directly to the location."}
             </p>
+          </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <a
-                href="https://wa.me/8801700000000?text=Hello%20I%20am%20interested%20in%20a%20site%20visit"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 border border-emerald-200/70 transition-all cursor-pointer"
-              >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{isBangla ? "হোয়াটসঅ্যাপ" : "WhatsApp"}</span>
-              </a>
-              <a
-                href="tel:+8801700000000"
-                className="py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0066FF] font-bold text-xs flex items-center justify-center gap-1.5 border border-blue-200/70 transition-all cursor-pointer"
-              >
-                <Phone className="w-3.5 h-3.5 text-[#0066FF]" />
-                <span>{isBangla ? "হটলাইন কল" : "Call Advisor"}</span>
-              </a>
-            </div>
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <a
+              href="https://wa.me/8801700000000?text=Hello%20I%20am%20interested%20in%20a%20site%20visit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-3 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-emerald-200/70 transition-all cursor-pointer"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>{isBangla ? "হোয়াটসঅ্যাপ" : "WhatsApp"}</span>
+            </a>
+            <a
+              href="tel:+8801700000000"
+              className="py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#0066FF] font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-blue-200/70 transition-all cursor-pointer"
+            >
+              <Phone className="w-4 h-4 text-[#0066FF]" />
+              <span>{isBangla ? "হটলাইন কল" : "Call Advisor"}</span>
+            </a>
           </div>
         </div>
       </div>
 
       {/* =========================================================================
-          4. FULL-WIDTH PROJECT POTENTIAL & VISUAL GALLERY SHOWCASE (12 COLS)
+          5. FULL-WIDTH PROJECT POTENTIAL & VISUAL GALLERY SHOWCASE (12 COLS)
           ========================================================================= */}
       <div className="w-full bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -899,7 +913,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       </div>
 
       {/* =========================================================================
-          5. FULL-WIDTH PROJECT ROADMAP & KEY MILESTONES (12 COLS)
+          6. FULL-WIDTH PROJECT ROADMAP & KEY MILESTONES (12 COLS)
           ========================================================================= */}
       {project.milestones && project.milestones.length > 0 && (
         <div className="w-full bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-sm">
@@ -987,7 +1001,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       )}
 
       {/* =========================================================================
-          6. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
+          7. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
           ========================================================================= */}
       <section className="space-y-6 pt-4">
         <ShareMatrixGrid
@@ -1001,7 +1015,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
       </section>
 
       {/* =========================================================================
-          7. BOTTOM CONVERSION BANNER
+          8. BOTTOM CONVERSION BANNER
           ========================================================================= */}
       <div className="rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/60 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
