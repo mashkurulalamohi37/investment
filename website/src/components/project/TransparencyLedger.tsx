@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
@@ -16,11 +17,80 @@ import {
   Download,
   Eye,
   X,
+  Lock,
 } from "lucide-react";
 
-export default function TransparencyLedger() {
-  const { isBangla } = useAuth();
+export default function TransparencyLedger({ hideIfGuest = false }: { hideIfGuest?: boolean }) {
+  const { isBangla, isAuthenticated, user, isLoading } = useAuth();
   const [selectedVoucher, setSelectedVoucher] = useState<any | null>(null);
+
+  if (isLoading) return null;
+
+  // Investor Access Control Gate: Only authenticated investors can view this ledger
+  if (!isAuthenticated) {
+    if (hideIfGuest) return null;
+
+    return (
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-card p-6 sm:p-10 relative overflow-hidden">
+        {/* Subtle blurred background preview of the ledger */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none filter blur-sm p-6 overflow-hidden">
+          <div className="grid grid-cols-4 gap-4">
+            <div className="h-20 bg-slate-300 rounded-2xl" />
+            <div className="h-20 bg-slate-300 rounded-2xl" />
+            <div className="h-20 bg-slate-300 rounded-2xl" />
+            <div className="h-20 bg-slate-300 rounded-2xl" />
+          </div>
+          <div className="mt-6 space-y-3">
+            <div className="h-10 bg-slate-300 rounded-xl" />
+            <div className="h-10 bg-slate-300 rounded-xl" />
+            <div className="h-10 bg-slate-300 rounded-xl" />
+          </div>
+        </div>
+
+        {/* Foreground Locked State Content */}
+        <div className="relative z-10 max-w-lg mx-auto text-center space-y-4 py-4 sm:py-6">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+            <Lock className="w-7 h-7 text-amber-600" />
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+              <Lock className="w-3 h-3 text-amber-600" />
+              <span>{isBangla ? "শুধুমাত্র বিনিয়োগকারীদের জন্য সংরক্ষিত" : "Investors Only Access"}</span>
+            </span>
+
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight pt-1">
+              {isBangla ? "লাইভ ফান্ড লেজার ও অডিট ভাউচার" : "Live Fund Ledger & Audited Vouchers"}
+            </h3>
+
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
+              {isBangla
+                ? "প্রকল্পের অভ্যন্তরীণ ব্যয়ের প্রতিটি অডিট ভাউচার, পে-অর্ডার ও ব্যাংক ক্লিয়ারেন্স স্টেটমেন্ট শুধুমাত্র নিবন্ধিত ও যাচাইকৃত শেয়ারহোল্ডারদের জন্য উন্মুক্ত।"
+                : "Real-time vendor expense vouchers, audited invoices, and City Bank escrow clearance trails are strictly restricted to verified project investors."}
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-brand-emerald hover:bg-brand-forest text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>{isBangla ? "ইনভেস্টর হিসেবে লগইন করুন" : "Sign In to Access Ledger"}</span>
+            </Link>
+
+            <Link
+              href="/register"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all flex items-center justify-center gap-1.5"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0066FF]" />
+              <span>{isBangla ? "নতুন একাউন্ট নিবন্ধন" : "Register as Investor"}</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const vouchers = [
     {
@@ -89,8 +159,12 @@ export default function TransparencyLedger() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-2xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{isBangla ? "ভেরিফাইড ইনভেস্টর অ্যাক্সেস" : "Verified Investor Access"}</span>
+          </span>
+          <span className="text-[11px] font-mono text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-200">
             Escrow: The City Bank PLC
           </span>
         </div>

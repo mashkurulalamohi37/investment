@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 
 export default function HomePage() {
-  const { isBangla } = useAuth();
+  const { isBangla, isAuthenticated } = useAuth();
 
   const trustPillars = [
     {
@@ -250,11 +250,13 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          5. LIVE FUND LEDGER & AUDITED EXPENSE VOUCHERS
+          5. LIVE FUND LEDGER & AUDITED EXPENSE VOUCHERS (Investors Only)
           ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <TransparencyLedger />
-      </section>
+      {isAuthenticated && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <TransparencyLedger />
+        </section>
+      )}
 
       {/* =========================================================================
           6. CALL TO ACTION RIBBON

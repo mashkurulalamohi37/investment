@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
+import TransparencyLedger from "@/components/project/TransparencyLedger";
 import { Coins, PlusCircle, ShieldCheck, Download, Award, CheckCircle2, FileText, ArrowUpRight } from "lucide-react";
 
 export default function MyInvestmentsPage() {
@@ -171,6 +172,11 @@ export default function MyInvestmentsPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Real-time Project Expense & Fund Transparency Ledger */}
+      <div className="pt-6">
+        <TransparencyLedger />
       </div>
     </div>
   );
