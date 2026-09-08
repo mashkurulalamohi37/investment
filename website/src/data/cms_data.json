@@ -67,7 +67,7 @@
         "labelBn": "বাস্তবায়িত প্রকল্প",
         "value": "4 Projects",
         "valueBn": "৪টি প্রকল্প",
-        "color": "text-[#0066FF]"
+        "color": "text-cyan-400"
       },
       {
         "id": "m2",
@@ -75,7 +75,7 @@
         "labelBn": "নির্দিষ্ট অংশীদারিত্ব",
         "value": "100 Units",
         "valueBn": "১০০টি ইউনিট",
-        "color": "text-slate-900"
+        "color": "text-amber-400"
       },
       {
         "id": "m3",
@@ -83,7 +83,7 @@
         "labelBn": "ব্যাংক এসক্রো গ্যারান্টি",
         "value": "100% Pro-Rata",
         "valueBn": "১০০% প্রো-রাটা",
-        "color": "text-emerald-600"
+        "color": "text-emerald-400"
       }
     ],
     "trustPillars": [

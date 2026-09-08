@@ -141,17 +141,29 @@ export default function HomePage() {
 
             {/* Trust Metrics Ribbon — Sleek Solid Frosted Glass Bar */}
             <div className="pt-3 border-t border-white/15 max-w-2xl mx-auto lg:mx-0">
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-[#040D1A]/75 backdrop-blur-xl border border-white/20 shadow-xl grid grid-cols-3 divide-x divide-white/15 text-center">
-                {home.metrics.slice(0, 3).map((metric, idx) => (
-                  <div key={metric.id || idx} className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
-                    <span className={`text-xs sm:text-base lg:text-lg font-black ${metric.color || "text-cyan"} font-mono whitespace-nowrap block`}>
-                      {isBangla ? metric.valueBn : metric.value}
-                    </span>
-                    <span className="text-[9px] sm:text-[11px] text-slate-300 font-medium whitespace-nowrap block mt-0.5">
-                      {isBangla ? metric.labelBn : metric.label}
-                    </span>
-                  </div>
-                ))}
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-[#040D1A]/85 backdrop-blur-xl border border-white/20 shadow-xl grid grid-cols-3 divide-x divide-white/15 text-center">
+                {home.metrics.slice(0, 3).map((metric, idx) => {
+                  // Ensure metric value is brightly visible on dark hero background
+                  const isDarkColor = !metric.color || metric.color.includes("900") || metric.color.includes("black") || metric.color.includes("slate-800") || metric.color.includes("slate-700");
+                  const activeColor = !isDarkColor
+                    ? metric.color
+                    : idx === 0
+                    ? "text-cyan-400"
+                    : idx === 1
+                    ? "text-amber-400"
+                    : "text-emerald-400";
+
+                  return (
+                    <div key={metric.id || idx} className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
+                      <span className={`text-xs sm:text-base lg:text-lg font-black ${activeColor} font-mono whitespace-nowrap block drop-shadow-sm`}>
+                        {isBangla ? metric.valueBn : metric.value}
+                      </span>
+                      <span className="text-[9px] sm:text-[11px] text-slate-200 font-semibold whitespace-nowrap block mt-0.5">
+                        {isBangla ? metric.labelBn : metric.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

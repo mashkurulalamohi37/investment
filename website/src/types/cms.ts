@@ -453,9 +453,9 @@ export const DEFAULT_HOME_CMS: HomeCmsConfig = {
     secondaryCtaUrl: "/how-it-works",
   },
   metrics: [
-    { id: "m1", label: "Track Record", labelBn: "বাস্তবায়িত প্রকল্প", value: "4 Projects", valueBn: "৪টি প্রকল্প", color: "text-[#0066FF]" },
-    { id: "m2", label: "Fixed Unit Equity", labelBn: "নির্দিষ্ট অংশীদারিত্ব", value: "100 Units", valueBn: "১০০টি ইউনিট", color: "text-slate-900" },
-    { id: "m3", label: "Bank Escrow Safe", labelBn: "ব্যাংক এসক্রো গ্যারান্টি", value: "100% Pro-Rata", valueBn: "১০০% প্রো-রাটা", color: "text-emerald-600" },
+    { id: "m1", label: "Track Record", labelBn: "বাস্তবায়িত প্রকল্প", value: "4 Projects", valueBn: "৪টি প্রকল্প", color: "text-cyan-400" },
+    { id: "m2", label: "Fixed Unit Equity", labelBn: "নির্দিষ্ট অংশীদারিত্ব", value: "100 Units", valueBn: "১০০টি ইউনিট", color: "text-amber-400" },
+    { id: "m3", label: "Bank Escrow Safe", labelBn: "ব্যাংক এসক্রো গ্যারান্টি", value: "100% Pro-Rata", valueBn: "১০০% প্রো-রাটা", color: "text-emerald-400" },
   ],
   trustPillars: [
     {
