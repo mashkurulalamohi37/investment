@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
@@ -32,8 +32,8 @@ import {
   MapPin,
   Eye,
   AlertCircle,
-  ArrowUp,
-  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   Copy,
   Check,
   ShieldCheck,
@@ -41,11 +41,13 @@ import {
   DollarSign,
   ToggleLeft,
   ToggleRight,
+  X,
+  Upload,
 } from "lucide-react";
 
 type CmsTab =
-  | "global"
   | "home"
+  | "global"
   | "about"
   | "howItWorks"
   | "faq"
@@ -102,10 +104,10 @@ export default function MasterCmsAdminPage() {
     navigator.clipboard.writeText(text);
     setCopiedUrl(text);
     setTimeout(() => setCopiedUrl(null), 2000);
-    showToast(isBangla ? "লিঙ্ক কপি হয়েছে!" : "Image URL copied to clipboard!");
+    showToast(isBangla ? "লিঙ্ক ক্লিপবোর্ডে কপি হয়েছে!" : "Image URL copied to clipboard!");
   };
 
-  const handleSaveAll = async () => {
+  const handleSaveAll = useCallback(async () => {
     setIsSaving(true);
     try {
       localStorage.setItem("swapnojatri_master_cms", JSON.stringify(cms));
@@ -118,16 +120,46 @@ export default function MasterCmsAdminPage() {
       });
       const json = await res.json();
       if (json.success) {
-        showToast(isBangla ? "সব পরিবর্তন সফলভাবে লাইভ ওয়েবসাইটে প্রকাশিত হয়েছে!" : "All CMS changes published to live website!");
+        showToast(
+          isBangla
+            ? "সব পরিবর্তন সফলভাবে লাইভ ওয়েবসাইটে প্রকাশিত হয়েছে!"
+            : "All CMS changes published to live website!"
+        );
       } else {
         showToast(json.message || "Failed to publish", "error");
       }
     } catch (err) {
-      showToast(isBangla ? "লোকাল স্টোরেজে সংরক্ষিত হয়েছে।" : "Saved to local cache.", "success");
+      showToast(isBangla ? "লোকাল ক্যাশে সংরক্ষিত হয়েছে।" : "Saved to local cache.", "success");
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [cms, isBangla]);
+
+  // Keyboard shortcut for Ctrl+S / Cmd+S
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        handleSaveAll();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSaveAll]);
+
+  // ESC key to close any open modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setEditingProject(null);
+        setEditingImage(null);
+        setEditingFaq(null);
+        setEditingDoc(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleResetFactory = async () => {
     if (
@@ -192,10 +224,10 @@ export default function MasterCmsAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#06101E] flex items-center justify-center text-white">
+      <div className="rounded-2xl bg-[#061529] border border-slate-800 p-16 flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-400 font-medium">
+          <p className="text-slate-400 font-medium text-sm">
             {isBangla ? "মাস্টার CMS লোড হচ্ছে..." : "Loading Universal CMS Studio..."}
           </p>
         </div>
@@ -203,472 +235,1871 @@ export default function MasterCmsAdminPage() {
     );
   }
 
-  const tabs = [
-    { id: "home", label: isBangla ? "হোমপেজ ও লাইভ প্রজেক্ট" : "Homepage & Live Projects", icon: Home },
+  const tabs: { id: CmsTab; label: string; icon: React.ComponentType<{ className?: string }>; count?: number }[] = [
+    {
+      id: "home",
+      label: isBangla ? "হোমপেজ ও লাইভ প্রজেক্ট" : "Homepage & Live Projects",
+      icon: Home,
+      count: cms.home.liveProjectsSection.projects.length,
+    },
     { id: "global", label: isBangla ? "ব্র্যান্ডিং ও ফুটার" : "Branding & Global", icon: Globe },
-    { id: "about", label: isBangla ? "আমাদের গল্প" : "Our Story (/about)", icon: BookOpen },
+    {
+      id: "about",
+      label: isBangla ? "আমাদের গল্প" : "Our Story (/about)",
+      icon: BookOpen,
+      count: cms.about.storyImages.length,
+    },
     { id: "howItWorks", label: isBangla ? "কার্যপদ্ধতি" : "How It Works", icon: Layers },
-    { id: "faq", label: isBangla ? "প্রশ্নোত্তর" : "FAQ Manager", icon: HelpCircle },
-    { id: "documents", label: isBangla ? "ডকুমেন্টস ভল্ট" : "Legal Vault", icon: FileText },
+    { id: "faq", label: isBangla ? "প্রশ্নোত্তর" : "FAQ Manager", icon: HelpCircle, count: cms.faq.items.length },
+    {
+      id: "documents",
+      label: isBangla ? "ডকুমেন্টস ভল্ট" : "Legal Vault",
+      icon: FileText,
+      count: cms.documents.documents.length,
+    },
     { id: "contact", label: isBangla ? "যোগাযোগ ও এসক্রো" : "Contact & Escrow", icon: PhoneCall },
-    { id: "media", label: isBangla ? "মিডিয়া লাইব্রেরি" : "Media Presets", icon: ImageIcon },
+    { id: "media", label: isBangla ? "মিডিয়া লাইব্রেরি" : "Media Presets", icon: ImageIcon, count: PLATFORM_ASSET_PRESETS.length },
   ];
 
   return (
-    <div className="min-h-screen bg-[#040D1A] text-slate-100 font-sans pb-28">
+    <div className="space-y-6">
       {/* Toast Notification */}
       {toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border text-sm font-semibold transition-all animate-bounce ${
             toast.type === "success"
-              ? "bg-emerald-950/90 text-emerald-200 border-emerald-500/50 shadow-emerald-950/50"
-              : "bg-rose-950/90 text-rose-200 border-rose-500/50 shadow-rose-950/50"
+              ? "bg-emerald-950/95 text-emerald-200 border-emerald-500/50 shadow-emerald-950/50"
+              : "bg-rose-950/95 text-rose-200 border-rose-500/50 shadow-rose-950/50"
           }`}
         >
-          {toast.type === "success" ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-5 h-5 text-rose-400" />}
-          {toast.text}
+          {toast.type === "success" ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+          )}
+          <span>{toast.text}</span>
         </div>
       )}
 
-      {/* Top Sticky Header with Unified Actions */}
-      <header className="sticky top-0 z-40 bg-[#061529]/95 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-8 py-4 shadow-xl shadow-black/30">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-              <Globe className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                  {isBangla ? "ইউনিভার্সাল CMS কন্ট্রোল স্টুডিও" : "Universal CMS Control Studio"}
-                </h1>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono font-semibold uppercase tracking-wider">
-                  Live Sync
-                </span>
+      {/* Main CMS Studio Shell */}
+      <div className="rounded-2xl bg-[#061529] border border-slate-800 shadow-2xl overflow-hidden text-slate-100 font-sans">
+        {/* Studio Top Header */}
+        <div className="bg-gradient-to-r from-[#071930] via-[#092244] to-[#061529] border-b border-slate-800 p-5 sm:p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0 shadow-inner">
+                <Globe className="w-7 h-7" />
               </div>
-              <p className="text-xs text-slate-400">
-                {isBangla
-                  ? "ওয়েবসাইটের প্রতিটি পেজ, হোমপেজ প্রজেক্ট শোকেস ও ডকুমেন্টস নিয়ন্ত্রণ করুন"
-                  : "Zero-code admin control for every single page, live project card, and legal record"}
-              </p>
+              <div>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                    {isBangla ? "ইউনিভার্সাল CMS কন্ট্রোল স্টুডিও" : "Universal CMS Control Studio"}
+                  </h1>
+                  <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono font-bold tracking-wider uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    LIVE SYNC
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {isBangla
+                    ? "জিরো-কোড অ্যাডমিন কন্ট্রোল: হোমপেজ শোকেস, ব্র্যান্ডিং, স্টোরি, ডকুমেন্টস ও সিটি ব্যাংক এসক্রো কনফিগারেশন"
+                    : "Zero-code admin studio: control homepage cards, branding, legal vault, FAQs, and live escrow parameters"}
+                </p>
+              </div>
+            </div>
+
+            {/* Header Action Buttons */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <Link
+                href="/"
+                target="_blank"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition-colors shadow-sm"
+              >
+                <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                <span>{isBangla ? "লাইভ সাইট দেখুন" : "View Live Site"}</span>
+                <ExternalLink className="w-3 h-3 opacity-60" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={handleResetFactory}
+                disabled={isSaving}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-colors disabled:opacity-50"
+                title="Restore original verified factory defaults"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
+                <span>{isBangla ? "ফ্যাক্টরি ডিফল্ট" : "Factory Reset"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 px-5 py-2 text-xs font-black rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg shadow-emerald-950/40 border border-emerald-400/40 transition-all transform active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>{isBangla ? "সংরক্ষণ হচ্ছে..." : "Publishing..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>{isBangla ? "সব পরিবর্তন সংরক্ষণ ও প্রকাশ" : "Save & Publish All"}</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <Link
-              href="/"
-              target="_blank"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors"
-            >
-              <Eye className="w-3.5 h-3.5 text-cyan-400" />
-              {isBangla ? "লাইভ সাইট দেখুন" : "View Live Site"}
-              <ExternalLink className="w-3 h-3 opacity-60" />
-            </Link>
-
-            <button
-              onClick={handleResetFactory}
-              disabled={isSaving}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-colors disabled:opacity-50"
-              title="Restore original factory content"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
-              {isBangla ? "ডিফল্ট রিস্টোর" : "Factory Reset"}
-            </button>
-
-            <button
-              onClick={handleSaveAll}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-lg shadow-emerald-900/30 border border-emerald-400/40 transition-all transform active:scale-95 disabled:opacity-50"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {isBangla ? "সংরক্ষণ হচ্ছে..." : "Publishing..."}
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  {isBangla ? "সব পরিবর্তন সংরক্ষণ ও প্রকাশ করুন" : "Save & Publish All"}
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Navigation Pill Strip */}
-        <div className="max-w-7xl mx-auto mt-4 pt-2 border-t border-slate-800/60 overflow-x-auto scrollbar-none">
-          <div className="flex items-center gap-1.5 min-w-max pb-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as CmsTab)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    isActive
-                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-cyan-400" : "text-slate-500"}`} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </header>
-
-      {/* Main Studio Body Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 mt-6">
-        {/* ========================================================================= */}
-        {/* TAB 1: HOMEPAGE & LIVE PROJECTS SHOWCASE MANAGER                         */}
-        {/* ========================================================================= */}
-        {activeTab === "home" && (
-          <div className="space-y-8 animate-fadeIn">
-            {/* Live Projects Showcase Highlight Card */}
-            <div className="p-6 rounded-2xl bg-gradient-to-b from-[#091F38] to-[#061529] border border-cyan-500/30 shadow-2xl shadow-cyan-950/20">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-700/60">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-                    <Layers className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2.5">
-                      <h2 className="text-lg sm:text-xl font-bold text-white">
-                        {isBangla ? "হোমপেজ লাইভ প্রজেক্ট শোকেস কন্ট্রোল" : "Homepage Live Projects Showcase Manager"}
-                      </h2>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                        Live Control
+          {/* Tab Navigation Pill Bar */}
+          <div className="mt-5 pt-4 border-t border-slate-800/80">
+            <div className="flex flex-wrap items-center gap-2">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                      isActive
+                        ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-md shadow-cyan-950/30"
+                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-slate-800/50"
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-cyan-400" : "text-slate-500"}`} />
+                    <span>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                          isActive
+                            ? "bg-cyan-400/20 text-cyan-200 border border-cyan-400/30"
+                            : "bg-slate-800 text-slate-400"
+                        }`}
+                      >
+                        {tab.count}
                       </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Studio Body Content Area */}
+        <div className="p-5 sm:p-8 bg-[#040E1B]">
+          {/* ========================================================================= */}
+          {/* TAB 1: HOMEPAGE & LIVE PROJECTS SHOWCASE MANAGER                         */}
+          {/* ========================================================================= */}
+          {activeTab === "home" && (
+            <div className="space-y-8 animate-fadeIn">
+              {/* Live Projects Showcase Highlight Box */}
+              <div className="p-6 rounded-2xl bg-gradient-to-b from-[#0A223E] to-[#07192F] border border-cyan-500/30 shadow-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-700/60">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                      <Layers className="w-5 h-5" />
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {isBangla
-                        ? "হোমপেজে কোন কোন প্রজেক্ট প্রদর্শিত হবে, তাদের ক্রম, স্ট্যাটাস ব্যাজ ও ডেটা রিয়েল-টাইমে নিয়ন্ত্রণ করুন"
-                        : "Toggle project visibility on Homepage, order 1-2-3, override badges, target shares, and CTA links"}
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base sm:text-lg font-bold text-white">
+                          {isBangla ? "হোমপেজ লাইভ প্রজেক্ট শোকেস কন্ট্রোল" : "Homepage Live Projects Showcase Manager"}
+                        </h2>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          Live Control
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {isBangla
+                          ? "হোমপেজে প্রদর্শিত প্রজেক্ট কার্ডসমূহের ক্রম, স্ট্যাটাস ব্যাজ ও ডেটা রিয়েল-টাইমে সাজান"
+                          : "Toggle project visibility on Homepage, order 1-2-3, override badges, target shares, and CTA links"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Section Active Switch */}
+                  <div className="flex items-center gap-3 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-700">
+                    <span className="text-xs font-semibold text-slate-300">
+                      {isBangla ? "হোমপেজ শোকেস সক্রিয়:" : "Section Active on Home:"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          liveProjectsSection: {
+                            ...prev.liveProjectsSection,
+                            enabled: !prev.liveProjectsSection.enabled,
+                          },
+                        }))
+                      }
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                        cms.home.liveProjectsSection.enabled
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                          : "bg-slate-800 text-slate-400 border border-slate-700"
+                      }`}
+                    >
+                      {cms.home.liveProjectsSection.enabled ? (
+                        <>
+                          <ToggleRight className="w-4 h-4 text-emerald-400" />
+                          <span>{isBangla ? "সক্রিয় (ENABLED)" : "ENABLED"}</span>
+                        </>
+                      ) : (
+                        <>
+                          <ToggleLeft className="w-4 h-4 text-slate-500" />
+                          <span>{isBangla ? "লুকানো (HIDDEN)" : "HIDDEN"}</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                {/* Master Showcase Toggle */}
-                <div className="flex items-center gap-3 bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-700">
-                  <span className="text-xs font-semibold text-slate-300">
-                    {isBangla ? "হোমপেজ শোকেস চালু/বন্ধ:" : "Section Active on Home:"}
-                  </span>
+                {/* Section Header Headings */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                      Section Title (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.liveProjectsSection.title}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          liveProjectsSection: { ...prev.liveProjectsSection, title: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                      Section Title (বাংলা)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.liveProjectsSection.titleBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          liveProjectsSection: { ...prev.liveProjectsSection, titleBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                      Section Subtitle (English)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={cms.home.liveProjectsSection.subtitle}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          liveProjectsSection: { ...prev.liveProjectsSection, subtitle: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                      Section Subtitle (বাংলা)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={cms.home.liveProjectsSection.subtitleBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          liveProjectsSection: { ...prev.liveProjectsSection, subtitleBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Showcase Cards List */}
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-3.5">
+                    <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-cyan-400" />
+                      <span>{isBangla ? "প্রকল্প কার্ডসমূহ (Showcase Cards)" : "Showcase Project Cards"}</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newProj: HomeLiveProjectCard = {
+                          id: `proj-${Date.now()}`,
+                          projectCode: "PROJ-NEW",
+                          showOnHome: true,
+                          order: cms.home.liveProjectsSection.projects.length + 1,
+                          statusBadge: "UPCOMING",
+                          statusBadgeBn: "আসন্ন প্রকল্প",
+                          imageUrl: "/images/landvest_hero.jpg",
+                          name: "New Fractional Venture",
+                          nameBn: "নতুন ফ্র্যাকশনাল প্রকল্প",
+                          category: "COMMERCIAL REAL ESTATE",
+                          categoryBn: "বাণিজ্যিক আবাসন",
+                          location: "Dhaka Belt, Bangladesh",
+                          locationBn: "ঢাকা সংলগ্ন এলাকা",
+                          pricePerShare: 25000,
+                          projectedRoiMin: 18,
+                          projectedRoiMax: 22,
+                          totalShares: 100,
+                          allocatedShares: 0,
+                          isUpcoming: true,
+                          ctaText: "View Details →",
+                          ctaTextBn: "বিস্তারিত দেখুন →",
+                          ctaUrl: "/projects",
+                          escrowBadge: "City Bank Escrow",
+                          escrowBadgeBn: "সিটি ব্যাংক এসক্রো",
+                        };
+                        setEditingProject(newProj);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{isBangla ? "নতুন প্রকল্প কার্ড যোগ করুন" : "Add Project Card"}</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {cms.home.liveProjectsSection.projects.map((proj, idx) => {
+                      const total = proj.totalShares || 100;
+                      const percent = Math.min(100, Math.round(((proj.allocatedShares || 0) / total) * 100));
+                      return (
+                        <div
+                          key={proj.id}
+                          className={`relative rounded-xl border p-4 transition-all flex flex-col justify-between ${
+                            proj.showOnHome
+                              ? "bg-[#06172C] border-slate-700/80 hover:border-cyan-500/60 shadow-lg"
+                              : "bg-[#040E1B] border-slate-800/60 opacity-60"
+                          }`}
+                        >
+                          <div>
+                            {/* Image & Badges */}
+                            <div className="relative w-full h-40 rounded-lg overflow-hidden bg-slate-950 mb-3 group">
+                              <img
+                                src={proj.imageUrl}
+                                alt={proj.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = "/images/landvest_hero.jpg";
+                                }}
+                              />
+                              <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-black/80 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm">
+                                  #{proj.order} {proj.projectCode}
+                                </span>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">
+                                  {isBangla ? proj.statusBadgeBn : proj.statusBadge}
+                                </span>
+                              </div>
+                              <div className="absolute top-2 right-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = cms.home.liveProjectsSection.projects.map((p) =>
+                                      p.id === proj.id ? { ...p, showOnHome: !p.showOnHome } : p
+                                    );
+                                    updateHome((prev) => ({
+                                      ...prev,
+                                      liveProjectsSection: { ...prev.liveProjectsSection, projects: updated },
+                                    }));
+                                  }}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm border transition-all ${
+                                    proj.showOnHome
+                                      ? "bg-emerald-500/90 text-white border-emerald-400 shadow"
+                                      : "bg-rose-500/90 text-white border-rose-400"
+                                  }`}
+                                  title="Toggle display on home"
+                                >
+                                  {proj.showOnHome ? "ON HOME" : "HIDDEN"}
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Title & Category */}
+                            <h4 className="text-sm font-bold text-white leading-tight">
+                              {isBangla ? proj.nameBn : proj.name}
+                            </h4>
+                            <p className="text-xs text-cyan-400 font-medium mt-0.5">
+                              {isBangla ? proj.categoryBn : proj.category} • {isBangla ? proj.locationBn : proj.location}
+                            </p>
+
+                            {/* Financials Summary */}
+                            <div className="mt-3 grid grid-cols-2 gap-2 text-xs bg-slate-900/70 p-2.5 rounded-lg border border-slate-800">
+                              <div>
+                                <span className="text-[10px] text-slate-400 block">Share Price</span>
+                                <span className="font-bold text-amber-400">৳{proj.pricePerShare.toLocaleString()}</span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-slate-400 block">Proj. ROI</span>
+                                <span className="font-bold text-emerald-400">
+                                  {proj.projectedRoiMin}% - {proj.projectedRoiMax}%
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mt-2.5">
+                              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                                <span>
+                                  {proj.allocatedShares} / {proj.totalShares} Shares
+                                </span>
+                                <span className="font-bold text-slate-200">{percent}%</span>
+                              </div>
+                              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                <div
+                                  className="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full rounded-full transition-all"
+                                  style={{ width: `${percent}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Ordering and Actions */}
+                          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => {
+                                  const list = [...cms.home.liveProjectsSection.projects];
+                                  const temp = list[idx - 1];
+                                  list[idx - 1] = list[idx];
+                                  list[idx] = temp;
+                                  list.forEach((p, i) => (p.order = i + 1));
+                                  updateHome((prev) => ({
+                                    ...prev,
+                                    liveProjectsSection: { ...prev.liveProjectsSection, projects: list },
+                                  }));
+                                }}
+                                className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                                title="Move card left/up"
+                              >
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === cms.home.liveProjectsSection.projects.length - 1}
+                                onClick={() => {
+                                  const list = [...cms.home.liveProjectsSection.projects];
+                                  const temp = list[idx + 1];
+                                  list[idx + 1] = list[idx];
+                                  list[idx] = temp;
+                                  list.forEach((p, i) => (p.order = i + 1));
+                                  updateHome((prev) => ({
+                                    ...prev,
+                                    liveProjectsSection: { ...prev.liveProjectsSection, projects: list },
+                                  }));
+                                }}
+                                className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
+                                title="Move card right/down"
+                              >
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setEditingProject(proj)}
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30"
+                              >
+                                <Edit2 className="w-3 h-3" />
+                                <span>{isBangla ? "এডিট" : "Edit"}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (confirm(isBangla ? "এই প্রজেক্ট কার্ডটি মুছে ফেলতে চান?" : "Delete this project card?")) {
+                                    const filtered = cms.home.liveProjectsSection.projects.filter(
+                                      (p) => p.id !== proj.id
+                                    );
+                                    filtered.forEach((p, i) => (p.order = i + 1));
+                                    updateHome((prev) => ({
+                                      ...prev,
+                                      liveProjectsSection: { ...prev.liveProjectsSection, projects: filtered },
+                                    }));
+                                  }
+                                }}
+                                className="p-1 text-rose-400 hover:text-rose-300 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30"
+                                title="Delete card"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* 1. Homepage Hero Section */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-5">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-bold text-white">
+                    {isBangla ? "১. হোমপেজ হিরো সেকশন" : "1. Homepage Hero Section"}
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Tagline Badge (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.tagline}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, tagline: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Tagline Badge (বাংলা)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.taglineBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, taglineBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Main Headline (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.headline}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, headline: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Main Headline (বাংলা)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.headlineBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, headlineBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Subheadline (English)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={cms.home.hero.subheadline}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, subheadline: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Subheadline (বাংলা)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={cms.home.hero.subheadlineBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, subheadlineBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Hero Background Image URL
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.bgImageUrl}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, bgImageUrl: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Primary CTA Button Label</label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.primaryCtaText}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, primaryCtaText: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Primary CTA Button URL</label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.primaryCtaUrl}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, primaryCtaUrl: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Real-Time Metrics Ribbon */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <DollarSign className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-base font-bold text-white">
+                    {isBangla ? "২. রিয়েল-টাইম মেট্রিক রিবন (৬টি কার্ড)" : "2. Real-Time Metrics Ribbon (6 Cards)"}
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {cms.home.metrics.map((metric, i) => (
+                    <div key={metric.id || i} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-cyan-400 uppercase">Card #{i + 1}</span>
+                        <input
+                          type="text"
+                          value={metric.color}
+                          onChange={(e) => {
+                            const updated = [...cms.home.metrics];
+                            updated[i].color = e.target.value;
+                            updateHome((prev) => ({ ...prev, metrics: updated }));
+                          }}
+                          className="text-[10px] bg-black/40 border border-slate-700 rounded px-2 py-0.5 text-slate-300 w-24"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-slate-400">Value (English & বাংলা)</label>
+                        <div className="grid grid-cols-2 gap-1.5 mt-0.5">
+                          <input
+                            type="text"
+                            value={metric.value}
+                            onChange={(e) => {
+                              const updated = [...cms.home.metrics];
+                              updated[i].value = e.target.value;
+                              updateHome((prev) => ({ ...prev, metrics: updated }));
+                            }}
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            value={metric.valueBn}
+                            onChange={(e) => {
+                              const updated = [...cms.home.metrics];
+                              updated[i].valueBn = e.target.value;
+                              updateHome((prev) => ({ ...prev, metrics: updated }));
+                            }}
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-slate-400">Label (English & বাংলা)</label>
+                        <div className="grid grid-cols-2 gap-1.5 mt-0.5">
+                          <input
+                            type="text"
+                            value={metric.label}
+                            onChange={(e) => {
+                              const updated = [...cms.home.metrics];
+                              updated[i].label = e.target.value;
+                              updateHome((prev) => ({ ...prev, metrics: updated }));
+                            }}
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            value={metric.labelBn}
+                            onChange={(e) => {
+                              const updated = [...cms.home.metrics];
+                              updated[i].labelBn = e.target.value;
+                              updateHome((prev) => ({ ...prev, metrics: updated }));
+                            }}
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. Trust Pillars */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <ShieldCheck className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white">3. Trust Pillars Section (3 Cards)</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {cms.home.trustPillars.map((pillar, i) => (
+                    <div key={pillar.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                      <span className="text-[10px] font-bold text-cyan-400 uppercase">Pillar #{i + 1}</span>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div>
+                          <label className="block text-[10px] text-slate-400 mb-0.5">Title (English)</label>
+                          <input
+                            type="text"
+                            value={pillar.title}
+                            onChange={(e) => {
+                              const updated = [...cms.home.trustPillars];
+                              updated[i].title = e.target.value;
+                              updateHome((prev) => ({ ...prev, trustPillars: updated }));
+                            }}
+                            className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400 mb-0.5">Title (বাংলা)</label>
+                          <input
+                            type="text"
+                            value={pillar.titleBn}
+                            onChange={(e) => {
+                              const updated = [...cms.home.trustPillars];
+                              updated[i].titleBn = e.target.value;
+                              updateHome((prev) => ({ ...prev, trustPillars: updated }));
+                            }}
+                            className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-slate-400 mb-0.5">Description (English)</label>
+                        <textarea
+                          rows={2}
+                          value={pillar.desc}
+                          onChange={(e) => {
+                            const updated = [...cms.home.trustPillars];
+                            updated[i].desc = e.target.value;
+                            updateHome((prev) => ({ ...prev, trustPillars: updated }));
+                          }}
+                          className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div>
+                          <label className="block text-[10px] text-slate-400 mb-0.5">Badge (EN)</label>
+                          <input
+                            type="text"
+                            value={pillar.badge}
+                            onChange={(e) => {
+                              const updated = [...cms.home.trustPillars];
+                              updated[i].badge = e.target.value;
+                              updateHome((prev) => ({ ...prev, trustPillars: updated }));
+                            }}
+                            className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400 mb-0.5">Badge (বাংলা)</label>
+                          <input
+                            type="text"
+                            value={pillar.badgeBn}
+                            onChange={(e) => {
+                              const updated = [...cms.home.trustPillars];
+                              updated[i].badgeBn = e.target.value;
+                              updateHome((prev) => ({ ...prev, trustPillars: updated }));
+                            }}
+                            className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Homepage Story / Vision */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <BookOpen className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-bold text-white">4. Homepage Story / Vision Section</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Section Title (English)</label>
+                    <input
+                      type="text"
+                      value={cms.home.storySection.title}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, title: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Section Title (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.home.storySection.titleBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, titleBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Description (English)</label>
+                    <textarea
+                      rows={3}
+                      value={cms.home.storySection.desc}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, desc: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Description (বাংলা)</label>
+                    <textarea
+                      rows={3}
+                      value={cms.home.storySection.descBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, descBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">CTA Button Label</label>
+                    <input
+                      type="text"
+                      value={cms.home.storySection.ctaText}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, ctaText: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">CTA Button URL</label>
+                    <input
+                      type="text"
+                      value={cms.home.storySection.ctaUrl}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, ctaUrl: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Section Image URL</label>
+                    <input
+                      type="text"
+                      value={cms.home.storySection.imageUrl}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, storySection: { ...prev.storySection, imageUrl: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. Bottom Conversion Banner */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-base font-bold text-white">5. Bottom Conversion / CTA Banner</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Banner Title (English)</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.title}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, title: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Banner Title (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.titleBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, titleBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Subtitle (English)</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.subtitle}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, subtitle: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Subtitle (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.subtitleBn}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, subtitleBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">CTA Button Text</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.ctaText}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, ctaText: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">CTA Button URL</label>
+                    <input
+                      type="text"
+                      value={cms.home.conversionBanner.ctaUrl}
+                      onChange={(e) =>
+                        updateHome((prev) => ({
+                          ...prev,
+                          conversionBanner: { ...prev.conversionBanner, ctaUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 2: GLOBAL BRANDING, TOP BAR & FOOTER LEGAL                            */}
+          {/* ========================================================================= */}
+          {activeTab === "global" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-5">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Globe className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white">
+                    {isBangla ? "প্ল্যাটফর্ম পরিচয় ও ব্র্যান্ডিং" : "Platform Identity & Branding"}
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Name (English)</label>
+                    <input
+                      type="text"
+                      value={cms.global.brandName}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, brandName: e.target.value }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Name (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.global.brandNameBn}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, brandNameBn: e.target.value }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Subtitle (English)</label>
+                    <input
+                      type="text"
+                      value={cms.global.brandSubtitle}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, brandSubtitle: e.target.value }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Subtitle (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.global.brandSubtitleBn}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, brandSubtitleBn: e.target.value }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Platform Logo URL</label>
+                    <input
+                      type="text"
+                      value={cms.global.logoUrl}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, logoUrl: e.target.value }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Announcement Bar */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-5 h-5 text-amber-400" />
+                    <h3 className="text-base font-bold text-white">Top Announcement Bar</h3>
+                  </div>
                   <button
                     type="button"
                     onClick={() =>
-                      updateHome((prev) => ({
+                      updateGlobal((prev) => ({
                         ...prev,
-                        liveProjectsSection: {
-                          ...prev.liveProjectsSection,
-                          enabled: !prev.liveProjectsSection.enabled,
-                        },
+                        announcement: { ...prev.announcement, enabled: !prev.announcement.enabled },
                       }))
                     }
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                      cms.home.liveProjectsSection.enabled
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                      cms.global.announcement.enabled
                         ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
                         : "bg-slate-800 text-slate-400 border border-slate-700"
                     }`}
                   >
-                    {cms.home.liveProjectsSection.enabled ? (
-                      <>
-                        <ToggleRight className="w-4 h-4 text-emerald-400" />
-                        {isBangla ? "সক্রিয় (VISIBLE)" : "ENABLED"}
-                      </>
-                    ) : (
-                      <>
-                        <ToggleLeft className="w-4 h-4 text-slate-500" />
-                        {isBangla ? "লুকানো (HIDDEN)" : "HIDDEN"}
-                      </>
-                    )}
+                    {cms.global.announcement.enabled ? "ENABLED" : "DISABLED"}
                   </button>
                 </div>
-              </div>
 
-              {/* Section Header Headings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                    Section Title (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.liveProjectsSection.title}
-                    onChange={(e) =>
-                      updateHome((prev) => ({
-                        ...prev,
-                        liveProjectsSection: { ...prev.liveProjectsSection, title: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                    Section Title (বাংলা)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.liveProjectsSection.titleBn}
-                    onChange={(e) =>
-                      updateHome((prev) => ({
-                        ...prev,
-                        liveProjectsSection: { ...prev.liveProjectsSection, titleBn: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                    Section Subtitle (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.liveProjectsSection.subtitle}
-                    onChange={(e) =>
-                      updateHome((prev) => ({
-                        ...prev,
-                        liveProjectsSection: { ...prev.liveProjectsSection, subtitle: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-                    Section Subtitle (বাংলা)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.liveProjectsSection.subtitleBn}
-                    onChange={(e) =>
-                      updateHome((prev) => ({
-                        ...prev,
-                        liveProjectsSection: { ...prev.liveProjectsSection, subtitleBn: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Message (English)</label>
+                    <input
+                      type="text"
+                      value={cms.global.announcement.text}
+                      onChange={(e) =>
+                        updateGlobal((prev) => ({
+                          ...prev,
+                          announcement: { ...prev.announcement, text: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Message (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.global.announcement.textBn}
+                      onChange={(e) =>
+                        updateGlobal((prev) => ({
+                          ...prev,
+                          announcement: { ...prev.announcement, textBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Projects Cards List */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-cyan-400" />
-                    {isBangla ? "প্রকল্প কার্ডসমূহ (Showcase Cards)" : "Showcase Project Cards"}
-                  </h3>
+              {/* Global Contact Info */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <PhoneCall className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-base font-bold text-white">Global Contact Details (Footer &amp; Navbar)</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Hotline Phone</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.hotline}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, hotline: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">WhatsApp Number</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.whatsapp}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, whatsapp: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.email}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, email: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Office Hours</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.hours}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, hours: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Office Address (English)</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.address}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, address: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Office Address (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.global.contact.addressBn}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, contact: { ...prev.contact, addressBn: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Globe className="w-5 h-5 text-blue-400" />
+                  <h3 className="text-base font-bold text-white">Social Media Links</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Facebook URL</label>
+                    <input
+                      type="text"
+                      value={cms.global.socials.facebook}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, socials: { ...prev.socials, facebook: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">YouTube URL</label>
+                    <input
+                      type="text"
+                      value={cms.global.socials.youtube}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, socials: { ...prev.socials, youtube: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">LinkedIn URL</label>
+                    <input
+                      type="text"
+                      value={cms.global.socials.linkedin}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, socials: { ...prev.socials, linkedin: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Twitter / X URL</label>
+                    <input
+                      type="text"
+                      value={cms.global.socials.twitter}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, socials: { ...prev.socials, twitter: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Legal Texts */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <FileText className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-bold text-white">Legal &amp; Compliance Texts (Footer)</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Trade License No.</label>
+                    <input
+                      type="text"
+                      value={cms.global.legal.tradeLicense}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, tradeLicense: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">TIN Number</label>
+                    <input
+                      type="text"
+                      value={cms.global.legal.tin}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, tin: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Sub-Registry Jurisdiction</label>
+                    <input
+                      type="text"
+                      value={cms.global.legal.subRegistryJurisdiction}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, subRegistryJurisdiction: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Copyright Text</label>
+                    <input
+                      type="text"
+                      value={cms.global.legal.copyright}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, copyright: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Legal Disclaimer (English)</label>
+                    <textarea
+                      rows={2}
+                      value={cms.global.legal.disclaimer}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, disclaimer: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Legal Disclaimer (বাংলা)</label>
+                    <textarea
+                      rows={2}
+                      value={cms.global.legal.disclaimerBn}
+                      onChange={(e) => updateGlobal((prev) => ({ ...prev, legal: { ...prev.legal, disclaimerBn: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 3: OUR STORY PAGE CMS (/about)                                        */}
+          {/* ========================================================================= */}
+          {activeTab === "about" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <ImageIcon className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white">Our Story Hero Visual</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Hero Image URL</label>
+                    <input
+                      type="text"
+                      value={cms.about.heroImage.imageUrl}
+                      onChange={(e) =>
+                        updateAbout((prev) => ({
+                          ...prev,
+                          heroImage: { ...prev.heroImage, imageUrl: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Gallery Images List */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <h3 className="text-base font-bold text-white">Gallery Photos</h3>
                   <button
                     type="button"
                     onClick={() => {
-                      const newProj: HomeLiveProjectCard = {
-                        id: `proj-${Date.now()}`,
-                        projectCode: "PROJ-NEW",
-                        showOnHome: true,
-                        order: cms.home.liveProjectsSection.projects.length + 1,
-                        statusBadge: "UPCOMING",
-                        statusBadgeBn: "আসন্ন প্রকল্প",
-                        imageUrl: "/images/landvest_hero.jpg",
-                        name: "New Fractional Venture",
-                        nameBn: "নতুন ফ্র্যাকশনাল প্রকল্প",
-                        category: "COMMERCIAL REAL ESTATE",
-                        categoryBn: "বাণিজ্যিক আবাসন",
-                        location: "Dhaka Belt, Bangladesh",
-                        locationBn: "ঢাকা সংলগ্ন এলাকা",
-                        pricePerShare: 20000,
-                        projectedRoiMin: 18,
-                        projectedRoiMax: 22,
-                        totalShares: 100,
-                        allocatedShares: 0,
-                        isUpcoming: true,
-                        ctaText: "View Details →",
-                        ctaTextBn: "বিস্তারিত দেখুন →",
-                        ctaUrl: "/projects",
-                        escrowBadge: "City Bank Escrow",
-                        escrowBadgeBn: "সিটি ব্যাংক এসক্রো",
+                      const newItem: AboutImageItem = {
+                        id: `story-${Date.now()}`,
+                        title: "New Field Asset",
+                        titleBn: "নতুন ফিল্ড পরিদর্শন",
+                        category: "REAL ESTATE",
+                        categoryBn: "জমি ও আবাসন",
+                        imageUrl: "/images/gallery_land.jpg",
+                        caption: "GPS surveyed field at Washpur.",
+                        captionBn: "ওয়াশপুরে জিপিএস জরিপ সম্পন্ন।",
                       };
-                      setEditingProject(newProj);
+                      setEditingImage(newItem);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    {isBangla ? "নতুন প্রকল্প কার্ড যোগ করুন" : "Add Project Card"}
+                    <span>Add Photo</span>
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {cms.home.liveProjectsSection.projects.map((proj, idx) => {
-                    const percent = Math.min(
-                      100,
-                      Math.round((proj.allocatedShares / (proj.totalShares || 1)) * 100)
-                    );
-                    return (
-                      <div
-                        key={proj.id}
-                        className={`relative rounded-xl border p-4 transition-all flex flex-col justify-between ${
-                          proj.showOnHome
-                            ? "bg-[#06172C] border-slate-700/80 hover:border-cyan-500/60"
-                            : "bg-[#040E1B] border-slate-800/60 opacity-60"
-                        }`}
-                      >
-                        <div>
-                          {/* Image & Badges */}
-                          <div className="relative w-full h-36 rounded-lg overflow-hidden bg-slate-900 mb-3 group">
-                            <img
-                              src={proj.imageUrl}
-                              alt={proj.name}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                            <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-black/75 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm">
-                                #{proj.order} {proj.projectCode}
-                              </span>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">
-                                {isBangla ? proj.statusBadgeBn : proj.statusBadge}
-                              </span>
-                            </div>
-                            <div className="absolute top-2 right-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = cms.home.liveProjectsSection.projects.map((p) =>
-                                    p.id === proj.id ? { ...p, showOnHome: !p.showOnHome } : p
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {cms.about.storyImages.map((img) => (
+                    <div key={img.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col gap-3">
+                      <div className="w-full h-36 rounded-lg overflow-hidden bg-slate-950 relative">
+                        <img
+                          src={img.imageUrl}
+                          alt={img.title || "Gallery image"}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/images/gallery_land.jpg";
+                          }}
+                        />
+                        <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-900/90 text-cyan-300 border border-cyan-700/60 backdrop-blur-sm">
+                          {isBangla ? img.categoryBn || img.category : img.category}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-white leading-snug">
+                          {isBangla ? img.titleBn || img.title : img.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                          {isBangla ? img.captionBn || img.caption : img.caption}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingImage(img)}
+                          className="text-xs font-semibold text-cyan-400 px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm("Delete this photo?")) {
+                              updateAbout((prev) => ({
+                                ...prev,
+                                storyImages: prev.storyImages.filter((i) => i.id !== img.id),
+                              }));
+                            }
+                          }}
+                          className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 4: HOW IT WORKS PAGE CMS (/how-it-works)                             */}
+          {/* ========================================================================= */}
+          {activeTab === "howItWorks" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Layers className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white">1. Page Header</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Badge (English)</label>
+                    <input
+                      type="text"
+                      value={cms.howItWorks.header.badge}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, badge: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Badge (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.howItWorks.header.badgeBn}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, badgeBn: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Title (English)</label>
+                    <input
+                      type="text"
+                      value={cms.howItWorks.header.title}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, title: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Title (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.howItWorks.header.titleBn}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, titleBn: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Subtitle (English)</label>
+                    <textarea
+                      rows={2}
+                      value={cms.howItWorks.header.subtitle}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, subtitle: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Subtitle (বাংলা)</label>
+                    <textarea
+                      rows={2}
+                      value={cms.howItWorks.header.subtitleBn}
+                      onChange={(e) => updateHowItWorks((prev) => ({ ...prev, header: { ...prev.header, subtitleBn: e.target.value } }))}
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Phases & Steps */}
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-5">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                  <Layers className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base font-bold text-white">2. Investment Process Phases &amp; Steps</h3>
+                </div>
+                <div className="space-y-6">
+                  {cms.howItWorks.phases.map((phase, pi) => (
+                    <div key={phase.id} className="p-4 rounded-xl bg-slate-900/70 border border-slate-700 space-y-3">
+                      <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                          Phase {phase.phaseNum}
+                        </span>
+                        <div className="grid grid-cols-2 gap-2 flex-1">
+                          <input
+                            type="text"
+                            value={phase.phaseTitle}
+                            onChange={(e) => {
+                              const updated = cms.howItWorks.phases.map((p, i) =>
+                                i === pi ? { ...p, phaseTitle: e.target.value } : p
+                              );
+                              updateHowItWorks((prev) => ({ ...prev, phases: updated }));
+                            }}
+                            placeholder="Phase title (English)"
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                          <input
+                            type="text"
+                            value={phase.phaseTitleBn}
+                            onChange={(e) => {
+                              const updated = cms.howItWorks.phases.map((p, i) =>
+                                i === pi ? { ...p, phaseTitleBn: e.target.value } : p
+                              );
+                              updateHowItWorks((prev) => ({ ...prev, phases: updated }));
+                            }}
+                            placeholder="ফেজ শিরোনাম (বাংলা)"
+                            className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+                      {phase.steps.map((step, si) => (
+                        <div key={si} className="p-3 rounded-lg bg-black/30 border border-slate-800 space-y-2">
+                          <span className="text-[10px] font-bold text-slate-400">Step {step.num}</span>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-slate-500 mb-0.5">Title (English)</label>
+                              <input
+                                type="text"
+                                value={step.title}
+                                onChange={(e) => {
+                                  const updated = cms.howItWorks.phases.map((p, pidx) =>
+                                    pidx === pi
+                                      ? {
+                                          ...p,
+                                          steps: p.steps.map((s, sidx) => (sidx === si ? { ...s, title: e.target.value } : s)),
+                                        }
+                                      : p
                                   );
-                                  updateHome((prev) => ({
-                                    ...prev,
-                                    liveProjectsSection: { ...prev.liveProjectsSection, projects: updated },
-                                  }));
+                                  updateHowItWorks((prev) => ({ ...prev, phases: updated }));
                                 }}
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm border transition-all ${
-                                  proj.showOnHome
-                                    ? "bg-emerald-500/80 text-white border-emerald-400"
-                                    : "bg-rose-500/80 text-white border-rose-400"
-                                }`}
-                                title="Toggle display on home"
-                              >
-                                {proj.showOnHome ? "ON HOME" : "HIDDEN"}
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Title & Info */}
-                          <h4 className="text-sm font-bold text-white leading-tight">
-                            {isBangla ? proj.nameBn : proj.name}
-                          </h4>
-                          <p className="text-xs text-cyan-400 font-medium mt-0.5">
-                            {isBangla ? proj.categoryBn : proj.category} • {isBangla ? proj.locationBn : proj.location}
-                          </p>
-
-                          {/* Financials */}
-                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-                            <div>
-                              <span className="text-[10px] text-slate-400 block">Share Price</span>
-                              <span className="font-bold text-amber-400">৳{proj.pricePerShare.toLocaleString()}</span>
+                                className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
+                              />
                             </div>
                             <div>
-                              <span className="text-[10px] text-slate-400 block">Proj. ROI</span>
-                              <span className="font-bold text-emerald-400">
-                                {proj.projectedRoiMin}% - {proj.projectedRoiMax}%
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Progress */}
-                          <div className="mt-2.5">
-                            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                              <span>
-                                {proj.allocatedShares} / {proj.totalShares} Shares
-                              </span>
-                              <span className="font-bold text-slate-200">{percent}%</span>
-                            </div>
-                            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                              <div
-                                className="bg-gradient-to-r from-cyan-500 to-emerald-400 h-full rounded-full transition-all"
-                                style={{ width: `${percent}%` }}
+                              <label className="block text-[10px] text-slate-500 mb-0.5">Title (বাংলা)</label>
+                              <input
+                                type="text"
+                                value={step.titleBn}
+                                onChange={(e) => {
+                                  const updated = cms.howItWorks.phases.map((p, pidx) =>
+                                    pidx === pi
+                                      ? {
+                                          ...p,
+                                          steps: p.steps.map((s, sidx) => (sidx === si ? { ...s, titleBn: e.target.value } : s)),
+                                        }
+                                      : p
+                                  );
+                                  updateHowItWorks((prev) => ({ ...prev, phases: updated }));
+                                }}
+                                className="w-full bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
                               />
                             </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-                        {/* Controls & Ordering */}
-                        <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              disabled={idx === 0}
-                              onClick={() => {
-                                const list = [...cms.home.liveProjectsSection.projects];
-                                const temp = list[idx - 1];
-                                list[idx - 1] = list[idx];
-                                list[idx] = temp;
-                                list.forEach((p, i) => (p.order = i + 1));
-                                updateHome((prev) => ({
-                                  ...prev,
-                                  liveProjectsSection: { ...prev.liveProjectsSection, projects: list },
-                                }));
-                              }}
-                              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
-                              title="Move card left"
-                            >
-                              <ArrowUp className="w-3.5 h-3.5 -rotate-90" />
-                            </button>
-                            <button
-                              type="button"
-                              disabled={idx === cms.home.liveProjectsSection.projects.length - 1}
-                              onClick={() => {
-                                const list = [...cms.home.liveProjectsSection.projects];
-                                const temp = list[idx + 1];
-                                list[idx + 1] = list[idx];
-                                list[idx] = temp;
-                                list.forEach((p, i) => (p.order = i + 1));
-                                updateHome((prev) => ({
-                                  ...prev,
-                                  liveProjectsSection: { ...prev.liveProjectsSection, projects: list },
-                                }));
-                              }}
-                              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30"
-                              title="Move card right"
-                            >
-                              <ArrowDown className="w-3.5 h-3.5 -rotate-90" />
-                            </button>
-                          </div>
+          {/* ========================================================================= */}
+          {/* TAB 5: FAQ MANAGER CMS (/faq)                                             */}
+          {/* ========================================================================= */}
+          {activeTab === "faq" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-cyan-400" />
+                    <h3 className="text-base font-bold text-white">FAQ Questions Manager</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newFaq: FaqItem = {
+                        id: `faq-${Date.now()}`,
+                        category: "GENERAL",
+                        q: "What makes Swapnojatri unique?",
+                        qBn: "স্বপ্নযাত্রীর বিশেষত্ব কী?",
+                        a: "Mandatory City Bank escrow supervision and GPS physical verification.",
+                        aBn: "বাধ্যতামূলক সিটি ব্যাংক এসক্রো এবং বাস্তব সাইট জিপিএস যাচাইকরণ।",
+                        order: cms.faq.items.length + 1,
+                        active: true,
+                      };
+                      setEditingFaq(newFaq);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add FAQ</span>
+                  </button>
+                </div>
 
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setEditingProject(proj)}
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30"
-                            >
-                              <Edit2 className="w-3 h-3" />
-                              {isBangla ? "এডিট" : "Edit"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (confirm(isBangla ? "এই প্রজেক্ট কার্ডটি মুছে ফেলতে চান?" : "Delete this project card?")) {
-                                  const filtered = cms.home.liveProjectsSection.projects.filter(
-                                    (p) => p.id !== proj.id
-                                  );
-                                  filtered.forEach((p, i) => (p.order = i + 1));
-                                  updateHome((prev) => ({
-                                    ...prev,
-                                    liveProjectsSection: { ...prev.liveProjectsSection, projects: filtered },
-                                  }));
-                                }
-                              }}
-                              className="p-1 text-rose-400 hover:text-rose-300 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30"
-                              title="Delete card"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                <div className="space-y-3">
+                  {cms.faq.items.map((item) => (
+                    <div key={item.id} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                            {item.category}
+                          </span>
+                          <h4 className="text-sm font-bold text-white">{isBangla ? item.qBn : item.q}</h4>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-1">{isBangla ? item.aBn : item.a}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = cms.faq.items.map((f) =>
+                              f.id === item.id ? { ...f, active: !f.active } : f
+                            );
+                            updateFaq((prev) => ({ ...prev, items: updated }));
+                          }}
+                          className={`text-xs font-bold px-2.5 py-1 rounded border ${
+                            item.active
+                              ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                              : "bg-slate-800 text-slate-400 border-slate-700"
+                          }`}
+                        >
+                          {item.active ? "ACTIVE" : "DRAFT"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingFaq(item)}
+                          className="text-xs font-semibold text-cyan-400 px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm("Delete this FAQ item?")) {
+                              updateFaq((prev) => ({
+                                ...prev,
+                                items: prev.items.filter((f) => f.id !== item.id),
+                              }));
+                            }
+                          }}
+                          className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 6: LEGAL DOCUMENTS VAULT CMS (/documents)                            */}
+          {/* ========================================================================= */}
+          {activeTab === "documents" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-cyan-400" />
+                    <h3 className="text-base font-bold text-white">Legal Documents Vault</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newDoc: DocumentItem = {
+                        id: `doc-${Date.now()}`,
+                        category: "DEED",
+                        categoryBn: "আইনি দলিল",
+                        title: "Certified Title Deed Record",
+                        titleBn: "সার্টিফাইড মূল দলিল ও খতিয়ান",
+                        type: "PDF",
+                        size: "2.8 MB",
+                        date: new Date().toISOString().split("T")[0],
+                        fileUrl: "/documents/sample_deed.pdf",
+                        hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        visibility: "PUBLIC",
+                      };
+                      setEditingDoc(newDoc);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Document</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {cms.documents.documents.map((doc) => (
+                    <div key={doc.id} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                            {doc.category}
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-400">{doc.size}</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white">{isBangla ? doc.titleBn : doc.title}</h4>
+                        <div className="mt-2 text-[10px] font-mono text-slate-400 break-all bg-black/40 p-2 rounded border border-slate-800">
+                          SHA-256: {doc.hash.slice(0, 32)}...
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                            doc.visibility === "INVESTOR_ONLY"
+                              ? "bg-amber-500/10 text-amber-300 border border-amber-500/30"
+                              : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
+                          }`}
+                        >
+                          {doc.visibility}
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingDoc(doc)}
+                            className="text-xs font-semibold text-cyan-400 px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm("Delete this document record?")) {
+                                updateDocuments((prev) => ({
+                                  ...prev,
+                                  documents: prev.documents.filter((d) => d.id !== doc.id),
+                                }));
+                              }
+                            }}
+                            className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 7: CONTACT & CITY BANK ESCROW CMS (/contact)                          */}
+          {/* ========================================================================= */}
+          {activeTab === "contact" && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-gradient-to-b from-[#091F38] to-[#061529] border border-cyan-500/30 shadow-xl space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-700/60">
+                  <Building2 className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white">The City Bank PLC Escrow Passbook Record</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Bank Name</label>
+                    <input
+                      type="text"
+                      value={cms.contact.bankPassbook.bankName}
+                      onChange={(e) =>
+                        updateContact((prev) => ({
+                          ...prev,
+                          bankPassbook: { ...prev.bankPassbook, bankName: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Account Title</label>
+                    <input
+                      type="text"
+                      value={cms.contact.bankPassbook.accountTitle}
+                      onChange={(e) =>
+                        updateContact((prev) => ({
+                          ...prev,
+                          bankPassbook: { ...prev.bankPassbook, accountTitle: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Account Number</label>
+                    <input
+                      type="text"
+                      value={cms.contact.bankPassbook.accountNumber}
+                      onChange={(e) =>
+                        updateContact((prev) => ({
+                          ...prev,
+                          bankPassbook: { ...prev.bankPassbook, accountNumber: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-cyan-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Routing Number</label>
+                    <input
+                      type="text"
+                      value={cms.contact.bankPassbook.routingNumber}
+                      onChange={(e) =>
+                        updateContact((prev) => ({
+                          ...prev,
+                          bankPassbook: { ...prev.bankPassbook, routingNumber: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-cyan-300"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 8: MEDIA LIBRARY & PRESET PICKER                                      */}
+          {/* ========================================================================= */}
+          {activeTab === "media" && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <ImageIcon className="w-5 h-5 text-cyan-400" />
+                    <div>
+                      <h3 className="text-base font-bold text-white">Platform Media Library</h3>
+                      <p className="text-xs text-slate-400">
+                        {isBangla ? "ক্লিক করে সহজেই ইমেজ URL কপি করুন" : "Click to copy verified photo URLs for projects & sections"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+                  {PLATFORM_ASSET_PRESETS.map((asset, i) => {
+                    const isCopied = copiedUrl === asset.url;
+                    return (
+                      <div
+                        key={i}
+                        className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="relative w-full h-40 rounded-lg overflow-hidden bg-slate-950 mb-3">
+                            <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
+                            <span className="absolute top-2 left-2 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/80 text-cyan-300 border border-cyan-500/30">
+                              {asset.category}
+                            </span>
                           </div>
+                          <h4 className="text-xs font-bold text-white">{isBangla ? asset.nameBn : asset.name}</h4>
+                          <p className="text-[11px] text-slate-400 truncate mt-0.5 font-mono">{asset.url}</p>
+                        </div>
+
+                        <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between">
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(asset.url)}
+                            className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
+                              isCopied
+                                ? "bg-emerald-500 text-white"
+                                : "bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20"
+                            }`}
+                          >
+                            {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{isCopied ? "Copied!" : "Copy URL"}</span>
+                          </button>
                         </div>
                       </div>
                     );
@@ -676,987 +2107,171 @@ export default function MasterCmsAdminPage() {
                 </div>
               </div>
             </div>
-
-            {/* Hero Section CMS */}
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-bold text-white">
-                  {isBangla ? "১. হোমপেজ হিরো সেকশন" : "1. Homepage Hero Section"}
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Tagline Badge (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.tagline}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, tagline: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Tagline Badge (বাংলা)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.taglineBn}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, taglineBn: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Main Headline (English)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.headline}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, headline: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Main Headline (বাংলা)
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.headlineBn}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, headlineBn: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Subheadline (English)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={cms.home.hero.subheadline}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, subheadline: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Subheadline (বাংলা)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={cms.home.hero.subheadlineBn}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, subheadlineBn: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Hero Background Image URL
-                  </label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.bgImageUrl}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, bgImageUrl: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Primary Button Label</label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.primaryCtaText}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, primaryCtaText: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Primary Button Link</label>
-                  <input
-                    type="text"
-                    value={cms.home.hero.primaryCtaUrl}
-                    onChange={(e) =>
-                      updateHome((prev) => ({ ...prev, hero: { ...prev.hero, primaryCtaUrl: e.target.value } }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Metrics Ribbon CMS */}
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <DollarSign className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">
-                  {isBangla ? "২. রিয়েল-টাইম মেট্রিক রিবন (৬টি কার্ড)" : "2. Real-Time Metrics Ribbon (6 Cards)"}
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cms.home.metrics.map((metric, i) => (
-                  <div key={metric.id || i} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-cyan-400 uppercase">Card #{i + 1}</span>
-                      <input
-                        type="text"
-                        value={metric.color}
-                        onChange={(e) => {
-                          const updated = [...cms.home.metrics];
-                          updated[i].color = e.target.value;
-                          updateHome((prev) => ({ ...prev, metrics: updated }));
-                        }}
-                        className="text-[10px] bg-black/40 border border-slate-700 rounded px-2 py-0.5 text-slate-300 w-24"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-slate-400">Value (English & বাংলা)</label>
-                      <div className="grid grid-cols-2 gap-1.5 mt-0.5">
-                        <input
-                          type="text"
-                          value={metric.value}
-                          onChange={(e) => {
-                            const updated = [...cms.home.metrics];
-                            updated[i].value = e.target.value;
-                            updateHome((prev) => ({ ...prev, metrics: updated }));
-                          }}
-                          className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
-                        />
-                        <input
-                          type="text"
-                          value={metric.valueBn}
-                          onChange={(e) => {
-                            const updated = [...cms.home.metrics];
-                            updated[i].valueBn = e.target.value;
-                            updateHome((prev) => ({ ...prev, metrics: updated }));
-                          }}
-                          className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-slate-400">Label (English & বাংলা)</label>
-                      <div className="grid grid-cols-2 gap-1.5 mt-0.5">
-                        <input
-                          type="text"
-                          value={metric.label}
-                          onChange={(e) => {
-                            const updated = [...cms.home.metrics];
-                            updated[i].label = e.target.value;
-                            updateHome((prev) => ({ ...prev, metrics: updated }));
-                          }}
-                          className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
-                        />
-                        <input
-                          type="text"
-                          value={metric.labelBn}
-                          onChange={(e) => {
-                            const updated = [...cms.home.metrics];
-                            updated[i].labelBn = e.target.value;
-                            updateHome((prev) => ({ ...prev, metrics: updated }));
-                          }}
-                          className="bg-[#051120] border border-slate-700 rounded px-2 py-1 text-xs text-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 2: GLOBAL BRANDING, TOP BAR & FOOTER LEGAL                            */}
-        {/* ========================================================================= */}
-        {activeTab === "global" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <Globe className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">
-                  {isBangla ? "প্ল্যাটফর্ম পরিচয় ও ব্র্যান্ডিং" : "Platform Identity & Branding"}
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Name (English)</label>
-                  <input
-                    type="text"
-                    value={cms.global.brandName}
-                    onChange={(e) => updateGlobal((prev) => ({ ...prev, brandName: e.target.value }))}
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Name (বাংলা)</label>
-                  <input
-                    type="text"
-                    value={cms.global.brandNameBn}
-                    onChange={(e) => updateGlobal((prev) => ({ ...prev, brandNameBn: e.target.value }))}
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Subtitle (English)</label>
-                  <input
-                    type="text"
-                    value={cms.global.brandSubtitle}
-                    onChange={(e) => updateGlobal((prev) => ({ ...prev, brandSubtitle: e.target.value }))}
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Brand Subtitle (বাংলা)</label>
-                  <input
-                    type="text"
-                    value={cms.global.brandSubtitleBn}
-                    onChange={(e) => updateGlobal((prev) => ({ ...prev, brandSubtitleBn: e.target.value }))}
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Platform Logo URL</label>
-                  <input
-                    type="text"
-                    value={cms.global.logoUrl}
-                    onChange={(e) => updateGlobal((prev) => ({ ...prev, logoUrl: e.target.value }))}
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Top Announcement Bar */}
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-base font-bold text-white">Top Announcement Bar</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    updateGlobal((prev) => ({
-                      ...prev,
-                      announcement: { ...prev.announcement, enabled: !prev.announcement.enabled },
-                    }))
-                  }
-                  className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                    cms.global.announcement.enabled
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                      : "bg-slate-800 text-slate-400 border border-slate-700"
-                  }`}
-                >
-                  {cms.global.announcement.enabled ? "ENABLED" : "DISABLED"}
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Message (English)</label>
-                  <input
-                    type="text"
-                    value={cms.global.announcement.text}
-                    onChange={(e) =>
-                      updateGlobal((prev) => ({
-                        ...prev,
-                        announcement: { ...prev.announcement, text: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Message (বাংলা)</label>
-                  <input
-                    type="text"
-                    value={cms.global.announcement.textBn}
-                    onChange={(e) =>
-                      updateGlobal((prev) => ({
-                        ...prev,
-                        announcement: { ...prev.announcement, textBn: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 3: OUR STORY PAGE CMS (/about)                                        */}
-        {/* ========================================================================= */}
-        {activeTab === "about" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <ImageIcon className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">Our Story Hero Visual</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Hero Image URL</label>
-                  <input
-                    type="text"
-                    value={cms.about.heroImage.imageUrl}
-                    onChange={(e) =>
-                      updateAbout((prev) => ({
-                        ...prev,
-                        heroImage: { ...prev.heroImage, imageUrl: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Gallery Images List */}
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <h3 className="text-base font-bold text-white">Gallery Photos</h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newItem: AboutImageItem = {
-                      id: `story-${Date.now()}`,
-                      title: "New Field Asset",
-                      titleBn: "নতুন ফিল্ড পরিদর্শন",
-                      category: "REAL ESTATE",
-                      categoryBn: "জমি ও আবাসন",
-                      imageUrl: "/images/gallery_land.jpg",
-                      caption: "GPS surveyed field at Washpur.",
-                      captionBn: "ওয়াশপুরে জিপিএস জরিপ সম্পন্ন।",
-                    };
-                    setEditingImage(newItem);
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                >
-                  <Plus className="w-3.5 h-3.5 inline mr-1" />
-                  Add Photo
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cms.about.storyImages.map((img) => (
-                  <div key={img.id} className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col gap-3">
-                    {/* Image Preview */}
-                    <div className="w-full rounded-lg overflow-hidden bg-slate-950 relative" style={{ minHeight: "8rem" }}>
-                      {img.imageUrl ? (
-                        <img
-                          src={img.imageUrl}
-                          alt={img.title || "Gallery image"}
-                          className="w-full object-cover"
-                          style={{ height: "8rem" }}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                            const parent = (e.target as HTMLImageElement).parentElement;
-                            if (parent && !parent.querySelector(".img-fallback")) {
-                              const fb = document.createElement("div");
-                              fb.className = "img-fallback flex items-center justify-center h-32 text-slate-600 text-xs font-mono";
-                              fb.textContent = "Image not found: " + img.imageUrl;
-                              parent.appendChild(fb);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-32 text-slate-600 text-xs font-mono">
-                          No image URL set
-                        </div>
-                      )}
-                      {/* Category badge overlay */}
-                      <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-900/90 text-cyan-300 border border-cyan-700/60">
-                        {isBangla ? img.categoryBn || img.category : img.category}
-                      </span>
-                    </div>
-                    {/* Title + Caption */}
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-bold text-white leading-snug">
-                        {isBangla ? (img.titleBn || img.title) : img.title}
-                      </h4>
-                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                        {isBangla ? (img.captionBn || img.caption) : img.caption}
-                      </p>
-                    </div>
-                    {/* URL input for quick editing */}
-                    <input
-                      type="text"
-                      value={img.imageUrl}
-                      onChange={(e) => {
-                        updateAbout((prev) => ({
-                          ...prev,
-                          storyImages: prev.storyImages.map((i) =>
-                            i.id === img.id ? { ...i, imageUrl: e.target.value } : i
-                          ),
-                        }));
-                      }}
-                      placeholder="Image URL (e.g. /images/gallery_land.jpg)"
-                      className="w-full bg-black/40 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-300 font-mono focus:outline-none focus:border-cyan-500"
-                    />
-                    {/* Actions */}
-                    <div className="pt-1 border-t border-slate-800 flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditingImage(img)}
-                        className="text-xs font-semibold text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm("Delete this photo?")) {
-                            updateAbout((prev) => ({
-                              ...prev,
-                              storyImages: prev.storyImages.filter((i) => i.id !== img.id),
-                            }));
-                          }
-                        }}
-                        className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 4: HOW IT WORKS PAGE CMS (/how-it-works)                             */}
-        {/* ========================================================================= */}
-        {activeTab === "howItWorks" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <Layers className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">How It Works Header</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Title (English)</label>
-                  <input
-                    type="text"
-                    value={cms.howItWorks.header.title}
-                    onChange={(e) =>
-                      updateHowItWorks((prev) => ({
-                        ...prev,
-                        header: { ...prev.header, title: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Title (বাংলা)</label>
-                  <input
-                    type="text"
-                    value={cms.howItWorks.header.titleBn}
-                    onChange={(e) =>
-                      updateHowItWorks((prev) => ({
-                        ...prev,
-                        header: { ...prev.header, titleBn: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 5: FAQ MANAGER CMS (/faq)                                             */}
-        {/* ========================================================================= */}
-        {activeTab === "faq" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">FAQ Questions Manager</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newFaq: FaqItem = {
-                      id: `faq-${Date.now()}`,
-                      category: "GENERAL",
-                      q: "What makes Swapnojatri unique?",
-                      qBn: "স্বপ্নযাত্রীর বিশেষত্ব কী?",
-                      a: "Mandatory City Bank escrow supervision and GPS physical verification.",
-                      aBn: "বাধ্যতামূলক সিটি ব্যাংক এসক্রো এবং বাস্তব সাইট জিপিএস যাচাইকরণ।",
-                      order: cms.faq.items.length + 1,
-                      active: true,
-                    };
-                    setEditingFaq(newFaq);
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                >
-                  <Plus className="w-3.5 h-3.5 inline mr-1" />
-                  Add FAQ
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {cms.faq.items.map((item) => (
-                  <div key={item.id} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                          {item.category}
-                        </span>
-                        <h4 className="text-sm font-bold text-white">{item.q}</h4>
-                      </div>
-                      <p className="text-xs text-slate-400 mt-1 line-clamp-1">{item.a}</p>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = cms.faq.items.map((f) =>
-                            f.id === item.id ? { ...f, active: !f.active } : f
-                          );
-                          updateFaq((prev) => ({ ...prev, items: updated }));
-                        }}
-                        className={`text-xs font-bold px-2.5 py-1 rounded border ${
-                          item.active
-                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-                            : "bg-slate-800 text-slate-400 border-slate-700"
-                        }`}
-                      >
-                        {item.active ? "ACTIVE" : "DRAFT"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditingFaq(item)}
-                        className="text-xs font-semibold text-cyan-400 px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm("Delete this FAQ item?")) {
-                            updateFaq((prev) => ({
-                              ...prev,
-                              items: prev.items.filter((f) => f.id !== item.id),
-                            }));
-                          }
-                        }}
-                        className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 6: LEGAL DOCUMENTS VAULT CMS (/documents)                            */}
-        {/* ========================================================================= */}
-        {activeTab === "documents" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">Legal Documents Vault</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newDoc: DocumentItem = {
-                      id: `doc-${Date.now()}`,
-                      category: "DEED",
-                      categoryBn: "আইনি দলিল",
-                      title: "Certified Title Deed Record",
-                      titleBn: "সার্টিফাইড মূল দলিল ও খতিয়ান",
-                      type: "PDF",
-                      size: "2.8 MB",
-                      date: new Date().toISOString().split("T")[0],
-                      fileUrl: "/documents/sample_deed.pdf",
-                      hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                      visibility: "PUBLIC",
-                    };
-                    setEditingDoc(newDoc);
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                >
-                  <Plus className="w-3.5 h-3.5 inline mr-1" />
-                  Add Document
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {cms.documents.documents.map((doc) => (
-                  <div key={doc.id} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                          {doc.category}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-400">{doc.size}</span>
-                      </div>
-                      <h4 className="text-sm font-bold text-white">{doc.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1">{isBangla ? doc.titleBn : doc.categoryBn}</p>
-                      <div className="mt-2 text-[10px] font-mono text-slate-500 break-all bg-black/40 p-1.5 rounded">
-                        SHA-256: {doc.hash.slice(0, 32)}...
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                        doc.visibility === "INVESTOR_ONLY"
-                          ? "bg-amber-500/10 text-amber-300 border border-amber-500/30"
-                          : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-                      }`}>
-                        {doc.visibility}
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setEditingDoc(doc)}
-                          className="text-xs font-semibold text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/30"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm("Delete this document record?")) {
-                              updateDocuments((prev) => ({
-                                ...prev,
-                                documents: prev.documents.filter((d) => d.id !== doc.id),
-                              }));
-                            }
-                          }}
-                          className="p-1 text-rose-400 rounded bg-rose-500/10 border border-rose-500/30"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 7: CONTACT & CITY BANK ESCROW CMS (/contact)                          */}
-        {/* ========================================================================= */}
-        {activeTab === "contact" && (
-          <div className="space-y-8 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-gradient-to-b from-[#091F38] to-[#061529] border border-cyan-500/30 shadow-xl space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-700/60">
-                <Building2 className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">The City Bank PLC Escrow Passbook Record</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Bank Name</label>
-                  <input
-                    type="text"
-                    value={cms.contact.bankPassbook.bankName}
-                    onChange={(e) =>
-                      updateContact((prev) => ({
-                        ...prev,
-                        bankPassbook: { ...prev.bankPassbook, bankName: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Account Title</label>
-                  <input
-                    type="text"
-                    value={cms.contact.bankPassbook.accountTitle}
-                    onChange={(e) =>
-                      updateContact((prev) => ({
-                        ...prev,
-                        bankPassbook: { ...prev.bankPassbook, accountTitle: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Account Number</label>
-                  <input
-                    type="text"
-                    value={cms.contact.bankPassbook.accountNumber}
-                    onChange={(e) =>
-                      updateContact((prev) => ({
-                        ...prev,
-                        bankPassbook: { ...prev.bankPassbook, accountNumber: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-cyan-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Routing Number</label>
-                  <input
-                    type="text"
-                    value={cms.contact.bankPassbook.routingNumber}
-                    onChange={(e) =>
-                      updateContact((prev) => ({
-                        ...prev,
-                        bankPassbook: { ...prev.bankPassbook, routingNumber: e.target.value },
-                      }))
-                    }
-                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-cyan-300"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 8: MEDIA LIBRARY & PRESET PICKER                                      */}
-        {/* ========================================================================= */}
-        {activeTab === "media" && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <ImageIcon className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">Platform Media Library</h3>
-                </div>
-                <span className="text-xs text-slate-400">Click to copy URL</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-                {PLATFORM_ASSET_PRESETS.map((asset, i) => {
-                  const isCopied = copiedUrl === asset.url;
-                  return (
-                    <div
-                      key={i}
-                      className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="relative w-full h-36 rounded-lg overflow-hidden bg-slate-950 mb-3">
-                          <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
-                        </div>
-                        <h4 className="text-xs font-bold text-white">{isBangla ? asset.nameBn : asset.name}</h4>
-                        <p className="text-[11px] text-slate-400 truncate">{asset.url}</p>
-                      </div>
-
-                      <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between">
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(asset.url)}
-                          className={`text-xs font-bold px-3 py-1 rounded ${
-                            isCopied ? "bg-emerald-500 text-white" : "bg-cyan-500/10 text-cyan-300 border border-cyan-500/30"
-                          }`}
-                        >
-                          {isCopied ? "Copied!" : "Copy URL"}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
+          )}
+        </div>
+      </div>
 
       {/* ========================================================================= */}
       {/* MODAL: EDIT / ADD HOMEPAGE LIVE PROJECT CARD                              */}
       {/* ========================================================================= */}
       {editingProject && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingProject(null);
+          }}
+        >
           <div className="bg-[#081B30] border border-cyan-500/40 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-4 my-8">
             <div className="flex items-center justify-between pb-3 border-b border-slate-700">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Layers className="w-4 h-4 text-cyan-400" />
-                Edit Homepage Live Project Card
+                <span>Edit Homepage Live Project Card</span>
               </h3>
-              <button onClick={() => setEditingProject(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button
+                type="button"
+                onClick={() => setEditingProject(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[70vh] overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[70vh] overflow-y-auto pr-1">
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Project Code</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Project Code</label>
                 <input
                   type="text"
                   value={editingProject.projectCode}
                   onChange={(e) => setEditingProject({ ...editingProject, projectCode: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white font-mono"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Display Order</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Display Order</label>
                 <input
                   type="number"
                   value={editingProject.order}
                   onChange={(e) => setEditingProject({ ...editingProject, order: Number(e.target.value) })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Name (English)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Name (English)</label>
                 <input
                   type="text"
                   value={editingProject.name}
                   onChange={(e) => setEditingProject({ ...editingProject, name: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Name (বাংলা)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Name (বাংলা)</label>
                 <input
                   type="text"
                   value={editingProject.nameBn}
                   onChange={(e) => setEditingProject({ ...editingProject, nameBn: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Status Badge (English)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Status Badge (English)</label>
                 <input
                   type="text"
                   value={editingProject.statusBadge}
                   onChange={(e) => setEditingProject({ ...editingProject, statusBadge: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-emerald-400 font-bold"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-emerald-400 font-bold"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Status Badge (বাংলা)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Status Badge (বাংলা)</label>
                 <input
                   type="text"
                   value={editingProject.statusBadgeBn}
                   onChange={(e) => setEditingProject({ ...editingProject, statusBadgeBn: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-emerald-400 font-bold"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-emerald-400 font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Price Per Share (৳)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Price Per Share (৳)</label>
                 <input
                   type="number"
                   value={editingProject.pricePerShare}
                   onChange={(e) => setEditingProject({ ...editingProject, pricePerShare: Number(e.target.value) })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-amber-400 font-bold"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-400 font-bold"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">ROI Min %</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">ROI Min %</label>
                   <input
                     type="number"
                     step="0.1"
                     value={editingProject.projectedRoiMin}
                     onChange={(e) => setEditingProject({ ...editingProject, projectedRoiMin: Number(e.target.value) })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">ROI Max %</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">ROI Max %</label>
                   <input
                     type="number"
                     step="0.1"
                     value={editingProject.projectedRoiMax}
                     onChange={(e) => setEditingProject({ ...editingProject, projectedRoiMax: Number(e.target.value) })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Allocated Shares</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Allocated Shares</label>
                 <input
                   type="number"
                   value={editingProject.allocatedShares}
                   onChange={(e) => setEditingProject({ ...editingProject, allocatedShares: Number(e.target.value) })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Total Shares</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Total Shares</label>
                 <input
                   type="number"
                   value={editingProject.totalShares}
                   onChange={(e) => setEditingProject({ ...editingProject, totalShares: Number(e.target.value) })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[11px] text-slate-300 mb-1">Card Image URL</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Card Image URL</label>
                 <input
                   type="text"
                   value={editingProject.imageUrl}
                   onChange={(e) => setEditingProject({ ...editingProject, imageUrl: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">CTA URL Link</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">CTA URL Link</label>
                 <input
                   type="text"
                   value={editingProject.ctaUrl}
                   onChange={(e) => setEditingProject({ ...editingProject, ctaUrl: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">CTA Text</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">CTA Text</label>
                 <input
                   type="text"
                   value={editingProject.ctaText}
                   onChange={(e) => setEditingProject({ ...editingProject, ctaText: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
             </div>
@@ -1665,7 +2280,7 @@ export default function MasterCmsAdminPage() {
               <button
                 type="button"
                 onClick={() => setEditingProject(null)}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -1688,7 +2303,7 @@ export default function MasterCmsAdminPage() {
                   setEditingProject(null);
                   showToast("Project card updated locally. Click 'Save & Publish All' to make it live!");
                 }}
-                className="px-5 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black shadow-lg"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black shadow-lg"
               >
                 Apply Changes
               </button>
@@ -1701,40 +2316,51 @@ export default function MasterCmsAdminPage() {
       {/* MODAL: EDIT / ADD ABOUT PHOTO ALBUM ITEM                                  */}
       {/* ========================================================================= */}
       {editingImage && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingImage(null);
+          }}
+        >
           <div className="bg-[#081B30] border border-cyan-500/40 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-700">
               <h3 className="text-base font-bold text-white">Edit Gallery Photo</h3>
-              <button onClick={() => setEditingImage(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button
+                type="button"
+                onClick={() => setEditingImage(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Image URL</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Image URL</label>
                 <input
                   type="text"
                   value={editingImage.imageUrl}
                   onChange={(e) => setEditingImage({ ...editingImage, imageUrl: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">Title (EN)</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Title (EN)</label>
                   <input
                     type="text"
                     value={editingImage.title}
                     onChange={(e) => setEditingImage({ ...editingImage, title: e.target.value })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">Title (BN)</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Title (BN)</label>
                   <input
                     type="text"
                     value={editingImage.titleBn}
                     onChange={(e) => setEditingImage({ ...editingImage, titleBn: e.target.value })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
               </div>
@@ -1744,7 +2370,7 @@ export default function MasterCmsAdminPage() {
               <button
                 type="button"
                 onClick={() => setEditingImage(null)}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -1759,7 +2385,7 @@ export default function MasterCmsAdminPage() {
                   setEditingImage(null);
                   showToast("Photo updated!");
                 }}
-                className="px-5 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
               >
                 Apply
               </button>
@@ -1772,20 +2398,31 @@ export default function MasterCmsAdminPage() {
       {/* MODAL: EDIT / ADD FAQ ITEM                                                */}
       {/* ========================================================================= */}
       {editingFaq && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingFaq(null);
+          }}
+        >
           <div className="bg-[#081B30] border border-cyan-500/40 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-700">
               <h3 className="text-base font-bold text-white">Edit FAQ Item</h3>
-              <button onClick={() => setEditingFaq(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button
+                type="button"
+                onClick={() => setEditingFaq(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Category</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Category</label>
                 <select
                   value={editingFaq.category}
                   onChange={(e) => setEditingFaq({ ...editingFaq, category: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 >
                   <option value="GENERAL">GENERAL</option>
                   <option value="SHARES">SHARES</option>
@@ -1795,39 +2432,39 @@ export default function MasterCmsAdminPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Question (EN)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Question (EN)</label>
                 <input
                   type="text"
                   value={editingFaq.q}
                   onChange={(e) => setEditingFaq({ ...editingFaq, q: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Question (বাংলা)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Question (বাংলা)</label>
                 <input
                   type="text"
                   value={editingFaq.qBn}
                   onChange={(e) => setEditingFaq({ ...editingFaq, qBn: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Answer (EN)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Answer (EN)</label>
                 <textarea
                   rows={3}
                   value={editingFaq.a}
                   onChange={(e) => setEditingFaq({ ...editingFaq, a: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Answer (বাংলা)</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Answer (বাংলা)</label>
                 <textarea
                   rows={3}
                   value={editingFaq.aBn}
                   onChange={(e) => setEditingFaq({ ...editingFaq, aBn: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
             </div>
@@ -1836,7 +2473,7 @@ export default function MasterCmsAdminPage() {
               <button
                 type="button"
                 onClick={() => setEditingFaq(null)}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -1851,7 +2488,7 @@ export default function MasterCmsAdminPage() {
                   setEditingFaq(null);
                   showToast("FAQ item updated!");
                 }}
-                className="px-5 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
               >
                 Apply
               </button>
@@ -1864,59 +2501,70 @@ export default function MasterCmsAdminPage() {
       {/* MODAL: EDIT / ADD LEGAL DOCUMENT                                          */}
       {/* ========================================================================= */}
       {editingDoc && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setEditingDoc(null);
+          }}
+        >
           <div className="bg-[#081B30] border border-cyan-500/40 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-700">
               <h3 className="text-base font-bold text-white">Edit Legal Document</h3>
-              <button onClick={() => setEditingDoc(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button
+                type="button"
+                onClick={() => setEditingDoc(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">Category</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Category</label>
                   <input
                     type="text"
                     value={editingDoc.category}
                     onChange={(e) => setEditingDoc({ ...editingDoc, category: e.target.value })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-slate-300 mb-1">File Size</label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">File Size</label>
                   <input
                     type="text"
                     value={editingDoc.size}
                     onChange={(e) => setEditingDoc({ ...editingDoc, size: e.target.value })}
-                    className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                    className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">Document Title</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Document Title</label>
                 <input
                   type="text"
                   value={editingDoc.title}
                   onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">File Download / View URL</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">File Download / View URL</label>
                 <input
                   type="text"
                   value={editingDoc.fileUrl}
                   onChange={(e) => setEditingDoc({ ...editingDoc, fileUrl: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-300 mb-1">SHA-256 Checksum Hash</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">SHA-256 Checksum Hash</label>
                 <input
                   type="text"
                   value={editingDoc.hash}
                   onChange={(e) => setEditingDoc({ ...editingDoc, hash: e.target.value })}
-                  className="w-full bg-[#051120] border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-cyan-300"
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-cyan-300"
                 />
               </div>
               <div className="flex items-center gap-2 pt-1">
@@ -1930,7 +2578,7 @@ export default function MasterCmsAdminPage() {
                       visibility: e.target.checked ? "INVESTOR_ONLY" : "PUBLIC",
                     })
                   }
-                  className="rounded bg-slate-900 border-slate-700"
+                  className="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-cyan-500"
                 />
                 <label htmlFor="investorOnly" className="text-xs text-slate-300 font-semibold cursor-pointer">
                   Require Verified Investor Login to Access
@@ -1942,7 +2590,7 @@ export default function MasterCmsAdminPage() {
               <button
                 type="button"
                 onClick={() => setEditingDoc(null)}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -1957,7 +2605,7 @@ export default function MasterCmsAdminPage() {
                   setEditingDoc(null);
                   showToast("Legal document updated!");
                 }}
-                className="px-5 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-black"
               >
                 Apply
               </button>
