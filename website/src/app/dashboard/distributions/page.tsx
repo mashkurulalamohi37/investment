@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { TrendingUp, ShieldCheck, CheckCircle2, Download, Building2, Coins, Calendar } from "lucide-react";
+import { TrendingUp, ShieldCheck, CheckCircle2, Download, Building2, Coins, Calendar, ArrowUpRight } from "lucide-react";
 
 export default function DistributionsPage() {
   const { isBangla } = useAuth();
@@ -43,13 +44,23 @@ export default function DistributionsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => alert("Downloading Annual Dividend Statement (PDF)...")}
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 transition-all cursor-pointer"
-        >
-          <Download className="w-3.5 h-3.5 text-[#0066FF]" />
-          <span>{isBangla ? "স্টেটমেন্ট ডাউনলোড" : "Download Statement"}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <Link
+            href="/dashboard/withdrawals"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>{isBangla ? "মুনাফা উত্তোলন করুন" : "Withdraw Profits"}</span>
+          </Link>
+
+          <button
+            onClick={() => alert("Downloading Annual Dividend Statement (PDF)...")}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-[#0066FF]" />
+            <span>{isBangla ? "স্টেটমেন্ট ডাউনলোড" : "Download Statement"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Mini Metric KPI Cards */}

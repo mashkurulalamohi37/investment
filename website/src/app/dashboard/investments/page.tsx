@@ -147,17 +147,27 @@ export default function MyInvestmentsPage() {
                 <span>{isBangla ? "SHA-256 ডিজিটাল নিরাপত্তা সনদ সক্রিয়" : "SHA-256 Digital Certificate Active"}</span>
               </span>
 
-              <button
-                onClick={() =>
-                  alert(
-                    `Generating Official Share Certificate:\nInvestment: ${inv.investmentNo}\nProject: ${inv.projectName}\nLots: ${inv.lots.join(", ")}\n\nCertificate downloaded successfully.`
-                  )
-                }
-                className="px-3.5 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] font-bold text-xs text-white flex items-center justify-center gap-2 shadow-xs shadow-[#0066FF]/20 transition-all cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>{isBangla ? "শেয়ার সনদপত্র ডাউনলোড (PDF)" : "Download Share Certificate (PDF)"}</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href="/dashboard/withdrawals"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-700 flex items-center justify-center gap-1.5 border border-slate-200 transition-all cursor-pointer"
+                >
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#0066FF]" />
+                  <span>{isBangla ? "মূলধন প্রত্যাহার রিকোয়েস্ট" : "Request Capital Exit"}</span>
+                </Link>
+
+                <button
+                  onClick={() =>
+                    alert(
+                      `Generating Official Share Certificate:\nInvestment: ${inv.investmentNo}\nProject: ${inv.projectName}\nLots: ${inv.lots.join(", ")}\n\nCertificate downloaded successfully.`
+                    )
+                  }
+                  className="px-3.5 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] font-bold text-xs text-white flex items-center justify-center gap-2 shadow-xs shadow-[#0066FF]/20 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{isBangla ? "শেয়ার সনদপত্র ডাউনলোড (PDF)" : "Download Share Certificate (PDF)"}</span>
+                </button>
+              </div>
             </div>
           </div>
         ))}

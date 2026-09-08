@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Layers,
   ArrowRight,
+  ArrowUpRight,
   ShieldCheck,
   FileCheck2,
   Clock,
@@ -76,13 +77,23 @@ export default function DashboardOverviewPage() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/investments/new"
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-sm shadow-[#0066FF]/20 transition-all cursor-pointer"
-        >
-          <PlusCircle className="w-3.5 h-3.5 text-white" />
-          <span>{isBangla ? "নতুন শেয়ার বুক করুন" : "Book New Shares"}</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          <Link
+            href="/dashboard/withdrawals"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300/80 shadow-2xs transition-all cursor-pointer"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{isBangla ? "টাকা উত্তোলন করুন" : "Withdraw Funds"}</span>
+          </Link>
+
+          <Link
+            href="/dashboard/investments/new"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-sm shadow-[#0066FF]/20 transition-all cursor-pointer"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-white" />
+            <span>{isBangla ? "নতুন শেয়ার বুক করুন" : "Book New Shares"}</span>
+          </Link>
+        </div>
       </div>
 
       {/* 2. 4 Sleek Metric KPI Cards */}
@@ -141,9 +152,17 @@ export default function DashboardOverviewPage() {
             <span className="text-lg sm:text-xl font-black text-emerald-700 block">
               {formatBDT(portfolio.totalProfitReceived, { isBangla })}
             </span>
-            <span className="text-[11px] text-emerald-700 font-medium block">
-              {isBangla ? "সরাসরি ব্যাংক জমা" : "Deposited to Bank"}
-            </span>
+            <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-100">
+              <span className="text-[11px] text-emerald-700 font-medium block">
+                {isBangla ? "সরাসরি ব্যাংক জমা" : "Deposited to Bank"}
+              </span>
+              <Link
+                href="/dashboard/withdrawals"
+                className="text-[11px] font-bold text-[#0066FF] hover:underline inline-flex items-center gap-0.5"
+              >
+                <span>{isBangla ? "উত্তোলন করুন →" : "Withdraw →"}</span>
+              </Link>
+            </div>
           </div>
         </div>
 
