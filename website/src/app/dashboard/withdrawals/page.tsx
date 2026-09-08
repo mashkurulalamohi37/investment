@@ -14,6 +14,10 @@ import {
   Wallet,
   Smartphone,
   Plus,
+  Coins,
+  Layers,
+  Sparkles,
+  BadgeCheck,
 } from "lucide-react";
 
 interface WithdrawalItem {
@@ -145,29 +149,108 @@ export default function WithdrawalsPage() {
         </div>
 
         <button
-          onClick={() => setShowModal(true)}
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-sm shadow-[#0066FF]/20 transition-all cursor-pointer"
+          onClick={() => {
+            setType("DIVIDEND");
+            setAmount(String(availableProfit));
+            setShowModal(true);
+          }}
+          className="self-start sm:self-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-black text-xs shadow-md shadow-[#0066FF]/25 transition-all cursor-pointer hover:scale-[1.02]"
         >
-          <Plus className="w-4 h-4 text-white" />
-          <span>{isBangla ? "নতুন উত্তোলন অনুরোধ" : "Request Withdrawal"}</span>
+          <Plus className="w-4 h-4 text-white stroke-[2.5]" />
+          <span>{isBangla ? "নতুন উত্তোলন অনুরোধ পাঠান" : "+ Request Withdrawal"}</span>
         </button>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1.5 flex flex-col justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 block">
-            {isBangla ? "উত্তোলনযোগ্য লভ্যাংশ" : "Available Dividend Profit"}
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-[#0066FF] block">
-            {formatBDT(availableProfit, { isBangla })}
-          </span>
-          <span className="text-[11px] text-emerald-600 block font-medium">
-            {isBangla ? "০% প্রসেসিং ফি • ১-২ দিনে জমা" : "0% fee • Disbursed in 1-2 days"}
-          </span>
+      {/* PROMINENT VISIBLE REQUEST HERO CARDS: DIVIDEND VS CAPITAL EXIT */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Option 1: Dividend Payout Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-emerald-500/40 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-emerald-500 transition-all">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                <Coins className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{isBangla ? "১. লভ্যাংশ উত্তোলন অপশন" : "Option 1: Dividend Payout"}</span>
+              </span>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+                {isBangla ? "০% ফি • ১-২ দিনে জমা" : "0% Fee • 1-2 Days"}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-xs font-semibold text-slate-500 block">
+                {isBangla ? "উত্তোলনযোগ্য নিট লভ্যাংশ" : "Available Dividend Profit"}
+              </span>
+              <span className="text-3xl sm:text-4xl font-black text-emerald-700 font-mono tracking-tight block">
+                {formatBDT(availableProfit, { isBangla })}
+              </span>
+              <p className="text-xs text-slate-600 mt-1">
+                {isBangla
+                  ? "আপনার প্রজেক্টের অর্জিত ত্রৈমাসিক লভ্যাংশ। ব্যাংক বা বিকাশ/নগদে যেকোনো সময় তুলুন।"
+                  : "Quarterly dividends earned from your project. Transfer directly to Bank or bKash."}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setType("DIVIDEND");
+              setAmount(String(availableProfit));
+              setShowModal(true);
+            }}
+            className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition-all cursor-pointer hover:scale-[1.01]"
+          >
+            <ArrowUpRight className="w-4 h-4 text-white" />
+            <span>{isBangla ? "মুনাফার টাকা তুলুন (৳ ১০,০০০)" : "Request Dividend Payout (৳ 10,000)"}</span>
+          </button>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1.5 flex flex-col justify-between">
+        {/* Option 2: Capital Exit Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-white border-2 border-blue-500/40 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-[#0066FF] transition-all">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-300">
+                <Layers className="w-3.5 h-3.5 text-[#0066FF]" />
+                <span>{isBangla ? "২. মূলধন প্রস্থান অপশন" : "Option 2: Capital Exit"}</span>
+              </span>
+              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-200">
+                {isBangla ? "৪টি সক্রিয় শেয়ার লট" : "4 Active Lots"}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-xs font-semibold text-slate-500 block">
+                {isBangla ? "বিনিয়োগকৃত মোট মূলধন" : "Total Invested Capital"}
+              </span>
+              <span className="text-3xl sm:text-4xl font-black text-[#0066FF] font-mono tracking-tight block">
+                {formatBDT(availableCapital, { isBangla })}
+              </span>
+              <p className="text-xs text-slate-600 mt-1">
+                {isBangla
+                  ? "প্রকল্প থেকে মূলধন প্রত্যাহার বা শেয়ার লিকুইডেশন আবেদন। ৩-৫ দিনে চুক্তি ও ব্যাংক নিষ্পত্তি।"
+                  : "Exit invested capital or surrender shares via platform buyback. Settled in 3-5 days."}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setType("CAPITAL_EXIT");
+              setAmount(String(availableCapital));
+              setShowModal(true);
+            }}
+            className="w-full py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#0066FF]/20 transition-all cursor-pointer hover:scale-[1.01]"
+          >
+            <ArrowUpRight className="w-4 h-4 text-white" />
+            <span>{isBangla ? "মূলধন প্রত্যাহারের আবেদন (৳ ১,০২,০০০)" : "Request Capital Exit (৳ 102,000)"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mini Summary Stats & Registered Account Details */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1 flex flex-col justify-between">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 block">
             {isBangla ? "মোট উত্তোলিত অর্থ" : "Total Disbursed"}
           </span>
@@ -179,7 +262,7 @@ export default function WithdrawalsPage() {
           </span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1.5 flex flex-col justify-between">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1 flex flex-col justify-between">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 block">
             {isBangla ? "অপেক্ষমান উত্তোলন" : "Pending Processing"}
           </span>
@@ -188,6 +271,19 @@ export default function WithdrawalsPage() {
           </span>
           <span className="text-[11px] text-slate-500 block font-medium">
             {isBangla ? "কমপ্লায়েন্স অডিট পর্যালোচনাধীন" : "Under compliance review"}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-1 flex flex-col justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 block">
+            {isBangla ? "ভেরিফাইড ব্যাংক হিসাব" : "Registered Payout Account"}
+          </span>
+          <div className="text-xs font-bold text-slate-900 flex items-center gap-1 mt-0.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>The City Bank Limited</span>
+          </div>
+          <span className="text-[11px] text-slate-500 block font-mono">
+            A/C: ****2001 (Uttara Branch)
           </span>
         </div>
       </div>
@@ -359,6 +455,23 @@ export default function WithdrawalsPage() {
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full px-3 py-2 text-sm font-bold border border-slate-200 rounded-xl focus:outline-hidden focus:border-[#0066FF]"
                 />
+                {/* Quick percentage buttons */}
+                <div className="flex items-center gap-1.5 pt-1">
+                  {[0.25, 0.5, 0.75, 1.0].map((ratio) => {
+                    const val = Math.floor(maxAvailable * ratio);
+                    const label = ratio === 1.0 ? (isBangla ? "১০০% (পুরোটা)" : "100% (Max)") : `${ratio * 100}%`;
+                    return (
+                      <button
+                        key={ratio}
+                        type="button"
+                        onClick={() => setAmount(String(val))}
+                        className="flex-1 py-1 text-[10px] font-bold rounded-lg border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 hover:text-[#0066FF] transition-all cursor-pointer"
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Destination Selector */}

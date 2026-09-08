@@ -187,6 +187,35 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
+      {/* 2.5 Prominent Fund Withdrawal & Exit Banner */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-[#0066FF] text-white shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-white/20 text-white tracking-wider backdrop-blur-xs">
+              {isBangla ? "তহবিল উত্তোলন ও প্রস্থান" : "FUNDS WITHDRAWAL & EXIT"}
+            </span>
+          </div>
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+            {isBangla ? "আপনার লভ্যাংশ বা মূলধন তুলতে চান?" : "Want to withdraw your dividends or exit capital?"}
+          </h2>
+          <p className="text-xs text-white/90">
+            {isBangla
+              ? "উত্তোলনযোগ্য লভ্যাংশ ৳ ১০,০০০ এবং সক্রিয় মূলধন ৳ ১,০২,০০০। সরাসরি ব্যাংক বা বিকাশে উত্তোলনের আবেদন করুন।"
+              : "Available dividend ৳ 10,000 & invested capital ৳ 102,000. Submit a payout or exit request now."}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Link
+            href="/dashboard/withdrawals"
+            className="px-4 py-2.5 rounded-xl bg-white text-emerald-800 hover:bg-emerald-50 font-black text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{isBangla ? "টাকা উত্তোলন করুন →" : "Request Payout →"}</span>
+          </Link>
+        </div>
+      </div>
+
       {/* 3. Action Grid: Share Lot Portfolio & Transactions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Allocated Share Lots Card */}
