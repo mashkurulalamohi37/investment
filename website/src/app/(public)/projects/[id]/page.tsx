@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, notFound } from "next/navigation";
 import { Project } from "@/types/api";
-import { SWAPNOJATRI_PROJECTS, FALLBACK_LANDVEST_100 } from "@/lib/api/projects";
+import { SWAPNOJATRI_PROJECTS, FALLBACK_LANDVEST_100, findProject } from "@/lib/api/projects";
 import ProjectDetailView from "@/components/project/ProjectDetailView";
 
 export default function DynamicProjectPage() {
@@ -11,13 +11,7 @@ export default function DynamicProjectPage() {
   const idOrCode = (params?.id as string) || "LV100";
 
   const [project, setProject] = useState<Project | null>(() => {
-    return (
-      SWAPNOJATRI_PROJECTS.find(
-        (p) =>
-          p.id.toLowerCase() === idOrCode.toLowerCase() ||
-          p.code.toLowerCase() === idOrCode.toLowerCase()
-      ) || null
-    );
+    return findProject(idOrCode) || null;
   });
 
   const [loading, setLoading] = useState(!project);
@@ -29,13 +23,22 @@ export default function DynamicProjectPage() {
         const json = await res.json();
         if (json.success && json.data) {
           setProject(json.data);
-        } else if (!project) {
-          // Fallback to LV100 if invalid id
-          setProject(FALLBACK_LANDVEST_100);
+        } else {
+          const localMatch = findProject(idOrCode);
+          if (localMatch) {
+            setProject(localMatch);
+          } else if (!project) {
+            setProject(FALLBACK_LANDVEST_100);
+          }
         }
       } catch (err) {
         console.error("Error fetching project:", err);
-        if (!project) setProject(FALLBACK_LANDVEST_100);
+        const localMatch = findProject(idOrCode);
+        if (localMatch) {
+          setProject(localMatch);
+        } else if (!project) {
+          setProject(FALLBACK_LANDVEST_100);
+        }
       } finally {
         setLoading(false);
       }

@@ -7,8 +7,14 @@ export async function GET(
 ) {
   try {
     const { id } = params;
+    const clean = id.trim().toLowerCase();
     const project = db.projects.find(
-      (p) => p.id.toLowerCase() === id.toLowerCase() || p.code.toLowerCase() === id.toLowerCase()
+      (p) =>
+        p.id.toLowerCase() === clean ||
+        p.code.toLowerCase() === clean ||
+        (clean.includes("landvest") && p.code === "LV100") ||
+        (clean.includes("agro") && p.code === "AGRO-S1") ||
+        (clean.includes("dairy") && p.code === "DAIRY-01")
     );
 
     if (!project) {
@@ -36,9 +42,15 @@ export async function PUT(
 ) {
   try {
     const { id } = params;
+    const clean = id.trim().toLowerCase();
     const body = await request.json();
     const index = db.projects.findIndex(
-      (p) => p.id.toLowerCase() === id.toLowerCase() || p.code.toLowerCase() === id.toLowerCase()
+      (p) =>
+        p.id.toLowerCase() === clean ||
+        p.code.toLowerCase() === clean ||
+        (clean.includes("landvest") && p.code === "LV100") ||
+        (clean.includes("agro") && p.code === "AGRO-S1") ||
+        (clean.includes("dairy") && p.code === "DAIRY-01")
     );
 
     if (index === -1) {

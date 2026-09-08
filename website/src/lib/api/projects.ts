@@ -100,31 +100,31 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
     ],
   },
   {
-    id: "proj-agro-farm",
-    code: "AGRO-01",
-    name: "Swapnojatri Smart Agro & High-Yield Farm",
-    name_bn: "স্বপ্নযাত্রী স্মার্ট কৃষি ও ডেইরি/এগ্রো প্রজেক্ট",
+    id: "proj-agro-season-01",
+    code: "AGRO-S1",
+    name: "Smart Organic Agro Farming (Season 1)",
+    name_bn: "স্মার্ট অর্গানিক এগ্রো ফার্মিং (সিজন ১)",
     category: "AGRICULTURAL",
     location: "Singair Agro Belt, Manikganj (Near Dhaka)",
     location_bn: "সিংগাইর এগ্রো বেল্ট, মানিকগঞ্জ (ঢাকা সংলগ্ন)",
     description:
-      "Modern high-yield agro farming, organic greenhouse cultivation, and cattle farming with seasonal profit returns for investors.",
+      "Modern high-yield agro farming, organic greenhouse cultivation, and vegetable expansion with quarterly profit distributions.",
     description_bn:
-      "আধুনিক সমন্বিত কৃষি, উন্নত জাতের অর্গানিক ফসল চাষ ও পশুপালন প্রকল্প। অভিজ্ঞ কৃষি বিশেষজ্ঞদের তত্ত্বাবধানে পরিচালিত এবং প্রতি সিজন শেষে সরাসরি বিনিয়োগকারীদের লভ্যাংশ প্রদান।",
+      "উচ্চ ফলনশীল জৈব সবজি ও আধুনিক গ্রিনহাউস চাষাবাদ প্রকল্প। অভিজ্ঞ কৃষি বিশেষজ্ঞদের তত্ত্বাবধানে পরিচালিত এবং প্রতি ৩ মাস পর পর লভ্যাংশ বণ্টন।",
     target_fund: 1500000,
     price_per_share: 15000,
     total_shares: 100,
-    allocated_shares: 35,
-    available_shares: 65,
+    allocated_shares: 42,
+    available_shares: 58,
     min_shares: 1,
     max_shares: 5,
     status: "OPEN",
     projected_roi_min: 20.0,
-    projected_roi_max: 25.0,
+    projected_roi_max: 24.5,
     hero_quote: "উর্বর মাটিতে আধুনিক কৃষি, নিশ্চিত মৌসুমী ফলন...",
     hero_tagline: "টেকসই কৃষির অংশীদারিত্বে সুরক্ষিত রিটার্ন",
     hero_image_url: "/images/hero_investment_bg.jpg",
-    tenure: "১ - ২ বছর (মৌসুমী লভ্যাংশ)",
+    tenure: "১ - ২ বছর (ত্রৈমাসিক লভ্যাংশ)",
     investment_type: "এগ্রো প্রফিট শেয়ার",
     risk_level: "প্রাকৃতিক ও বাজার ঝুঁকি সাপেক্ষ",
     map_url: "https://maps.google.com/?q=Singair,Manikganj",
@@ -137,6 +137,7 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
     documents: [
       { title: "এগ্রো প্রকল্প পরিচিতি (PDF)", file_url: "/documents/agro-prospectus.pdf", type: "PDF", size: "2.1 MB" },
       { title: "কৃষি বিনিয়োগ চুক্তি (PDF)", file_url: "/documents/investment-agreement.pdf", type: "PDF", size: "1.8 MB" },
+      { title: "অডিট ও লভ্যাংশ গাইডলাইন (PDF)", file_url: "/documents/faq.pdf", type: "PDF", size: "850 KB" },
     ],
     bottom_cta_title: "আপনার পুঁজিতে হোক সমৃদ্ধ বাংলাদেশ",
     bottom_cta_subtitle: "স্মার্ট এগ্রো উদ্যোগে গড়ে তুলুন নিরাপদ আয়।",
@@ -155,9 +156,74 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
         id: "ag-2",
         title: "High-Yield Sowing & Greenhouse Infrastructure",
         title_bn: "উচ্চফলনশীল বীজ বপন ও গ্রিনহাউস শেড তৈরি",
-        description: "Planting and livestock management.",
-        description_bn: "উচ্চফলনশীল বীজ রোপণ ও গবাদি পশুর আধুনিক খামার ব্যবস্থাপনা।",
+        description: "Planting and farm management.",
+        description_bn: "উচ্চফলনশীল বীজ রোপণ ও আধুনিক খামার ব্যবস্থাপনা।",
         milestone_date: "2026-09-20T00:00:00Z",
+        is_completed: false,
+        sequence: 2,
+      },
+    ],
+  },
+  {
+    id: "proj-dairy-02",
+    code: "DAIRY-01",
+    name: "Integrated Modern Dairy & Livestock",
+    name_bn: "আধুনিক ডেইরি ও সমন্বিত ক্যাটল প্রজেক্ট",
+    category: "AGRICULTURAL",
+    location: "Savar Dairy Zone, Dhaka",
+    location_bn: "সাভার ডেইরি জোন, ঢাকা",
+    description:
+      "Commercial dairy farming and breed livestock expansion producing daily supply to Dhaka retail markets. Regular milk clearing and annual festive returns.",
+    description_bn:
+      "উন্নত জাতের গাভী পালন, বাণিজ্যিক দুগ্ধ উৎপাদন ও ক্যাটল মোটাতাজাকরণ প্রকল্প। রাজধানী ঢাকার খুচরা বাজারে নিয়মিত তরল দুধ সরবরাহ ও বার্ষিক পশু বিক্রয়ের মাধ্যমে আকর্ষণীয় মুনাফা অর্জন।",
+    target_fund: 3000000,
+    price_per_share: 30000,
+    total_shares: 100,
+    allocated_shares: 0,
+    available_shares: 100,
+    min_shares: 1,
+    max_shares: 4,
+    status: "UPCOMING",
+    projected_roi_min: 16.5,
+    projected_roi_max: 21.0,
+    hero_quote: "উন্নত প্রযুক্তির খামার, প্রতিদিনের তরল দুধের নির্ভরযোগ্য বাজার...",
+    hero_tagline: "বাণিজ্যিক ডেইরি খাতে নিরাপদ যৌথ অংশীদারিত্ব",
+    hero_image_url: "/images/gallery_road.jpg",
+    tenure: "২ - ৩ বছর (বার্ষিক ও অর্ধবার্ষিক লভ্যাংশ)",
+    investment_type: "ডেইরি প্রফিট শেয়ার",
+    risk_level: "লাইভস্টক স্বাস্থ্য ও বাজার সাপেক্ষ",
+    map_url: "https://maps.google.com/?q=Savar,Dhaka",
+    map_image_url: "/images/washpur_map.svg",
+    gallery_images: [
+      { title: "আধুনিক ক্যাটল শেড", image_url: "/images/gallery_land.jpg" },
+      { title: "অটোমেটেড মিল্কিং প্রসেসিং", image_url: "/images/gallery_road.jpg" },
+      { title: "সবুজ ঘাস ও সাইলেজ ফিড", image_url: "/images/gallery_future.jpg" },
+    ],
+    documents: [
+      { title: "ডেইরি প্রকল্প পরিচিতি (PDF)", file_url: "/documents/dairy-prospectus.pdf", type: "PDF", size: "2.3 MB" },
+      { title: "পশুসম্পদ ও ভেটেরিনারি নীতিমালা (PDF)", file_url: "/documents/veterinary-guidelines.pdf", type: "PDF", size: "1.5 MB" },
+      { title: "বিনিয়োগ ও মুনাফা বণ্টন চুক্তি (PDF)", file_url: "/documents/investment-agreement.pdf", type: "PDF", size: "1.8 MB" },
+    ],
+    bottom_cta_title: "ডেইরি ও লাইভস্টক উদ্যোগে নিরাপদ অংশীদারিত্ব",
+    bottom_cta_subtitle: "আগামী প্রজন্মের পুষ্টি ও আপনার হালাল মুনাফার মেলবন্ধন।",
+    milestones: [
+      {
+        id: "dy-1",
+        title: "Modern Shed Construction & Biosecurity Setup",
+        title_bn: "আধুনিক ক্যাটল শেড নির্মাণ ও বায়োসিকিউরিটি প্রাচীর",
+        description: "Standard cross-ventilated sheds and bio-secure boundary setup.",
+        description_bn: "আন্তর্জাতিক মানের ক্রস-ভেন্টিলেটেড শেড ও বায়োসিকিউরিটি বেষ্টনী তৈরি।",
+        milestone_date: "2026-11-15T00:00:00Z",
+        is_completed: false,
+        sequence: 1,
+      },
+      {
+        id: "dy-2",
+        title: "High-Pedigree Cattle Induction & Dairy Setup",
+        title_bn: "উন্নত জাতের গাভী সংগ্রহ ও নিয়মিত দুগ্ধ উৎপাদন কার্যক্রম",
+        description: "Induction of high-producing dairy cows and automated milking plant.",
+        description_bn: "উচ্চ উৎপাদনশীল সংকর জাতের গাভী সংযোজন ও মিল্কিং প্ল্যান্ট চালু।",
+        milestone_date: "2027-01-20T00:00:00Z",
         is_completed: false,
         sequence: 2,
       },
@@ -166,3 +232,47 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
 ];
 
 export const FALLBACK_LANDVEST_100 = SWAPNOJATRI_PROJECTS[0];
+
+export function findProject(idOrSlug?: string): Project | undefined {
+  if (!idOrSlug) return undefined;
+  const clean = idOrSlug.trim().toLowerCase();
+
+  // 1. Exact ID or Code Match
+  const exact = SWAPNOJATRI_PROJECTS.find(
+    (p) => p.id.toLowerCase() === clean || p.code.toLowerCase() === clean
+  );
+  if (exact) return exact;
+
+  // 2. Common Aliases & Slugs
+  if (
+    clean === "landvest-100" ||
+    clean === "landvest" ||
+    clean === "lv-100" ||
+    clean === "lv100" ||
+    clean.includes("landvest")
+  ) {
+    return SWAPNOJATRI_PROJECTS.find((p) => p.code === "LV100");
+  }
+
+  if (
+    clean === "agro-s1" ||
+    clean === "agro-season-01" ||
+    clean === "agro" ||
+    clean.includes("agro") ||
+    clean.includes("organic")
+  ) {
+    return SWAPNOJATRI_PROJECTS.find((p) => p.code === "AGRO-S1");
+  }
+
+  if (
+    clean === "dairy-01" ||
+    clean === "dairy-02" ||
+    clean === "dairy" ||
+    clean.includes("dairy") ||
+    clean.includes("cattle")
+  ) {
+    return SWAPNOJATRI_PROJECTS.find((p) => p.code === "DAIRY-01");
+  }
+
+  return undefined;
+}

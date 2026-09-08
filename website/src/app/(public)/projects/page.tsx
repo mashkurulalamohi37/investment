@@ -4,60 +4,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { FALLBACK_LANDVEST_100 } from "@/lib/api/projects";
+import { SWAPNOJATRI_PROJECTS } from "@/lib/api/projects";
 import { MapPin, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Layers, Sprout } from "lucide-react";
 
 export default function ProjectsCatalogPage() {
   const { isBangla } = useAuth();
   const [filter, setFilter] = useState<"ALL" | "REAL_ESTATE" | "AGRICULTURAL">("ALL");
 
-  const projects = [
-    FALLBACK_LANDVEST_100,
-    {
-      id: "proj-agro-season-01",
-      code: "AGRO-S1",
-      name: "Smart Organic Agro Farming (Season 1)",
-      name_bn: "স্মার্ট অর্গানিক এগ্রো ফার্মিং (সিজন ১)",
-      category: "AGRICULTURAL" as const,
-      location: "Singair Agro Belt, Manikganj",
-      location_bn: "সিংগাইর এগ্রো বেল্ট, মানিকগঞ্জ",
-      description: "High-yield organic vegetable and modern greenhouse farming project with quarterly profit distributions.",
-      description_bn: "উচ্চ ফলনশীল জৈব সবজি ও আধুনিক গ্রিনহাউস চাষাবাদ প্রকল্প। প্রতি ৩ মাস পর পর লভ্যাংশ বণ্টন।",
-      target_fund: 1500000,
-      price_per_share: 15000,
-      total_shares: 100,
-      allocated_shares: 42,
-      available_shares: 58,
-      min_shares: 1,
-      max_shares: 5,
-      status: "OPEN" as const,
-      projected_roi_min: 20.0,
-      projected_roi_max: 24.5,
-      milestones: [],
-    },
-    {
-      id: "proj-dairy-02",
-      code: "DAIRY-01",
-      name: "Integrated Modern Dairy & Livestock",
-      name_bn: "আধুনিক ডেইরি ও সমন্বিত ক্যাটল প্রজেক্ট",
-      category: "AGRICULTURAL" as const,
-      location: "Savar Dairy Zone, Dhaka",
-      location_bn: "সাভার ডেইরি জোন, ঢাকা",
-      description: "Commercial dairy farming and breed livestock expansion producing daily supply to Dhaka retail markets.",
-      description_bn: "উন্নত জাতের গাভী পালন ও দুগ্ধ উৎপাদন প্রকল্প। নিয়মিত বিক্রির মাধ্যমে লভ্যাংশ বণ্টন।",
-      target_fund: 3000000,
-      price_per_share: 30000,
-      total_shares: 100,
-      allocated_shares: 0,
-      available_shares: 100,
-      min_shares: 1,
-      max_shares: 4,
-      status: "UPCOMING" as const,
-      projected_roi_min: 16.5,
-      projected_roi_max: 21.0,
-      milestones: [],
-    },
-  ];
+  const projects = SWAPNOJATRI_PROJECTS;
 
   const filteredProjects = filter === "ALL" ? projects : projects.filter((p) => p.category === filter);
 
@@ -116,8 +70,9 @@ export default function ProjectsCatalogPage() {
       {/* 3. Compact & Calibrated Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((proj) => {
-          const isLandVest = proj.id === "landvest-100";
+          const isLandVest = proj.code === "LV100" || proj.id === "proj-lv100";
           const progressPercent = Math.round((proj.allocated_shares / proj.total_shares) * 100);
+          const projectSlug = isLandVest ? "landvest-100" : proj.code;
 
           return (
             <div
@@ -210,7 +165,7 @@ export default function ProjectsCatalogPage() {
                 </span>
 
                 <Link
-                  href={`/projects/${proj.id}`}
+                  href={`/projects/${projectSlug}`}
                   className="px-4 py-2 rounded-full bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs transition-all group-hover:shadow-md"
                 >
                   <span>{isBangla ? "বিস্তারিত দেখুন" : "View Details"}</span>

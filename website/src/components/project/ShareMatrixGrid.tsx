@@ -11,6 +11,9 @@ interface ShareAllocationProps {
   allocatedShares?: number;
   userOwnedShares?: number;
   pricePerShare?: number;
+  projectName?: string;
+  projectNameBn?: string;
+  projectCode?: string;
 }
 
 export default function ShareMatrixGrid({
@@ -18,6 +21,9 @@ export default function ShareMatrixGrid({
   allocatedShares = 74,
   userOwnedShares = 4,
   pricePerShare = 25500,
+  projectName,
+  projectNameBn,
+  projectCode,
 }: ShareAllocationProps) {
   const { isBangla, isAuthenticated } = useAuth();
 
@@ -32,6 +38,10 @@ export default function ShareMatrixGrid({
   const collectedFund = allocatedShares * pricePerShare;
   const userFund = userOwnedShares * pricePerShare;
   const availableFund = availableShares * pricePerShare;
+
+  const resolvedName = isBangla
+    ? projectNameBn || projectName || "ল্যান্ডভেস্ট ১০০"
+    : projectName || "LandVest 100";
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200/90 shadow-card hover:shadow-cardHover transition-all p-6 sm:p-10 space-y-8">
@@ -49,17 +59,23 @@ export default function ShareMatrixGrid({
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {isBangla ? "ল্যান্ডভেস্ট ১০০ শেয়ার বণ্টন ও তহবিল প্রগ্রেস" : "LandVest 100 Share Allocation Progress"}
+            {isBangla
+              ? `${resolvedName} শেয়ার বণ্টন ও তহবিল প্রগ্রেস`
+              : `${resolvedName} Share Allocation Progress`}
           </h3>
           <p className="text-xs sm:text-sm text-slate-500 font-normal">
             {isBangla
-              ? "মোট ১০০টি নির্দিষ্ট শেয়ারের রিয়েল-টাইম সাবস্ক্রিপশন ও তহবিল বরাদ্দের বিবরণী"
-              : "Real-time subscription progress and capital clearing breakdown across 100 fixed shares"}
+              ? `মোট ${totalShares}টি নির্দিষ্ট শেয়ারের রিয়েল-টাইম সাবস্ক্রিপশন ও তহবিল বরাদ্দের বিবরণী`
+              : `Real-time subscription progress and capital clearing breakdown across ${totalShares} fixed shares`}
           </p>
         </div>
 
         <Link
-          href={isAuthenticated ? "/dashboard/investments/new" : "/login?redirect=/dashboard/investments/new"}
+          href={
+            isAuthenticated
+              ? `/dashboard/investments/new?project=${projectCode || "LV100"}`
+              : `/login?redirect=/dashboard/investments/new?project=${projectCode || "LV100"}`
+          }
           className="self-start sm:self-auto px-6 py-3.5 rounded-full bg-brand-emerald hover:bg-brand-forest text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-brand-emerald/25 transition-all flex items-center gap-2 group"
         >
           <span>{isBangla ? "অনলাইনে শেয়ার বুক করুন" : "Subscribe Shares"}</span>

@@ -32,6 +32,7 @@ import {
   FolderDown,
   Scale,
   BadgeCheck,
+  Sprout,
 } from "lucide-react";
 
 interface ProjectDetailViewProps {
@@ -113,7 +114,12 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
     ? project.documents
     : defaultDocuments;
 
-  const investUrl = isAuthenticated
+  const isUpcoming = project.status === "UPCOMING";
+  const investUrl = isUpcoming
+    ? isAuthenticated
+      ? `/dashboard/investments/new?project=${project.id || project.code}&shares=${shares}&mode=prebook`
+      : `/login?redirect=/dashboard/investments/new?project=${project.id || project.code}&shares=${shares}&mode=prebook`
+    : isAuthenticated
     ? `/dashboard/investments/new?project=${project.id || project.code}&shares=${shares}`
     : `/login?redirect=/dashboard/investments/new?project=${project.id || project.code}&shares=${shares}`;
 
@@ -141,10 +147,21 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
             <span className="px-3 py-1 rounded-full text-xs font-mono font-black bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-xs">
               {project.code || "LV100"}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 backdrop-blur-md text-emerald-300 border border-emerald-400/40 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{isBangla ? "লাইভ প্রজেক্ট" : "LIVE PROJECT"}</span>
-            </span>
+            {project.status === "OPEN" ? (
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 backdrop-blur-md text-emerald-300 border border-emerald-400/40 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{isBangla ? "লাইভ প্রজেক্ট" : "LIVE PROJECT"}</span>
+              </span>
+            ) : isUpcoming ? (
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/25 backdrop-blur-md text-amber-300 border border-amber-400/50 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>{isBangla ? "আসন্ন প্রকল্প" : "UPCOMING PROJECT"}</span>
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-500/20 backdrop-blur-md text-slate-300 border border-slate-400/40 flex items-center gap-1.5">
+                <span>{isBangla ? "সম্পন্ন" : "CLOSED"}</span>
+              </span>
+            )}
           </div>
 
           {/* Tagline on top-right */}
@@ -235,14 +252,21 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
           {/* Status Badge */}
           <div className="p-2 sm:px-3 flex items-center justify-center sm:justify-end">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>
-                {project.status === "OPEN"
-                  ? isBangla ? "চলমান" : "Open"
-                  : isBangla ? "সম্পন্ন" : "Closed"}
+            {project.status === "OPEN" ? (
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{isBangla ? "চলমান" : "Open"}</span>
               </span>
-            </span>
+            ) : isUpcoming ? (
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>{isBangla ? "আসন্ন" : "Upcoming"}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs">
+                <span>{isBangla ? "সম্পন্ন" : "Closed"}</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -263,8 +287,8 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {isBangla
-                  ? `${project.name_bn || project.name} একটি প্রফিট শেয়ার ভিত্তিক রিয়েল এস্টেট বিনিয়োগ প্রকল্প। আমরা ঢাকার সম্ভাবনাময় এলাকায় জমি কিনে দীর্ঘমেয়াদে মূল্য বৃদ্ধির মাধ্যমে বিনিয়োগকারীদের জন্য লাভের সুযোগ তৈরি করি। এটি কেবল আর্থিক বিনিয়োগ নয়, বরং ভবিষ্যতের স্থায়িত্ব ও নিরাপত্তার পথে একটি সম্মিলিত যাত্রা।`
-                  : `${project.name} is a vetted profit-sharing real estate venture. We acquire strategic land parcels across high-growth corridors to unlock long-term capital appreciation and distributed pro-rata commercial returns.`}
+                  ? project.description_bn || project.description
+                  : project.description || project.description_bn}
               </p>
             </div>
 
@@ -290,10 +314,16 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
 
               <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 space-y-2 flex flex-col items-center justify-center">
                 <div className="w-10 h-10 rounded-xl bg-blue-100 text-[#0066FF] flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5" />
+                  {project.category === "AGRICULTURAL" ? (
+                    <Sprout className="w-5 h-5" />
+                  ) : (
+                    <TrendingUp className="w-5 h-5" />
+                  )}
                 </div>
                 <span className="text-xs font-bold text-slate-800 block">
-                  {isBangla ? "দীর্ঘমেয়াদি মূল্য বৃদ্ধি" : "High Appreciation"}
+                  {project.category === "AGRICULTURAL"
+                    ? isBangla ? "মৌসুমী ও নিয়মিত মুনাফা" : "Seasonal Crop & Dairy Yields"
+                    : isBangla ? "দীর্ঘমেয়াদি মূল্য বৃদ্ধি" : "High Appreciation"}
                 </span>
               </div>
 
@@ -446,6 +476,70 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               ))}
             </div>
           </div>
+
+          {/* 5. Project Roadmap & Key Milestones */}
+          {project.milestones && project.milestones.length > 0 && (
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 space-y-5 shadow-sm">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-[#0066FF]" />
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                    {isBangla ? "প্রকল্পের রোডম্যাপ ও মাইলস্টোন" : "Roadmap & Key Milestones"}
+                  </h3>
+                </div>
+                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-[#0066FF]">
+                  {project.milestones.length} {isBangla ? "টি ধাপ" : "Stages"}
+                </span>
+              </div>
+
+              <div className="space-y-4 pt-1">
+                {project.milestones.map((m, idx) => (
+                  <div key={m.id || idx} className="relative flex items-start gap-3.5 group">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
+                          m.is_completed
+                            ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
+                            : "bg-blue-50 text-[#0066FF] border border-blue-200"
+                        }`}
+                      >
+                        {m.is_completed ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <span>{m.sequence || idx + 1}</span>
+                        )}
+                      </div>
+                      {idx < (project.milestones?.length || 0) - 1 && (
+                        <div className="w-0.5 h-12 bg-slate-200 mt-1" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 bg-slate-50/80 rounded-2xl p-3.5 border border-slate-200/80 space-y-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs sm:text-sm font-bold text-slate-900">
+                          {isBangla ? m.title_bn || m.title : m.title}
+                        </span>
+                        {m.is_completed ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            {isBangla ? "সম্পন্ন" : "Completed"}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                            {isBangla ? "পরিকল্পিত / চলমান" : "In Progress"}
+                          </span>
+                        )}
+                      </div>
+                      {(m.description_bn || m.description) && (
+                        <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                          {isBangla ? m.description_bn || m.description : m.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* =======================================================================
@@ -459,7 +553,9 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <Calculator className="w-5 h-5 text-[#0066FF]" />
               <h3 className="font-bold text-slate-900 text-base">
-                {isBangla ? "আপনার বিনিয়োগ হিসাব করুন" : "Calculate Investment"}
+                {isUpcoming
+                  ? isBangla ? "প্রি-বুকিং লট হিসাব" : "Pre-Booking Estimate"
+                  : isBangla ? "আপনার বিনিয়োগ হিসাব করুন" : "Calculate Investment"}
               </h3>
             </div>
 
@@ -525,7 +621,11 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               href={investUrl}
               className="w-full py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#0066FF]/25 transition-all cursor-pointer hover:scale-[1.01]"
             >
-              <span>{isBangla ? "এখনই বিনিয়োগ করুন →" : "Invest Now →"}</span>
+              <span>
+                {isUpcoming
+                  ? isBangla ? "প্রি-বুকিং / আগ্রহ প্রকাশ করুন →" : "Pre-Book / Express Interest →"
+                  : isBangla ? "এখনই বিনিয়োগ করুন →" : "Invest Now →"}
+              </span>
             </Link>
           </div>
 
@@ -653,7 +753,14 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
           4. RETAINED INSTITUTIONAL TRANSPARENCY MODULES
           ========================================================================= */}
       <section className="space-y-6 pt-4">
-        <ShareMatrixGrid />
+        <ShareMatrixGrid
+          totalShares={totalShares}
+          allocatedShares={allocatedShares}
+          pricePerShare={pricePerShare}
+          projectName={project.name}
+          projectNameBn={project.name_bn}
+          projectCode={project.code}
+        />
         <TransparencyLedger />
       </section>
 
@@ -684,7 +791,11 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
             href={investUrl}
             className="px-8 py-3.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-black text-xs sm:text-sm shadow-md shadow-[#0066FF]/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02]"
           >
-            <span>{isBangla ? "এখনই বিনিয়োগ করুন →" : "Invest Now →"}</span>
+            <span>
+              {isUpcoming
+                ? isBangla ? "প্রি-বুকিং / আগ্রহ প্রকাশ করুন →" : "Pre-Book / Express Interest →"
+                : isBangla ? "এখনই বিনিয়োগ করুন →" : "Invest Now →"}
+            </span>
           </Link>
           <span className="text-[11px] text-slate-500 font-medium">
             💙 {isBangla ? "একটি ছোট সিদ্ধান্ত, একটি বড় পরিবর্তনের শুরু" : "One small decision, beginning of a big change"}
