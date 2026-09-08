@@ -36,6 +36,26 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
     status: "OPEN",
     projected_roi_min: 18.5,
     projected_roi_max: 22.0,
+    hero_quote: "ছোট বিনিয়োগ, বড় ভবিষ্যৎ...",
+    hero_tagline: "আজকের বিশ্বাস আগামীর নিরাপদ ঠিকানা",
+    hero_image_url: "/images/landvest_hero.jpg",
+    tenure: "৩ - ৫ বছর (আনুমানিক)",
+    investment_type: "প্রফিট শেয়ার",
+    risk_level: "বাজার পরিস্থিতি অনুসারে",
+    map_url: "https://maps.google.com/?q=Washpur,Bosila,Dhaka",
+    map_image_url: "/images/washpur_map.svg",
+    gallery_images: [
+      { title: "বর্তমান জমির অবস্থা", image_url: "/images/gallery_land.jpg" },
+      { title: "এলাকার উন্নয়ন সম্ভাবনা", image_url: "/images/gallery_road.jpg" },
+      { title: "ভবিষ্যতের সম্ভাবনা", image_url: "/images/gallery_future.jpg" },
+    ],
+    documents: [
+      { title: "প্রকল্প পরিচিতি (PDF)", file_url: "/documents/landvest-100-prospectus.pdf", type: "PDF", size: "2.4 MB" },
+      { title: "বিনিয়োগ চুক্তি (PDF)", file_url: "/documents/investment-agreement.pdf", type: "PDF", size: "1.8 MB" },
+      { title: "FAQ (PDF)", file_url: "/documents/faq.pdf", type: "PDF", size: "850 KB" },
+    ],
+    bottom_cta_title: "আপনার টাকারও একটি স্বপ্ন আছে",
+    bottom_cta_subtitle: "চলুন, একসাথে গড়ি নিরাপদ ভবিষ্যৎ।",
     milestones: [
       {
         id: "m-1",
@@ -101,6 +121,25 @@ export const SWAPNOJATRI_PROJECTS: Project[] = [
     status: "OPEN",
     projected_roi_min: 20.0,
     projected_roi_max: 25.0,
+    hero_quote: "উর্বর মাটিতে আধুনিক কৃষি, নিশ্চিত মৌসুমী ফলন...",
+    hero_tagline: "টেকসই কৃষির অংশীদারিত্বে সুরক্ষিত রিটার্ন",
+    hero_image_url: "/images/hero_investment_bg.jpg",
+    tenure: "১ - ২ বছর (মৌসুমী লভ্যাংশ)",
+    investment_type: "এগ্রো প্রফিট শেয়ার",
+    risk_level: "প্রাকৃতিক ও বাজার ঝুঁকি সাপেক্ষ",
+    map_url: "https://maps.google.com/?q=Singair,Manikganj",
+    map_image_url: "/images/washpur_map.svg",
+    gallery_images: [
+      { title: "গ্রিনহাউস ও অর্গানিক ফার্ম", image_url: "/images/gallery_land.jpg" },
+      { title: "আধুনিক সেচ ব্যবস্থা", image_url: "/images/gallery_road.jpg" },
+      { title: "মৌসুমী ফসল সংগ্রহ", image_url: "/images/gallery_future.jpg" },
+    ],
+    documents: [
+      { title: "এগ্রো প্রকল্প পরিচিতি (PDF)", file_url: "/documents/agro-prospectus.pdf", type: "PDF", size: "2.1 MB" },
+      { title: "কৃষি বিনিয়োগ চুক্তি (PDF)", file_url: "/documents/investment-agreement.pdf", type: "PDF", size: "1.8 MB" },
+    ],
+    bottom_cta_title: "আপনার পুঁজিতে হোক সমৃদ্ধ বাংলাদেশ",
+    bottom_cta_subtitle: "স্মার্ট এগ্রো উদ্যোগে গড়ে তুলুন নিরাপদ আয়।",
     milestones: [
       {
         id: "ag-1",

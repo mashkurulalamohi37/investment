@@ -47,6 +47,18 @@ export interface ProjectMilestone {
   sequence: number;
 }
 
+export interface ProjectGalleryItem {
+  title: string;
+  image_url: string;
+}
+
+export interface ProjectDocumentItem {
+  title: string;
+  file_url: string;
+  type: string;
+  size?: string;
+}
+
 export interface Project {
   id: string;
   code: string;
@@ -69,6 +81,19 @@ export interface Project {
   projected_roi_min: number | string;
   projected_roi_max: number | string;
   milestones: ProjectMilestone[];
+  // CMS Dynamic Content Fields
+  hero_quote?: string;
+  hero_tagline?: string;
+  hero_image_url?: string;
+  tenure?: string;
+  investment_type?: string;
+  risk_level?: string;
+  map_url?: string;
+  map_image_url?: string;
+  gallery_images?: ProjectGalleryItem[];
+  documents?: ProjectDocumentItem[];
+  bottom_cta_title?: string;
+  bottom_cta_subtitle?: string;
 }
 
 export interface Investment {
