@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCms } from "@/lib/cms/useCms";
 import {
   MapPin,
   Phone,
@@ -24,6 +25,7 @@ import {
 
 export default function ContactPage() {
   const { isBangla } = useAuth();
+  const { contact } = useCms();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [inquirySent, setInquirySent] = useState(false);
   const [inquiryType, setInquiryType] = useState("share_booking");
@@ -49,21 +51,17 @@ export default function ContactPage() {
           <span>{isBangla ? "অফিসিয়াল যোগাযোগ ও ব্যাংকিং" : "Institutional Contact & Banking"}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-[#0A2540] tracking-tight">
-          {isBangla ? "আমাদের সাথে যুক্ত হোন" : "Connect with Swapnojatri"}
+          {isBangla ? contact.header.titleBn : contact.header.title}
         </h1>
         <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed">
-          {isBangla
-            ? "প্রকল্প পরিদর্শন, শেয়ার বুকিং কিংবা ব্যাংক এসক্রো ডিপোজিট সংক্রান্ত যেকোনো প্রয়োজনে আমাদের সাথে সরাসরি যোগাযোগ করুন।"
-            : "Reach out for project site visits, share subscriptions, or verified bank escrow clearing inquiries."}
+          {isBangla ? contact.header.subtitleBn : contact.header.subtitle}
         </p>
       </div>
 
       {/* 2. Main 2-Column Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
         {/* Left Column: Escrow Passbook + Office Hub (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          
           {/* Virtual Escrow Banking Card */}
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#041628] to-[#0A2540] text-white p-6 sm:p-8 shadow-2xl border border-slate-800 space-y-6">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#0066FF]/15 rounded-full blur-3xl pointer-events-none" />
@@ -77,7 +75,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-extrabold tracking-wide uppercase text-white">
-                    The City Bank PLC
+                    {isBangla ? contact.bankPassbook.bankNameBn : contact.bankPassbook.bankName}
                   </h3>
                   <span className="text-[11px] text-cyan-light font-medium block">
                     {isBangla ? "এসক্রো ট্রাস্টি ও ক্লিয়ারিং পার্টনার" : "Custodial Escrow & Clearing Partner"}
@@ -86,7 +84,7 @@ export default function ContactPage() {
               </div>
 
               <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                100% ESCROW SAFE
+                {contact.bankPassbook.badge || "100% ESCROW SAFE"}
               </span>
             </div>
 
@@ -96,7 +94,7 @@ export default function ContactPage() {
                 {isBangla ? "হিসাবের নাম (Beneficiary Title)" : "Beneficiary Title"}
               </span>
               <p className="text-base sm:text-lg font-black tracking-wide text-white">
-                Swapnojatri Investment Platform Ltd
+                {contact.bankPassbook.accountTitle}
               </p>
             </div>
 
@@ -107,12 +105,12 @@ export default function ContactPage() {
                   {isBangla ? "এসক্রো হিসাব নম্বর (Account Number)" : "Escrow Account Number"}
                 </span>
                 <span className="text-xl sm:text-2xl font-black font-mono tracking-wider text-white mt-0.5 block">
-                  1402-9988-7710-1
+                  {contact.bankPassbook.accountNumber}
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => copyToClipboard("1402998877101", "acc")}
+                onClick={() => copyToClipboard(contact.bankPassbook.accountNumber.replace(/[^0-9]/g, ""), "acc")}
                 className="px-4 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-[#0066FF]/30 cursor-pointer"
               >
                 {copiedKey === "acc" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -127,11 +125,13 @@ export default function ContactPage() {
                   <span className="text-[10px] text-slate-400 uppercase font-mono block">
                     {isBangla ? "রাউটিং নম্বর" : "Routing No"}
                   </span>
-                  <span className="font-bold font-mono text-white text-sm">225275357</span>
+                  <span className="font-bold font-mono text-white text-sm">
+                    {contact.bankPassbook.routingNumber}
+                  </span>
                 </div>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard("225275357", "rt")}
+                  onClick={() => copyToClipboard(contact.bankPassbook.routingNumber, "rt")}
                   className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10"
                   title="Copy Routing Number"
                 >
@@ -143,19 +143,26 @@ export default function ContactPage() {
                 <span className="text-[10px] text-slate-400 uppercase font-mono block">
                   {isBangla ? "শাখা (Branch)" : "Branch"}
                 </span>
-                <span className="font-bold text-white text-xs truncate block">Gulshan-1 Branch, Dhaka</span>
+                <span className="font-bold text-white text-xs truncate block">
+                  {isBangla ? contact.bankPassbook.branchNameBn : contact.bankPassbook.branchName}
+                </span>
               </div>
             </div>
 
-            {/* Bottom Channels */}
-            <div className="relative z-10 pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
-              <span>{isBangla ? "অনুমোদিত লেনদেন মাধ্যম:" : "Accepted Channels:"}</span>
-              <div className="flex gap-1.5">
-                <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">BEFTN</span>
-                <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">NPSB</span>
-                <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">RTGS</span>
-                <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">Pay-Order</span>
+            {/* Bottom Channels & Notice */}
+            <div className="relative z-10 pt-2 border-t border-white/10 space-y-1.5 text-[11px] text-slate-400">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>{isBangla ? "অনুমোদিত লেনদেন মাধ্যম:" : "Accepted Channels:"}</span>
+                <div className="flex gap-1.5">
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">BEFTN</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">NPSB</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">RTGS</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] font-bold">Pay-Order</span>
+                </div>
               </div>
+              <p className="text-[10px] text-slate-400/90 italic pt-1">
+                {isBangla ? contact.bankPassbook.noticeBn : contact.bankPassbook.notice}
+              </p>
             </div>
           </div>
 
@@ -167,31 +174,27 @@ export default function ContactPage() {
                 <Building2 className="w-5 h-5" />
               </div>
               <h4 className="font-extrabold text-[#0A2540] text-sm">
-                {isBangla ? "প্রধান কার্যালয় (গুলশান-১, ঢাকা)" : "Corporate Head Office (Gulshan-1)"}
+                {isBangla ? contact.headOffice.titleBn : contact.headOffice.title}
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {isBangla
-                  ? "লেভেল ৭, কনকর্ড টাওয়ার, রোড ১১, গুলশান-১, ঢাকা-১২১২"
-                  : "Level 7, Concord Tower, Road 11, Gulshan-1, Dhaka-1212"}
+                {isBangla ? contact.headOffice.addressBn : contact.headOffice.address}
               </p>
             </div>
 
-            {/* Savar Site Desk */}
+            {/* Project Site Desk */}
             <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-card hover:shadow-cardHover transition-all space-y-2">
               <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-[#00B4D8] flex items-center justify-center">
                 <MapPin className="w-5 h-5" />
               </div>
               <h4 className="font-extrabold text-[#0A2540] text-sm">
-                {isBangla ? "সাভার প্রজেক্ট সাইট অফিস" : "Savar Project Site Desk"}
+                {isBangla ? contact.siteOffice.titleBn : contact.siteOffice.title}
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {isBangla
-                  ? "ওয়াশপুর টাওয়ার রোড (বসিলা ব্রিজ সংলগ্ন), হেমায়েতপুর, সাভার"
-                  : "Washpur Tower Road (Near Bosila Bridge), Savar, Dhaka"}
+                {isBangla ? contact.siteOffice.addressBn : contact.siteOffice.address}
               </p>
             </div>
 
-            {/* Helpline */}
+            {/* Helpline & WhatsApp */}
             <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-card hover:shadow-cardHover transition-all space-y-2">
               <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <Phone className="w-5 h-5" />
@@ -200,7 +203,7 @@ export default function ContactPage() {
                 {isBangla ? "হেল্পলাইন ও হোয়াটসঅ্যাপ" : "Helpline & WhatsApp"}
               </h4>
               <p className="text-xs font-mono font-bold text-slate-800">
-                +880 1712-345678 / +880 1819-998877
+                {contact.channels.advisorHotline || contact.headOffice.phone}
               </p>
             </div>
 
@@ -213,7 +216,7 @@ export default function ContactPage() {
                 {isBangla ? "অফিসিয়াল ইমেইল" : "Investor Relations Email"}
               </h4>
               <p className="text-xs font-mono text-slate-600 truncate">
-                invest@swapnojatri.com
+                {contact.channels.supportEmail || contact.headOffice.email}
               </p>
             </div>
           </div>
@@ -372,7 +375,6 @@ export default function ContactPage() {
 
         {/* Compact Map Container with Floating Overlay */}
         <div className="relative w-full h-[260px] sm:h-[300px] rounded-2xl overflow-hidden border border-slate-200/90 shadow-card bg-slate-100">
-          {/* Embedded Google Maps iframe pinpointed to Concord Tower, Gulshan-1, Dhaka */}
           <iframe
             title="Concord Tower Gulshan-1 Location Map"
             src="https://maps.google.com/maps?q=Concord+Tower,+Road+11,+Gulshan-1,+Dhaka,+Bangladesh&t=&z=16&ie=UTF8&iwloc=&output=embed"
@@ -381,7 +383,6 @@ export default function ContactPage() {
             allowFullScreen
           />
 
-          {/* Floating Google Map Card (Concord Tower, Gulshan-1 - Exact Google Maps Widget Style) */}
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 max-w-[270px] sm:max-w-[310px] bg-white rounded-xl p-3.5 sm:p-4 shadow-lg border border-slate-200/90 z-10 space-y-2">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -396,7 +397,6 @@ export default function ContactPage() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-                {/* External link button */}
                 <a
                   href="https://maps.google.com/?q=Concord+Tower,+Road+11,+Gulshan-1,+Dhaka"
                   target="_blank"
@@ -406,7 +406,6 @@ export default function ContactPage() {
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>
-                {/* Google Maps Direction Diamond Button */}
                 <a
                   href="https://www.google.com/maps/dir/?api=1&destination=Concord+Tower+Road+11+Gulshan-1+Dhaka"
                   target="_blank"
@@ -414,10 +413,7 @@ export default function ContactPage() {
                   className="w-8 h-8 rounded-full bg-[#1A73E8] hover:bg-[#1557B0] text-white flex items-center justify-center transition-transform hover:scale-105 shadow-sm"
                   title={isBangla ? "দিকনির্দেশনা পান" : "Get Directions"}
                 >
-                  <svg
-                    className="w-4 h-4 fill-current"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M21.71 11.29l-9-9a.996.996 0 0 0-1.41 0l-9 9a.996.996 0 0 0 0 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 0 0 0-1.41zm-9.71 6.3l-7.59-7.59 7.59-7.59 7.59 7.59-7.59 7.59zm1-8.59V6.5l3.5 3.5-3.5 3.5v-2.5h-3v-3h3z"/>
                   </svg>
                 </a>

@@ -4,9 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { ShieldCheck, Building2, MapPin, Phone, Mail, FileText, CheckCircle2, Award, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCms } from "@/lib/cms/useCms";
 
 export default function Footer() {
   const { isBangla } = useAuth();
+  const { global } = useCms();
 
   return (
     <footer className="bg-[#030914] text-slate-300 border-t border-slate-800/80">
@@ -18,35 +20,39 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 shrink-0">
                 <img
-                  src="/swapnojatri_logo.svg"
-                  alt="স্বপ্নযাত্রী"
+                  src={global.logoUrl || "/swapnojatri_logo.svg"}
+                  alt={isBangla ? global.brandNameBn : global.brandName}
                   className="w-full h-full object-contain filter drop-shadow"
                 />
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-extrabold text-white tracking-tight">
-                  {isBangla ? "স্বপ্নযাত্রী ইনভেস্টমেন্ট" : "Swapnojatri Investment"}
+                  {isBangla ? global.brandNameBn : global.brandName}
                 </span>
                 <span className="text-[10px] text-cyan-light font-bold uppercase tracking-wider">
-                  {isBangla ? "সহজ ও নির্ভরযোগ্য প্রফিট-শেয়ারিং" : "Smart Multi-Project Crowdfunding"}
+                  {isBangla ? global.brandSubtitleBn : global.brandSubtitle}
                 </span>
               </div>
             </Link>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal pr-4">
-              {isBangla
-                ? "স্বপ্নযাত্রী ঢাকায় জমি, আধুনিক কৃষি ও লাভজনক বাণিজ্যিক উদ্যোগে সাধারণ মানুষকে অল্প পুঁজিতে অংশ নিয়ে সরাসরি অর্জিত নিট মুনাফা লাভের নির্ভরযোগ্য মাধ্যম।"
-                : "Swapnojatri enables everyday investors to participate in vetted prime land, smart agro, and commercial businesses with small amounts to earn distributed net profits."}
+              {isBangla ? global.legal.disclaimerBn : global.legal.disclaimer}
             </p>
 
             <div className="pt-2 text-xs text-slate-400 font-mono space-y-1">
               <div>
-                <span className="text-slate-500">DNCC Trade Reg:</span>{" "}
-                <span className="text-slate-200">TRAD/DNCC/049182/2026</span>
+                <span className="text-slate-500">Trade License:</span>{" "}
+                <span className="text-slate-200">{global.legal.tradeLicense}</span>
               </div>
               <div>
                 <span className="text-slate-500">Corporate TIN:</span>{" "}
-                <span className="text-slate-200">718294019283</span>
+                <span className="text-slate-200">{global.legal.tin}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">Sub-Registry:</span>{" "}
+                <span className="text-slate-200">
+                  {isBangla ? global.legal.subRegistryJurisdictionBn : global.legal.subRegistryJurisdiction}
+                </span>
               </div>
             </div>
           </div>
@@ -130,18 +136,16 @@ export default function Footer() {
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-cyan shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
-                  {isBangla
-                    ? "লেভেল ৭, কনকর্ড টাওয়ার, রোড ১১, গুলশান-১, ঢাকা-১২১২"
-                    : "Level 7, Concord Tower, Road 11, Gulshan-1, Dhaka-1212"}
+                  {isBangla ? global.contact.addressBn : global.contact.address}
                 </span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-cyan shrink-0" />
-                <span className="font-mono text-white font-bold">+880 1712-345678</span>
+                <span className="font-mono text-white font-bold">{global.contact.hotline}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-cyan shrink-0" />
-                <span className="font-mono text-slate-200">invest@swapnojatri.com</span>
+                <span className="font-mono text-slate-200">{global.contact.email}</span>
               </li>
               <li className="flex items-center gap-2.5 pt-1 text-[11px] text-slate-400">
                 <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />

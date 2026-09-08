@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCms } from "@/lib/cms/useCms";
 import {
   Users,
   ShieldCheck,
@@ -20,77 +21,23 @@ import {
   Landmark,
 } from "lucide-react";
 
+const STEP_ICON_MAP: Record<string, any> = {
+  Users,
+  ShieldCheck,
+  Coins,
+  Landmark,
+  FileCheck2,
+  TrendingUp,
+  Building2,
+  Scale,
+  FileText,
+};
+
 export default function HowItWorksPage() {
   const { isBangla } = useAuth();
+  const { howItWorks } = useCms();
 
-  const phases = [
-    {
-      phaseNum: "01",
-      phaseTitle: isBangla ? "পরিচিতি ও নিরাপদ নিবন্ধন" : "Investor Onboarding & KYC",
-      steps: [
-        {
-          num: isBangla ? "১" : "1",
-          title: isBangla ? "মোবাইল OTP ভেরিফিকেশন" : "Mobile OTP Verification",
-          desc: isBangla
-            ? "বাংলাদেশি মোবাইল নম্বরে তাৎক্ষণিক SMS কোডের মাধ্যমে এনক্রিপ্টেড অ্যাকাউন্ট সক্রিয় করুন।"
-            : "Quick instant SMS OTP verification secures your account identity.",
-          icon: Users,
-        },
-        {
-          num: isBangla ? "২" : "2",
-          title: isBangla ? "স্মার্ট এনআইডি ও নমিনি কেওয়াইসি" : "Smart NID & Nominee KYC",
-          desc: isBangla
-            ? "আইনি নিরাপত্তা ও উত্তরাধিকার সংরক্ষণে আপনার জাতীয় পরিচয়পত্র ও নমিনির তথ্য জমা দিন।"
-            : "Submit legal Smart NID details and designate nominee for fiduciary safety.",
-          icon: ShieldCheck,
-        },
-      ],
-    },
-    {
-      phaseNum: "02",
-      phaseTitle: isBangla ? "শেয়ার নির্বাচন ও এসক্রো পেমেন্ট" : "Share Booking & Escrow",
-      steps: [
-        {
-          num: isBangla ? "৩" : "3",
-          title: isBangla ? "শেয়ার সংখ্যা নির্বাচন (১-৪টি)" : "Share Selection (1 to 4 Units)",
-          desc: isBangla
-            ? "ল্যান্ডভেস্ট ১০০ প্রকল্পে ১ থেকে ৪টি শেয়ার নির্বাচন করুন (প্রতি শেয়ার মাত্র ৳২৫,৫০০)।"
-            : "Select 1 to 4 fixed share units with transparent pro-rata equity calculation.",
-          icon: Coins,
-        },
-        {
-          num: isBangla ? "৪" : "4",
-          title: isBangla ? "সিটি ব্যাংক এসক্রো ক্লিয়ারিং" : "City Bank Escrow Clearing",
-          desc: isBangla
-            ? "EPS গেটওয়ে (বিকাশ/কার্ড) অথবা সরাসরি সিটি ব্যাংক এসক্রো অ্যাকাউন্টে অর্থ জমা দিন।"
-            : "Direct deposit via The City Bank PLC Escrow or online EPS gateway.",
-          icon: Landmark,
-        },
-      ],
-    },
-    {
-      phaseNum: "03",
-      phaseTitle: isBangla ? "ডিজিটাল সার্টিফিকেট ও লভ্যাংশ" : "Digital Asset & Profit Payout",
-      steps: [
-        {
-          num: isBangla ? "৫" : "5",
-          title: isBangla ? "SHA-256 ডিজিটাল সার্টিফিকেট" : "Cryptographic Share Certificate",
-          desc: isBangla
-            ? "পেমেন্ট নিশ্চিতের সাথে সাথে সিকোয়েনশিয়াল লট নম্বর ও হ্যাশযুক্ত সার্টিফিকেট ইস্যু।"
-            : "Instant issuance of cryptographic SHA-256 certificate in your vault.",
-          icon: FileCheck2,
-        },
-        {
-          num: isBangla ? "৬" : "6",
-          title: isBangla ? "প্রো-রাটা ব্যাংক লভ্যাংশ জমা" : "Pro-Rata Profit Payout",
-          desc: isBangla
-            ? "প্রকল্প থেকে অর্জিত নিট মুনাফা সরাসরি আপনার ব্যাংক অ্যাকাউন্টে প্রো-রাটা হারে জমা হবে।"
-            : "Direct pro-rata net profit bank transfer upon commercial milestones.",
-          icon: TrendingUp,
-        },
-      ],
-    },
-  ];
+  const phases = howItWorks.phases || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
@@ -98,15 +45,13 @@ export default function HowItWorksPage() {
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-50 text-[#0066FF] border border-blue-100 shadow-2xs">
           <Layers className="w-3.5 h-3.5" />
-          <span>{isBangla ? "কার্যপদ্ধতি" : "How It Works"}</span>
+          <span>{isBangla ? howItWorks.header.badgeBn : howItWorks.header.badge}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-black text-[#0A2540] tracking-tight">
-          {isBangla ? "সহজ ও নিরাপদ বিনিয়োগ কার্যপদ্ধতি" : "Institutional 3-Phase Process"}
+          {isBangla ? howItWorks.header.titleBn : howItWorks.header.title}
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 font-normal max-w-xl mx-auto leading-relaxed">
-          {isBangla
-            ? "মোবাইল ওয়ান-টাইম পাসওয়ার্ড থেকে শুরু করে সিটি ব্যাংক এসক্রো এবং লভ্যাংশ বণ্টন পর্যন্ত ৩টি ধাপে স্বচ্ছ কার্যপ্রণালী।"
-            : "From instant mobile verification to City Bank escrow clearing and pro-rata profit payout in 3 transparent phases."}
+          {isBangla ? howItWorks.header.subtitleBn : howItWorks.header.subtitle}
         </p>
       </div>
 
@@ -114,7 +59,7 @@ export default function HowItWorksPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {phases.map((phase) => (
           <div
-            key={phase.phaseNum}
+            key={phase.id || phase.phaseNum}
             className="bg-white rounded-3xl border border-slate-200/90 shadow-card p-6 space-y-5 flex flex-col justify-between hover:shadow-cardHover transition-all"
           >
             {/* Phase Header */}
@@ -123,14 +68,14 @@ export default function HowItWorksPage() {
                 PHASE {phase.phaseNum}
               </span>
               <h3 className="font-extrabold text-[#0A2540] text-sm">
-                {phase.phaseTitle}
+                {isBangla ? phase.phaseTitleBn : phase.phaseTitle}
               </h3>
             </div>
 
             {/* Steps in this phase */}
             <div className="space-y-4">
-              {phase.steps.map((s) => {
-                const Icon = s.icon;
+              {(phase.steps || []).map((s) => {
+                const Icon = STEP_ICON_MAP[s.icon] || FileCheck2;
                 return (
                   <div key={s.num} className="p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 space-y-2">
                     <div className="flex items-center gap-2.5">
@@ -138,11 +83,11 @@ export default function HowItWorksPage() {
                         <Icon className="w-4 h-4" />
                       </div>
                       <h4 className="font-bold text-[#0A2540] text-xs sm:text-[13px]">
-                        {s.title}
+                        {isBangla ? s.titleBn : s.title}
                       </h4>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                      {s.desc}
+                      {isBangla ? s.descBn : s.desc}
                     </p>
                   </div>
                 );

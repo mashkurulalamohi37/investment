@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { SWAPNOJATRI_PROJECTS } from "@/lib/api/projects";
+import { useCms } from "@/lib/cms/useCms";
 import ShareMatrixGrid from "@/components/project/ShareMatrixGrid";
 import TransparencyLedger from "@/components/project/TransparencyLedger";
 import LandVestStoryCard from "@/components/project/LandVestStoryCard";
@@ -27,55 +27,30 @@ import {
   Receipt,
 } from "lucide-react";
 
+const ICON_MAP: Record<string, any> = {
+  Layers,
+  Building2,
+  Receipt,
+  Scale,
+  ShieldCheck,
+  Award,
+  Coins,
+};
+
 export default function HomePage() {
   const { isBangla, isAuthenticated } = useAuth();
+  const { home } = useCms();
 
-  const featuredProjects = SWAPNOJATRI_PROJECTS.slice(0, 3);
+  // Extract live projects for showcase
+  const showcaseProjects = (home.liveProjectsSection?.projects || [])
+    .filter((p) => p.showOnHome)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-  const trustPillars = [
-    {
-      icon: Layers,
-      title: isBangla ? "১০০ নির্দিষ্ট শেয়ার" : "Fixed 100 Unit Equity",
-      desc: isBangla
-        ? "প্রতিটি প্রজেক্ট কঠোরভাবে ১০০টি নির্দিষ্ট শেয়ারে সীমাবদ্ধ। অতিরিক্ত শেয়ার ইস্যুর কোনো ঝুঁকি নেই।"
-        : "Strictly fixed at 100 units per project. Prevents dilution and guarantees transparent 1.0% equity per share.",
-      color: "text-brand-emerald",
-      bg: "bg-brand-light/60",
-    },
-    {
-      icon: Building2,
-      title: isBangla ? "সিটি ব্যাংক এসক্রো হিসাব" : "City Bank Escrow Safety",
-      desc: isBangla
-        ? "সকল বিনিয়োগ সুরক্ষিত দ্য সিটি ব্যাংক পিএলসি এসক্রো একাউন্টে জমা হয়। অনুমোদিত ব্যয় ছাড়া ফান্ড উত্তোলন অসম্ভব।"
-        : "Direct institutional clearing through The City Bank PLC. Disbursed only against vetted project milestones.",
-      color: "text-cyan-dark",
-      bg: "bg-cyan-tint/60",
-    },
-    {
-      icon: Receipt,
-      title: isBangla ? "১০০% অডিটকৃত ব্যয় ভাউচার" : "100% Audited Fund Ledger",
-      desc: isBangla
-        ? "জমির উন্নয়ন ও প্রজেক্টের প্রতিটি খরচের ভাউচার ও রসিদ ২৪/৭ লাইভ লেজারে উন্মুক্ত থাকে।"
-        : "Complete transparent real-time expense book with vendor receipts and independent audit trail.",
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
-    {
-      icon: Scale,
-      title: isBangla ? "সরাসরি প্রো-রাটা লভ্যাংশ" : "Mathematical Pro-Rata Returns",
-      desc: isBangla
-        ? "প্রজেক্টের যাবতীয় নিট মুনাফা গাণিতিক প্রো-রাটা সূত্রে সরাসরি আপনার ব্যাংক একাউন্টে জমা হয়।"
-        : "Net commercial and agro profits are automatically calculated and distributed directly into your account.",
-      color: "text-jade-dark",
-      bg: "bg-jade-light/60",
-    },
-  ];
+  // 4 Bento Trust Pillars from CMS
+  const trustPillars = home.trustPillars || [];
 
   return (
     <div className="space-y-16 lg:space-y-20 pb-20">
-      {/* =========================================================================
-          1. HERO SECTION — Ultra-Luxurious Deep Mesh Gradient
-          ========================================================================= */}
       {/* =========================================================================
           1. HERO SECTION — Ultra-Luxurious Prime Asset Imagery & Ambient Mesh
           ========================================================================= */}
@@ -83,7 +58,7 @@ export default function HomePage() {
         {/* Full Background Asset Image with Balanced Cinematic Gradient */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img
-            src="/images/hero_investment_bg.jpg"
+            src={home.hero.bgImageUrl || "/images/hero_investment_bg.jpg"}
             alt="Prime Asset and Smart Agro Development"
             className="w-full h-full object-cover object-center lg:object-[center_28%]"
           />
@@ -102,51 +77,53 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-semibold text-cyan-light shadow-inner">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <Sparkles className="w-3.5 h-3.5 text-cyan" />
-              <span>
-                {isBangla
-                  ? "ল্যান্ডভেস্ট ১০০ লাইভ • ৭৪টি শেয়ার বরাদ্দ সম্পন্ন"
-                  : "LandVest 100 Live • 74 Shares Subscribed (74%)"}
-              </span>
+              <span>{isBangla ? home.hero.taglineBn : home.hero.tagline}</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.14]">
               {isBangla ? (
                 <>
-                  পরিকল্পিত প্রজেক্টে বিনিয়োগ। <br />
-                  <span className="text-shimmer-blue">সরাসরি মুনাফা বণ্টন।</span>
+                  {home.hero.headlineBn.split("।")[0]}
+                  {home.hero.headlineBn.includes("।") ? "।" : ""}{" "}
+                  <br />
+                  <span className="text-shimmer-blue">
+                    {home.hero.headlineBn.split("।")[1] || ""}
+                  </span>
                 </>
               ) : (
                 <>
-                  Invest in High-Value Assets. <br />
-                  <span className="text-shimmer-blue">Share Verified Profits.</span>
+                  {home.hero.headline.split(".")[0]}
+                  {home.hero.headline.includes(".") ? "." : ""}{" "}
+                  <br />
+                  <span className="text-shimmer-blue">
+                    {home.hero.headline.split(".")[1] || ""}
+                  </span>
                 </>
               )}
             </h1>
 
             {/* Sub-Headline */}
             <p className="text-xs sm:text-sm lg:text-base text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              {isBangla
-                ? "স্বপ্নযাত্রী জমি, স্মার্ট এগ্রো এবং উচ্চ-সম্ভাবনাময় উদ্যোগে সাধারণ মানুষকে অল্প পুঁজিতে অংশ নেওয়ার আধুনিক প্ল্যাটফর্ম। কোনো প্রজেক্টের ব্যক্তিগত জটিল ঝামেলা ছাড়া সহজে ইনভেস্ট করুন এবং সরাসরি লভ্যাংশ পান।"
-                : "Swapnojatri enables everyday investors to participate in vetted prime land, smart agro, and commercial businesses. No property management headaches—invest securely and earn distributed pro-rata profits."}
+              {isBangla ? home.hero.subheadlineBn : home.hero.subheadline}
             </p>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-0.5">
               <Link
-                href="/projects/landvest-100"
+                href={home.hero.primaryCtaUrl || "/projects/landvest-100"}
                 className="w-full sm:w-auto px-7 py-3 rounded-full btn-primary-glow text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>{isBangla ? "ল্যান্ডভেস্ট ১০০ প্রজেক্ট দেখুন" : "Explore LandVest 100"}</span>
+                <span>{isBangla ? home.hero.primaryCtaTextBn : home.hero.primaryCtaText}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 text-cyan-light" />
               </Link>
 
               <Link
-                href="/projects"
+                href={home.hero.secondaryCtaUrl || "/projects"}
                 className="w-full sm:w-auto px-6 py-3 rounded-full btn-secondary-glow text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-cyan" />
-                <span>{isBangla ? "সকল প্রজেক্ট স্পেকট্রাম" : "View All Projects"}</span>
+                <span>{isBangla ? home.hero.secondaryCtaTextBn : home.hero.secondaryCtaText}</span>
               </Link>
             </div>
 
@@ -165,32 +142,16 @@ export default function HomePage() {
             {/* Trust Metrics Ribbon — Sleek Solid Frosted Glass Bar */}
             <div className="pt-3 border-t border-white/15 max-w-2xl mx-auto lg:mx-0">
               <div className="p-2.5 sm:p-3 rounded-2xl bg-[#040D1A]/75 backdrop-blur-xl border border-white/20 shadow-xl grid grid-cols-3 divide-x divide-white/15 text-center">
-                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
-                  <span className="text-xs sm:text-base lg:text-lg font-black text-cyan font-mono whitespace-nowrap block">
-                    {isBangla ? "৪টি প্রজেক্ট" : "4 Projects"}
-                  </span>
-                  <span className="text-[9px] sm:text-[11px] text-slate-300 font-medium whitespace-nowrap block mt-0.5">
-                    {isBangla ? "ট্র্যাক রেকর্ড" : "Track Record"}
-                  </span>
-                </div>
-
-                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
-                  <span className="text-xs sm:text-base lg:text-lg font-black text-white font-mono whitespace-nowrap block">
-                    {isBangla ? "১০০টি শেয়ার" : "100 Units"}
-                  </span>
-                  <span className="text-[9px] sm:text-[11px] text-slate-300 font-medium whitespace-nowrap block mt-0.5">
-                    {isBangla ? "নির্দিষ্ট ইকুইটি" : "Fixed Equity"}
-                  </span>
-                </div>
-
-                <div className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
-                  <span className="text-xs sm:text-base lg:text-lg font-black text-emerald-400 font-mono whitespace-nowrap block">
-                    {isBangla ? "১০০% প্রদেয়" : "100% Pro-Rata"}
-                  </span>
-                  <span className="text-[9px] sm:text-[11px] text-slate-300 font-medium whitespace-nowrap block mt-0.5">
-                    {isBangla ? "ব্যাংক লভ্যাংশ" : "Bank Payouts"}
-                  </span>
-                </div>
+                {home.metrics.slice(0, 3).map((metric, idx) => (
+                  <div key={metric.id || idx} className="px-1.5 sm:px-3 flex flex-col items-center justify-center">
+                    <span className={`text-xs sm:text-base lg:text-lg font-black ${metric.color || "text-cyan"} font-mono whitespace-nowrap block`}>
+                      {isBangla ? metric.valueBn : metric.value}
+                    </span>
+                    <span className="text-[9px] sm:text-[11px] text-slate-300 font-medium whitespace-nowrap block mt-0.5">
+                      {isBangla ? metric.labelBn : metric.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -216,25 +177,37 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trustPillars.map((tp, idx) => (
-            <div
-              key={idx}
-              className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card hover:shadow-cardHover hover:-translate-y-1 transition-all duration-300 space-y-4 flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className={`w-12 h-12 rounded-2xl ${tp.bg} ${tp.color} flex items-center justify-center`}>
-                  <tp.icon className="w-6 h-6" />
+          {trustPillars.map((tp, idx) => {
+            const PillarIcon = ICON_MAP[tp.icon] || Layers;
+            return (
+              <div
+                key={tp.id || idx}
+                className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-card hover:shadow-cardHover hover:-translate-y-1 transition-all duration-300 space-y-4 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-tint/60 text-cyan-dark flex items-center justify-center">
+                    <PillarIcon className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-mono">
+                      {isBangla ? tp.badgeBn : tp.badge}
+                    </span>
+                    <h3 className="text-base font-bold text-slate-900 pt-1">
+                      {isBangla ? tp.titleBn : tp.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {isBangla ? tp.descBn : tp.desc}
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-slate-900">{tp.title}</h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{tp.desc}</p>
-              </div>
 
-              <div className="pt-2 flex items-center gap-1 text-[11px] font-bold text-brand-emerald">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>{isBangla ? "যাচাইকৃত সুবিধা" : "Verified Protocol"}</span>
+                <div className="pt-2 flex items-center gap-1 text-[11px] font-bold text-brand-emerald">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>{isBangla ? "যাচাইকৃত সুবিধা" : "Verified Protocol"}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -253,184 +226,182 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================================
-          5. COMPACT ONGOING & UPCOMING PROJECTS (চলমান ও পাইপলাইন প্রকল্পসমূহ)
+          5. CMS-CONTROLLED ONGOING & UPCOMING PROJECTS SHOWCASE
           ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Compact Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-slate-200/80">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{isBangla ? "প্রকল্প পোর্টফোলিও" : "Investment Portfolio"}</span>
+      {home.liveProjectsSection?.enabled !== false && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-slate-200/80">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>
+                  {isBangla
+                    ? home.liveProjectsSection.badgeBn
+                    : home.liveProjectsSection.badge}
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
+                {isBangla
+                  ? home.liveProjectsSection.titleBn
+                  : home.liveProjectsSection.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
+                {isBangla
+                  ? home.liveProjectsSection.subtitleBn
+                  : home.liveProjectsSection.subtitle}
+              </p>
             </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">
-              {isBangla ? "চলমান ও পাইপলাইন প্রকল্পসমূহ" : "Ongoing & Upcoming Projects"}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
-              {isBangla
-                ? "১০০টি নির্দিষ্ট ভাগে বিভক্ত যাচাইকৃত প্রাইম জমি ও লাভজনক এগ্রো প্রকল্পে ব্যাংক এসক্রো নিরাপত্তায় অংশ নিন।"
-                : "Vetted prime land and high-yield agro assets structured into 100 fixed shares with escrow security."}
-            </p>
+
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 hover:text-brand-emerald shadow-2xs transition-all self-start sm:self-auto group cursor-pointer shrink-0"
+            >
+              <span>{isBangla ? "সকল প্রকল্প দেখুন" : "View All Projects"}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-brand-emerald transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
 
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 hover:text-brand-emerald shadow-2xs transition-all self-start sm:self-auto group cursor-pointer shrink-0"
-          >
-            <span>{isBangla ? "সকল প্রকল্প দেখুন" : "View All Projects"}</span>
-            <ArrowRight className="w-3.5 h-3.5 text-brand-emerald transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+          {/* Dynamic Project Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {showcaseProjects.map((proj) => {
+              const progressPercent = Math.min(
+                100,
+                Math.round((proj.allocatedShares / (proj.totalShares || 1)) * 100)
+              );
+              const detailUrl = proj.ctaUrl || `/projects/${proj.projectCode.toLowerCase()}`;
 
-        {/* Compact 3-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {featuredProjects.map((proj) => {
-            const isLandVest = proj.code === "LV100";
-            const isUpcoming = proj.status === "UPCOMING";
-            const progressPercent = Math.min(100, Math.round((proj.allocated_shares / proj.total_shares) * 100));
-            const detailUrl = isLandVest ? "/projects/landvest-100" : `/projects/${proj.code}`;
+              return (
+                <div
+                  key={proj.id}
+                  className="bg-white rounded-2xl border border-slate-200/90 hover:border-brand-emerald/40 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+                >
+                  {/* Image Header with Badges */}
+                  <div className="relative h-36 sm:h-40 overflow-hidden bg-slate-900">
+                    <img
+                      src={proj.imageUrl || "/images/landvest_hero.jpg"}
+                      alt={proj.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
 
-            return (
-              <div
-                key={proj.id}
-                className="bg-white rounded-2xl border border-slate-200/90 hover:border-brand-emerald/40 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between overflow-hidden group"
-              >
-                {/* Image Header with Compact Badges */}
-                <div className="relative h-36 sm:h-40 overflow-hidden bg-slate-900">
-                  <img
-                    src={proj.hero_image_url || "/images/landvest_hero.jpg"}
-                    alt={proj.name}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
-
-                  {/* Top Badges */}
-                  <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#040D1A]/85 backdrop-blur-md text-cyan-light border border-white/20 shadow-xs">
-                      {proj.code}
-                    </span>
-                    {isUpcoming ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/90 backdrop-blur-md text-white border border-amber-400/40 shadow-xs">
+                    {/* Top Badges */}
+                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#040D1A]/85 backdrop-blur-md text-cyan-light border border-white/20 shadow-xs">
+                        {proj.projectCode}
+                      </span>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md text-white border shadow-xs ${
+                        proj.isUpcoming
+                          ? "bg-amber-500/90 border-amber-400/40"
+                          : "bg-emerald-500/90 border-emerald-400/40"
+                      }`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        <span>{isBangla ? "শীঘ্রই আসছে" : "UPCOMING"}</span>
+                        <span>{isBangla ? proj.statusBadgeBn : proj.statusBadge}</span>
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/90 backdrop-blur-md text-white border border-emerald-400/40 shadow-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        <span>{isBangla ? "চলমান" : "OPEN"}</span>
+                    </div>
+
+                    {/* Bottom Image Overlay Info */}
+                    <div className="absolute bottom-2.5 left-2.5 right-2.5">
+                      <span className="text-[10px] font-mono text-cyan-light font-bold flex items-center gap-1 drop-shadow">
+                        <MapPin className="w-3 h-3 text-cyan shrink-0" />
+                        <span className="truncate">{isBangla ? proj.locationBn : proj.location}</span>
                       </span>
-                    )}
+                    </div>
                   </div>
 
-                  {/* Bottom Image Overlay Info */}
-                  <div className="absolute bottom-2.5 left-2.5 right-2.5">
-                    <span className="text-[10px] font-mono text-cyan-light font-bold flex items-center gap-1 drop-shadow">
-                      <MapPin className="w-3 h-3 text-cyan shrink-0" />
-                      <span className="truncate">{isBangla ? proj.location_bn : proj.location}</span>
+                  {/* Card Body */}
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
+                          {isBangla ? proj.categoryBn : proj.category}
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-slate-500">
+                          {proj.isUpcoming
+                            ? (isBangla ? `${proj.totalShares}টি শেয়ার লক্ষ্য` : `${proj.totalShares} Units Goal`)
+                            : `${proj.totalShares - proj.allocatedShares} ${isBangla ? "ভাগ বাকি" : "Units Left"}`}
+                        </span>
+                      </div>
+
+                      <Link href={detailUrl} className="block group-hover:text-brand-emerald transition-colors">
+                        <h3 className="text-base font-black text-slate-900 tracking-tight leading-snug line-clamp-1">
+                          {isBangla ? proj.nameBn : proj.name}
+                        </h3>
+                      </Link>
+                    </div>
+
+                    {/* Compact Key Metrics 2-Col Box */}
+                    <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                      <div>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase font-mono block">
+                          {isBangla ? "প্রতি শেয়ার মূল্য" : "Per Share Price"}
+                        </span>
+                        <span className="font-mono font-black text-[#0066FF] text-sm block mt-0.5">
+                          {formatBDT(proj.pricePerShare, { isBangla })}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase font-mono block">
+                          {isBangla ? "প্রত্যাশিত ROI" : "Projected ROI"}
+                        </span>
+                        <span className="font-mono font-black text-emerald-600 text-sm block mt-0.5">
+                          {proj.projectedRoiMin}% - {proj.projectedRoiMax}%
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Share Subscription Progress Bar */}
+                    <div className="space-y-1 pt-0.5">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                        <span>
+                          {proj.isUpcoming
+                            ? (isBangla ? "প্রি-বুকিং রেজিস্ট্রেশন চলমান" : "Pre-Booking Registration")
+                            : (isBangla
+                                ? `${proj.allocatedShares} / ${proj.totalShares} শেয়ার বরাদ্দ`
+                                : `${proj.allocatedShares} / ${proj.totalShares} Subscribed`)}
+                        </span>
+                        <span className="text-brand-emerald font-mono font-black">
+                          {proj.isUpcoming ? (isBangla ? "শীঘ্রই" : "Soon") : `${progressPercent}%`}
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${
+                            proj.isUpcoming
+                              ? "bg-amber-400"
+                              : "bg-gradient-to-r from-brand-forest via-brand-emerald to-cyan"
+                          }`}
+                          style={{ width: proj.isUpcoming ? "12%" : `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Compact Card Action Footer */}
+                  <div className="p-3 px-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="truncate">
+                        {isBangla ? proj.escrowBadgeBn : proj.escrowBadge}
+                      </span>
                     </span>
-                  </div>
-                </div>
 
-                {/* Card Body */}
-                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
-                        {proj.category === "REAL_ESTATE"
-                          ? isBangla ? "🏢 জমি ও আবাসন" : "Real Estate"
-                          : proj.category === "AGRICULTURAL"
-                          ? isBangla ? "🌱 স্মার্ট এগ্রো" : "Smart Agro"
-                          : isBangla ? "🐄 ডেইরি ও ক্যাটল" : "Livestock"}
-                      </span>
-                      <span className="text-[10px] font-mono font-bold text-slate-500">
-                        {isUpcoming
-                          ? (isBangla ? "১০০টি শেয়ার লক্ষ্য" : "100 Units Goal")
-                          : `${proj.total_shares - proj.allocated_shares} ${isBangla ? "ভাগ বাকি" : "Units Left"}`}
-                      </span>
-                    </div>
-
-                    <Link href={detailUrl} className="block group-hover:text-brand-emerald transition-colors">
-                      <h3 className="text-base font-black text-slate-900 tracking-tight leading-snug line-clamp-1">
-                        {isBangla ? proj.name_bn : proj.name}
-                      </h3>
-                    </Link>
-
-                    <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 font-normal">
-                      {isBangla ? proj.description_bn : proj.description}
-                    </p>
-                  </div>
-
-                  {/* Compact Key Metrics 2-Col Box */}
-                  <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
-                    <div>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase font-mono block">
-                        {isBangla ? "প্রতি শেয়ার মূল্য" : "Per Share Price"}
-                      </span>
-                      <span className="font-mono font-black text-[#0066FF] text-sm block mt-0.5">
-                        {formatBDT(proj.price_per_share, { isBangla })}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase font-mono block">
-                        {isBangla ? "প্রত্যাশিত ROI" : "Projected ROI"}
-                      </span>
-                      <span className="font-mono font-black text-emerald-600 text-sm block mt-0.5">
-                        {proj.projected_roi_min}% - {proj.projected_roi_max}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Share Subscription Progress Bar */}
-                  <div className="space-y-1 pt-0.5">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                    <Link
+                      href={detailUrl}
+                      className="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-brand-emerald text-white font-bold text-[11px] flex items-center gap-1 shadow-2xs transition-all group-hover:scale-[1.02] cursor-pointer shrink-0"
+                    >
                       <span>
-                        {isUpcoming
-                          ? (isBangla ? "প্রি-বুকিং রেজিস্ট্রেশন চলমান" : "Pre-Booking Registration")
-                          : (isBangla
-                              ? `${proj.allocated_shares} / ${proj.total_shares} শেয়ার বরাদ্দ`
-                              : `${proj.allocated_shares} / ${proj.total_shares} Subscribed`)}
+                        {isBangla ? proj.ctaTextBn : proj.ctaText}
                       </span>
-                      <span className="text-brand-emerald font-mono font-black">
-                        {isUpcoming ? (isBangla ? "শীঘ্রই" : "Soon") : `${progressPercent}%`}
-                      </span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-700 ${
-                          isUpcoming
-                            ? "bg-amber-400"
-                            : "bg-gradient-to-r from-brand-forest via-brand-emerald to-cyan"
-                        }`}
-                        style={{ width: isUpcoming ? "12%" : `${progressPercent}%` }}
-                      />
-                    </div>
+                      <ArrowRight className="w-3 h-3 text-cyan-light transition-transform group-hover:translate-x-0.5" />
+                    </Link>
                   </div>
                 </div>
-
-                {/* Compact Card Action Footer */}
-                <div className="p-3 px-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-medium text-slate-500 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="truncate">{isBangla ? "সিটি ব্যাংক এসক্রো" : "City Bank Escrow"}</span>
-                  </span>
-
-                  <Link
-                    href={detailUrl}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-brand-emerald text-white font-bold text-[11px] flex items-center gap-1 shadow-2xs transition-all group-hover:scale-[1.02] cursor-pointer shrink-0"
-                  >
-                    <span>
-                      {isUpcoming
-                        ? (isBangla ? "অগ্রিম দেখুন" : "Preview")
-                        : (isBangla ? "বিস্তারিত দেখুন" : "View Details")}
-                    </span>
-                    <ArrowRight className="w-3 h-3 text-cyan-light transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* =========================================================================
           6. LIVE FUND LEDGER & AUDITED EXPENSE VOUCHERS (Investors Only)
@@ -442,7 +413,7 @@ export default function HomePage() {
       )}
 
       {/* =========================================================================
-          7. CALL TO ACTION RIBBON
+          7. CMS-CONTROLLED CALL TO ACTION RIBBON
           ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="p-8 sm:p-12 rounded-3xl bg-[#0A2540] hero-mesh-gradient text-white text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden border border-slate-800">
@@ -452,22 +423,22 @@ export default function HomePage() {
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               {isBangla
-                ? "আজই ল্যান্ডভেস্ট ১০০-এ আপনার শেয়ার নিশ্চিত করুন"
-                : "Secure Your Pro-Rata Shares in LandVest 100"}
+                ? home.conversionBanner.titleBn
+                : home.conversionBanner.title}
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
               {isBangla
-                ? "প্রতি শেয়ার মাত্র ৳২৫,৫০০। EPS গেটওয়ে (বিকাশ/কার্ড) বা সিটি ব্যাংক এসক্রো অ্যাকাউন্টে সরাসরি জমা দিয়ে আজই বিনিয়োগ সম্পন্ন করুন।"
-                : "Starting at ৳25,500 per share. Instant payment via EPS Gateway or direct City Bank Escrow deposit."}
+                ? home.conversionBanner.subtitleBn
+                : home.conversionBanner.subtitle}
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto relative z-10 shrink-0">
             <Link
-              href="/projects/landvest-100"
+              href={home.conversionBanner.ctaUrl || "/projects/landvest-100"}
               className="px-8 py-4 rounded-full bg-brand-emerald hover:bg-brand-forest text-white font-extrabold text-sm text-center shadow-lg shadow-brand-emerald/30 transition-all flex items-center justify-center gap-2 group"
             >
-              <span>{isBangla ? "অনলাইনে শেয়ার বুক করুন" : "Invest Now"}</span>
+              <span>{isBangla ? home.conversionBanner.ctaTextBn : home.conversionBanner.ctaText}</span>
               <ArrowRight className="w-4 h-4 text-cyan-light transition-transform group-hover:translate-x-1" />
             </Link>
           </div>

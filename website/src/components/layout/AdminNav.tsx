@@ -81,8 +81,10 @@ export default function AdminNav() {
     },
     {
       href: "/admin/cms",
-      label: isBangla ? "স্টোরি ও ইমেজ CMS" : "Our Story Media CMS",
-      icon: ImageIcon,
+      label: isBangla ? "ইউনিভার্সাল CMS কন্ট্রোল" : "Universal CMS Studio",
+      icon: Globe,
+      badge: "LIVE",
+      badgeColor: "bg-emerald-400/20 text-emerald-300 border border-emerald-400/30",
     },
     {
       href: "/admin/settings",

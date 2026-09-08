@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCms } from "@/lib/cms/useCms";
 import {
   AboutPageCmsConfig,
   AboutImageItem,
@@ -27,31 +28,8 @@ import {
 
 export default function AboutPage() {
   const { isBangla } = useAuth();
-
-  // Dynamic CMS state
-  const [cmsConfig, setCmsConfig] = useState<AboutPageCmsConfig>(DEFAULT_ABOUT_CMS);
+  const { about: cmsConfig } = useCms();
   const [activePreview, setActivePreview] = useState<AboutImageItem | null>(null);
-
-  // Fetch CMS config from API / LocalStorage
-  useEffect(() => {
-    async function fetchCms() {
-      try {
-        const res = await fetch("/api/cms/about");
-        const json = await res.json();
-        if (json.success && json.data) {
-          setCmsConfig(json.data);
-          localStorage.setItem("swapnojatri_about_cms", JSON.stringify(json.data));
-        } else {
-          const cached = localStorage.getItem("swapnojatri_about_cms");
-          if (cached) setCmsConfig(JSON.parse(cached));
-        }
-      } catch (err) {
-        const cached = localStorage.getItem("swapnojatri_about_cms");
-        if (cached) setCmsConfig(JSON.parse(cached));
-      }
-    }
-    fetchCms();
-  }, []);
 
   const principles = [
     {
@@ -150,14 +128,20 @@ export default function AboutPage() {
 
             <p>
               {isBangla
-                ? "আমরা অপরিচিত মানুষের কাছ থেকে বড় আকারে অর্থ সংগ্রহের চিন্তা থেকে এটি শুরু করিনি। বরং পরিচিত ও আমাদের ওপর আস্থা রাখেন—এমন মানুষদের ছোট অঙ্কে একটি নিরাপদ যৌথ বিনিয়োগের সুযোগে যুক্ত করার চিন্তা থেকেই স্বপ্নযাত্রী ও LandVest 100 এর সূচনা।"
-                : "Rather than raising capital indiscriminately from strangers, Swapnojatri was born to provide trusted individuals with low-ticket access to asset-backed co-investments."}
+                ? (cmsConfig.storyParagraphs?.p1Bn || "আমরা অপরিচিত মানুষের কাছ থেকে বড় আকারে অর্থ সংগ্রহের চিন্তা থেকে এটি শুরু করিনি।")
+                : (cmsConfig.storyParagraphs?.p1 || "Rather than raising capital indiscriminately from strangers, Swapnojatri was born to provide trusted individuals with low-ticket access to asset-backed co-investments.")}
+            </p>
+
+            <p>
+              {isBangla
+                ? (cmsConfig.storyParagraphs?.p2Bn || "জমির প্রতিটি খণ্ডকে কঠোরভাবে ১০০টি নির্দিষ্ট ইউনিটে রূপান্তর করেছি।")
+                : (cmsConfig.storyParagraphs?.p2 || "By dividing prime verified properties into exactly 100 fractional units with mandatory City Bank escrow supervision, we eliminated middleman exploitation.")}
             </p>
 
             <p className="font-bold text-[#0066FF] p-3 rounded-2xl bg-blue-50/60 border border-blue-100">
               {isBangla
-                ? "আমাদের লক্ষ্য সম্পূর্ণ স্বচ্ছতা—কোনো লুকায়িত শর্ত নেই। আপনি পরিকল্পনা বুঝবেন, ভাউচার দেখবেন, তারপর সিদ্ধান্ত নেবেন।"
-                : "Our goal is absolute fiduciary transparency without hidden clauses. Review our audited ledger, inspect the bank escrow, and invest with confidence."}
+                ? (cmsConfig.storyParagraphs?.quoteBn || "“ছোট পুঁজিতে অংশীদারিত্ব, শতভাগ স্বচ্ছতা এবং নিরাপদ ভবিষ্যৎ।”")
+                : (cmsConfig.storyParagraphs?.quote || "“Small investments, transparent governance, transformative legacy.”")}
             </p>
 
             {/* Verification checklist bullets */}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCms } from "@/lib/cms/useCms";
 import {
   Globe,
   LayoutDashboard,
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const { user, isAuthenticated, logout, isBangla, toggleLanguage } = useAuth();
+  const { global } = useCms();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +44,24 @@ export default function Navbar() {
 
   return (
     <div className="sticky top-0 z-50 w-full">
+      {/* Top Announcement Banner (CMS Controlled) */}
+      {global.announcement?.enabled && (
+        <div className="w-full bg-gradient-to-r from-[#003B46] via-[#0A2540] to-[#003B46] border-b border-cyan-500/30 text-white text-[11px] sm:text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 shadow-sm">
+          <Sparkles className="w-3 h-3 text-amber-400 shrink-0 animate-pulse" />
+          <span className="font-medium">
+            {isBangla ? global.announcement.textBn : global.announcement.text}
+          </span>
+          {global.announcement.link && (
+            <Link
+              href={global.announcement.link}
+              className="underline font-bold text-cyan-300 hover:text-white transition-colors ml-1"
+            >
+              {isBangla ? global.announcement.linkTextBn : global.announcement.linkText} →
+            </Link>
+          )}
+        </div>
+      )}
+
       {/* Main Deep Royal Navy Glassmorphic Header */}
       <header
         className={`w-full transition-all duration-200 border-b ${
@@ -56,23 +76,23 @@ export default function Navbar() {
             <Link href="/" className="flex items-center gap-3 group shrink-0">
               <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 relative transition-transform duration-300 group-hover:scale-105">
                 <img
-                  src="/swapnojatri_logo.svg"
-                  alt="Swapnojatri"
+                  src={global.logoUrl || "/swapnojatri_logo.svg"}
+                  alt={isBangla ? global.brandNameBn : global.brandName}
                   className="w-full h-full object-contain filter drop-shadow"
                 />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold text-white text-base sm:text-lg leading-tight tracking-tight">
-                    {isBangla ? "স্বপ্নযাত্রী" : "Swapnojatri"}
+                    {isBangla ? global.brandNameBn : global.brandName}
                   </span>
                   <span className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
                     <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
-                    <span>{isBangla ? "যাচাইকৃত" : "Verified"}</span>
+                    <span>{isBangla ? global.verifiedBadgeBn : global.verifiedBadge}</span>
                   </span>
                 </div>
                 <span className="text-[10px] font-bold text-cyan-light tracking-wide">
-                  {isBangla ? "ইনভেস্টমেন্ট প্ল্যাটফর্ম" : "Investment Platform"}
+                  {isBangla ? global.brandSubtitleBn : global.brandSubtitle}
                 </span>
               </div>
             </Link>

@@ -1,7 +1,14 @@
 // Server-side State Store for Swapnojatri API (cPanel compatible)
+import fs from "fs";
+import path from "path";
 import { SWAPNOJATRI_PROJECTS } from "../api/projects";
 import { Project } from "@/types/api";
-import { AboutPageCmsConfig, DEFAULT_ABOUT_CMS } from "@/types/cms";
+import { 
+  MasterCmsState, 
+  DEFAULT_MASTER_CMS, 
+  AboutPageCmsConfig, 
+  DEFAULT_ABOUT_CMS 
+} from "@/types/cms";
 
 export interface ServerInvestment {
   id: string;
@@ -241,10 +248,93 @@ class DataStore {
     cityBankEscrowBalance: 12850000,
   };
 
-  aboutCms: AboutPageCmsConfig = { ...DEFAULT_ABOUT_CMS };
+  masterCms: MasterCmsState = loadCmsData();
+
+  get aboutCms(): AboutPageCmsConfig {
+    return this.masterCms.about;
+  }
+
+  set aboutCms(val: AboutPageCmsConfig) {
+    this.masterCms.about = val;
+    this.masterCms.updatedAt = new Date().toISOString();
+    saveCmsData(this.masterCms);
+  }
+
+  updateMasterCms(newCms: Partial<MasterCmsState> | MasterCmsState): MasterCmsState {
+    this.masterCms = {
+      ...this.masterCms,
+      ...newCms,
+      updatedAt: new Date().toISOString(),
+    };
+    saveCmsData(this.masterCms);
+    return this.masterCms;
+  }
+
+  resetMasterCms(): MasterCmsState {
+    this.masterCms = {
+      ...DEFAULT_MASTER_CMS,
+      updatedAt: new Date().toISOString(),
+    };
+    saveCmsData(this.masterCms);
+    return this.masterCms;
+  }
+}
+
+const CMS_FILE_PATH = path.join(process.cwd(), "src", "data", "cms_data.json");
+
+function loadCmsData(): MasterCmsState {
+  try {
+    if (fs.existsSync(CMS_FILE_PATH)) {
+      const raw = fs.readFileSync(CMS_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        return {
+          ...DEFAULT_MASTER_CMS,
+          ...parsed,
+          global: { ...DEFAULT_MASTER_CMS.global, ...(parsed.global || {}) },
+          home: { ...DEFAULT_MASTER_CMS.home, ...(parsed.home || {}) },
+          about: { ...DEFAULT_MASTER_CMS.about, ...(parsed.about || {}) },
+          howItWorks: { ...DEFAULT_MASTER_CMS.howItWorks, ...(parsed.howItWorks || {}) },
+          faq: { ...DEFAULT_MASTER_CMS.faq, ...(parsed.faq || {}) },
+          documents: { ...DEFAULT_MASTER_CMS.documents, ...(parsed.documents || {}) },
+          contact: { ...DEFAULT_MASTER_CMS.contact, ...(parsed.contact || {}) },
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to read cms_data.json, falling back to defaults:", err);
+  }
+
+  // If file doesn't exist, create it with factory defaults
+  try {
+    const dir = path.dirname(CMS_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(DEFAULT_MASTER_CMS, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("Could not save initial cms_data.json:", err);
+  }
+
+  return { ...DEFAULT_MASTER_CMS };
+}
+
+function saveCmsData(data: MasterCmsState): boolean {
+  try {
+    const dir = path.dirname(CMS_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(CMS_FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
+    return true;
+  } catch (err) {
+    console.error("Failed to write cms_data.json:", err);
+    return false;
+  }
 }
 
 // Global singleton instance for server execution
 const globalForDb = global as unknown as { dbStore: DataStore };
 export const db = globalForDb.dbStore || new DataStore();
 if (process.env.NODE_ENV !== "production") globalForDb.dbStore = db;
+
