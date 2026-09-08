@@ -167,16 +167,84 @@ class ApiService {
     }
   }
 
+  /// 8. Fetch CMS Configuration / Master CMS Data from Website Backend
+  Future<Map<String, dynamic>?> getCmsData({String? section}) async {
+    try {
+      final url = section != null
+          ? '${AppConfig.activeApiUrl}/cms?section=$section'
+          : '${AppConfig.activeApiUrl}/cms';
+      final uri = Uri.parse(url);
+      final response = await _client.get(uri, headers: _headers).timeout(_timeout);
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['success'] == true) {
+          return decoded['data'] as Map<String, dynamic>?;
+        }
+      }
+    } catch (e) {
+      debugPrint('[ApiService] Error fetching CMS data: $e');
+    }
+    return null;
+  }
+
   // --- Mappers ---
   ProjectModel _mapProject(Map<String, dynamic> json) {
+    final rawCat = (json['category'] as String?)?.toUpperCase() ?? 'REAL_ESTATE';
+    ProjectCategory projectCat = ProjectCategory.realEstate;
+    String catNameBn = 'রিয়েল এস্টেট জমি';
+    if (rawCat.contains('AGRO') || rawCat.contains('AGRICULTURAL')) {
+      projectCat = ProjectCategory.agroFarming;
+      catNameBn = 'স্মার্ট এগ্রো ফার্মিং';
+    } else if (rawCat.contains('COMMERCIAL') || rawCat.contains('DAIRY')) {
+      projectCat = ProjectCategory.commercial;
+      catNameBn = 'বাণিজ্যিক উদ্যোগ';
+    }
+
+    final rawStatus = (json['status'] as String?)?.toUpperCase() ?? 'ACTIVE';
+    ProjectStatus pStatus = ProjectStatus.active;
+    if (rawStatus == 'UPCOMING') {
+      pStatus = ProjectStatus.upcoming;
+    } else if (rawStatus == 'FUNDED') {
+      pStatus = ProjectStatus.funded;
+    } else if (rawStatus == 'COMPLETED') {
+      pStatus = ProjectStatus.completed;
+    } else if (rawStatus == 'CLOSED') {
+      pStatus = ProjectStatus.closed;
+    }
+
+    String rawImage = json['image_url'] ??
+        json['cover_image_url'] ??
+        json['hero_image_url'] ??
+        'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800';
+    if (rawImage.startsWith('/')) {
+      rawImage = AppConfig.resolveUrl(rawImage);
+    }
+
+    List<Milestone> milestones = [];
+    if (json['milestones'] is List) {
+      final mList = json['milestones'] as List;
+      milestones = mList.map((m) {
+        return Milestone(
+          id: m['id']?.toString() ?? 'm-1',
+          title: m['title']?.toString() ?? '',
+          titleBn: m['title_bn']?.toString() ?? m['title']?.toString() ?? '',
+          description: m['description']?.toString() ?? '',
+          date: m['milestone_date'] != null
+              ? DateTime.tryParse(m['milestone_date'].toString()) ?? DateTime.now()
+              : DateTime.now(),
+          isCompleted: m['is_completed'] == true,
+        );
+      }).toList();
+    }
+
     return ProjectModel(
       id: json['id'] ?? 'proj-lv100',
       code: json['code'] ?? 'LV100',
       name: json['name'] ?? 'LandVest 100',
       nameBn: json['name_bn'] ?? 'ল্যান্ডভেস্ট ১০০ (ওয়াশপুর, ঢাকা)',
-      category: json['category'] ?? 'REAL_ESTATE',
-      projectCategory: ProjectCategory.realEstate,
-      categoryNameBn: 'রিয়েল এস্টেট জমি',
+      category: rawCat,
+      projectCategory: projectCat,
+      categoryNameBn: catNameBn,
       location: json['location'] ?? 'Washpur, Dhaka',
       description: json['description'] ?? '',
       descriptionBn: json['description_bn'] ?? '',
@@ -186,12 +254,12 @@ class ApiService {
       minShares: (json['min_shares'] as num?)?.toInt() ?? 1,
       maxShares: (json['max_shares'] as num?)?.toInt() ?? 4,
       allocatedShares: (json['allocated_shares'] as num?)?.toInt() ?? 74,
-      status: ProjectStatus.active,
+      status: pStatus,
       startDate: DateTime.now().subtract(const Duration(days: 30)),
-      imageUrl: json['image_url'] ?? json['cover_image_url'] ?? 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800',
-      milestones: [],
+      imageUrl: rawImage,
+      milestones: milestones,
       highlights: [
-        'Prime location in Washpur, Tower Road, Dhaka',
+        'Prime location in ${json['location'] ?? 'Dhaka'}',
         'Direct Shariah Murabaha profit-sharing',
         'City Bank Escrow Account verified',
       ],

@@ -49,7 +49,7 @@ class EpsPaymentSessionRequest {
     required this.customerPhone,
     required this.projectTitle,
     required this.shareCount,
-    this.callbackUrl = 'https://swapnojatri.com/api/payment/eps-callback',
+    this.callbackUrl = 'https://investment-alpha-smoky.vercel.app/api/payment/eps-callback',
   });
 }
 

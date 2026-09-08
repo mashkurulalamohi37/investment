@@ -11,6 +11,7 @@ import 'package:swapnojatri/features/investor/kyc/kyc_screen.dart';
 import 'package:swapnojatri/features/investor/document_vault/document_vault_screen.dart';
 import 'package:swapnojatri/features/investor/support/support_screen.dart';
 import 'package:swapnojatri/features/investor/transparency/transparency_screen.dart';
+import 'package:swapnojatri/core/constants/app_config.dart';
 
 class ProfileScreen extends StatelessWidget {
   final AppState state;
@@ -208,7 +209,176 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
+
+              // Cloud Backend & CMS Connection Section
+              MatraRuleWidget(width: 32, color: palette.pine),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isBangla ? 'অনলাইন ক্লাউড ও সিএমএস সিঙ্ক' : 'Cloud Backend & CMS Live Sync',
+                    style: AppTypography.titleMedium(isDark: isDark, isBangla: isBangla).copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: state.isWebsiteConnected
+                          ? const Color(0xFF10B981).withValues(alpha: 0.12)
+                          : const Color(0xFFEF4444).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: state.isWebsiteConnected
+                            ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                            : const Color(0xFFEF4444).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: state.isWebsiteConnected ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          state.isWebsiteConnected
+                              ? (isBangla ? 'অনলাইন ক্লাউড' : 'Online Vercel')
+                              : (isBangla ? 'অফলাইন ক্যাশ' : 'Offline Mode'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: state.isWebsiteConnected ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: AppRadius.borderCard,
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.cloud_done_rounded, color: palette.pine, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isBangla ? 'লাইভ ক্লাউড ব্যাকএন্ড ডিপ্লয়মেন্ট' : 'Live Production Deployment',
+                                style: AppTypography.bodyStrong(isDark: isDark).copyWith(fontSize: 13),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                AppConfig.activeApiUrl,
+                                style: const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 11,
+                                  color: Color(0xFF0066FF),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          state.lastSyncedAt != null
+                              ? (isBangla
+                                  ? 'সর্বশেষ সিঙ্ক: ${state.lastSyncedAt!.hour.toString().padLeft(2, '0')}:${state.lastSyncedAt!.minute.toString().padLeft(2, '0')}'
+                                  : 'Last Sync: ${state.lastSyncedAt!.hour.toString().padLeft(2, '0')}:${state.lastSyncedAt!.minute.toString().padLeft(2, '0')}')
+                              : (isBangla ? 'সিঙ্ক করা প্রয়োজন' : 'Sync needed'),
+                          style: TextStyle(fontSize: 11, color: palette.inkSecondary),
+                        ),
+                        InkWell(
+                          onTap: state.isSyncing
+                              ? null
+                              : () async {
+                                  await state.syncWithWebsite();
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          state.isWebsiteConnected
+                                              ? (isBangla
+                                                  ? 'অনলাইন ক্লাউড ডাটা সফলভাবে সিঙ্ক হয়েছে'
+                                                  : 'Live cloud data synced with Vercel backend!')
+                                              : (isBangla
+                                                  ? 'ক্লাউড ব্যাকএন্ডে সংযোগ স্থাপন করা সম্ভব হয়নি'
+                                                  : 'Could not connect to online backend'),
+                                        ),
+                                        backgroundColor: state.isWebsiteConnected
+                                            ? const Color(0xFF059669)
+                                            : const Color(0xFFDC2626),
+                                      ),
+                                    );
+                                  }
+                                },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: palette.pine.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: palette.pine.withValues(alpha: 0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (state.isSyncing)
+                                  const SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                else
+                                  Icon(Icons.sync_rounded, size: 14, color: palette.pine),
+                                const SizedBox(width: 6),
+                                Text(
+                                  state.isSyncing
+                                      ? (isBangla ? 'সিঙ্ক হচ্ছে...' : 'Syncing...')
+                                      : (isBangla ? 'এখনই সিঙ্ক করুন' : 'Sync Now'),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: palette.pine,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
 
               // Preferences Section (Language & Theme)
               MatraRuleWidget(width: 32, color: palette.pine),

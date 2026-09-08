@@ -5,6 +5,7 @@ import 'package:swapnojatri/data/models/user_model.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/admin/modules/admin_payment_verification_screen.dart';
 import 'package:swapnojatri/features/admin/modules/audit_logs_screen.dart';
+import 'package:swapnojatri/core/constants/app_config.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
   final AppState state;
@@ -85,7 +86,35 @@ class AdminSettingsScreen extends StatelessWidget {
                   );
                 },
               ),
-              _buildSettingsTile(Icons.cloud_sync_outlined, isBangla ? 'ব্যাকআপ ও রিস্টোর' : 'Backup & Restore', palette),
+              _buildSettingsTile(
+                state.isWebsiteConnected ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                isBangla
+                    ? 'ক্লাউড সিঙ্ক (${state.isWebsiteConnected ? "অনলাইন সংযুক্ত" : "অফলাইন"})'
+                    : 'Cloud Backend Live Sync (${state.isWebsiteConnected ? "Online Connected" : "Offline"})',
+                palette,
+                subtitle: AppConfig.activeApiUrl,
+                onTap: () async {
+                  await state.syncWithWebsite();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          state.isWebsiteConnected
+                              ? (isBangla
+                                  ? 'ক্লাউড ডাটা সফলভাবে সিঙ্ক হয়েছে'
+                                  : 'Synced with Vercel backend!')
+                              : (isBangla
+                                  ? 'ক্লাউড ব্যাকএন্ডে সংযোগ স্থাপন সম্ভব হয়নি'
+                                  : 'Could not connect to online backend'),
+                        ),
+                        backgroundColor: state.isWebsiteConnected
+                            ? const Color(0xFF059669)
+                            : const Color(0xFFDC2626),
+                      ),
+                    );
+                  }
+                },
+              ),
               _buildSettingsTile(Icons.security_outlined, isBangla ? 'সিকিউরিটি সেটিংস' : 'Security Settings', palette),
               const SizedBox(height: 16),
 
@@ -131,6 +160,7 @@ class AdminSettingsScreen extends StatelessWidget {
     AppPalette palette, {
     VoidCallback? onTap,
     bool isHighlight = false,
+    String? subtitle,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -154,6 +184,16 @@ class AdminSettingsScreen extends StatelessWidget {
             color: isHighlight ? const Color(0xFF0066FF) : palette.ink,
           ),
         ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 10.5,
+                  color: Color(0xFF0066FF),
+                ),
+              )
+            : null,
         trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: palette.inkTertiary),
       ),
     );

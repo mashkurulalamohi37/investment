@@ -15,6 +15,7 @@ import 'package:swapnojatri/data/models/user_model.dart';
 import 'package:swapnojatri/data/models/withdrawal_model.dart';
 import 'package:swapnojatri/core/constants/project_seeds.dart';
 import 'package:swapnojatri/core/services/api_service.dart';
+import 'package:swapnojatri/core/constants/app_config.dart';
 
 /// Central reactive state store for Swapnojatri Investment Platform
 class AppState extends ChangeNotifier {
@@ -97,7 +98,10 @@ class AppState extends ChangeNotifier {
 
   int get unreadNotificationCount => _notifications.where((n) => !n.isRead).length;
 
-  /// Asynchronously fetch live data from the website backend (Next.js / cPanel)
+  Map<String, dynamic>? _cmsData;
+  Map<String, dynamic>? get cmsData => _cmsData;
+
+  /// Asynchronously fetch live data from the website backend (Next.js / Vercel)
   Future<void> syncWithWebsite({bool notify = true}) async {
     _isSyncing = true;
     if (notify) notifyListeners();
@@ -140,8 +144,14 @@ class AppState extends ChangeNotifier {
           _kyc = liveKyc;
         }
 
+        // 5. Fetch live Master CMS configuration
+        final liveCms = await api.getCmsData();
+        if (liveCms != null) {
+          _cmsData = liveCms;
+        }
+
         _lastSyncedAt = DateTime.now();
-        debugPrint('[AppState] Successfully synced state with Swapnojatri website backend!');
+        debugPrint('[AppState] Successfully synced state with live Vercel backend at ${AppConfig.activeApiUrl}');
       }
     } catch (e) {
       debugPrint('[AppState] Sync error (using offline cache): $e');
