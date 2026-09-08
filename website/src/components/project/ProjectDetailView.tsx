@@ -6,7 +6,6 @@ import { formatBDT } from "@/lib/utils/currency";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Project } from "@/types/api";
 import ShareMatrixGrid from "@/components/project/ShareMatrixGrid";
-import TransparencyLedger from "@/components/project/TransparencyLedger";
 import {
   MapPin,
   Building2,
@@ -999,7 +998,6 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
           projectNameBn={project.name_bn}
           projectCode={project.code}
         />
-        <TransparencyLedger />
       </section>
 
       {/* =========================================================================

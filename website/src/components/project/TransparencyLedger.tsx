@@ -20,7 +20,7 @@ import {
   Lock,
 } from "lucide-react";
 
-export default function TransparencyLedger({ hideIfGuest = false }: { hideIfGuest?: boolean }) {
+export default function TransparencyLedger({ hideIfGuest = true }: { hideIfGuest?: boolean }) {
   const { isBangla, isAuthenticated, user, isLoading } = useAuth();
   const [selectedVoucher, setSelectedVoucher] = useState<any | null>(null);
 
