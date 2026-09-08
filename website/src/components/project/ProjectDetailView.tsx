@@ -33,9 +33,6 @@ import {
   Scale,
   BadgeCheck,
   Sprout,
-  Lock,
-  Unlock,
-  Navigation,
 } from "lucide-react";
 
 interface ProjectDetailViewProps {
@@ -94,8 +91,7 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
     setActiveSlide((prev) => (prev === galleryList.length - 1 ? 0 : prev + 1));
   };
 
-  // Map interactive state to prevent mouse-wheel scroll trapping
-  const [mapInteractive, setMapInteractive] = useState(false);
+  // Map view tab switcher
   const [mapTab, setMapTab] = useState<"LIVE" | "PLAN">("LIVE");
 
   const mapQuery = project.code === "LV100"
@@ -444,53 +440,17 @@ export default function ProjectDetailView({ project }: ProjectDetailViewProps) {
               </div>
             </div>
 
-            {/* Map Frame Container with Anti-Scroll-Trap Protection */}
-            <div
-              className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-inner h-64 sm:h-80 lg:h-88 bg-slate-100 group"
-              onMouseLeave={() => setMapInteractive(false)}
-            >
+            {/* Map Frame Container (100% Crystal Clear & Interactive) */}
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-inner h-72 sm:h-88 lg:h-96 bg-slate-100">
               {mapTab === "LIVE" ? (
-                <>
-                  <iframe
-                    title="Project Location Map"
-                    src={googleMapsEmbedUrl}
-                    className={`w-full h-full border-0 transition-opacity duration-300 ${
-                      mapInteractive ? "pointer-events-auto" : "pointer-events-none"
-                    }`}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-
-                  {/* Anti-Scroll Trap Overlay when not actively interacting */}
-                  {!mapInteractive ? (
-                    <div
-                      onClick={() => setMapInteractive(true)}
-                      className="absolute inset-0 bg-slate-950/10 hover:bg-slate-950/20 backdrop-blur-[1px] flex items-center justify-center cursor-pointer transition-all group/btn"
-                    >
-                      <button
-                        type="button"
-                        className="px-4 py-2 rounded-xl bg-white/95 hover:bg-white text-slate-800 text-xs font-extrabold shadow-lg border border-slate-200 flex items-center gap-2 transform group-hover/btn:scale-105 transition-all cursor-pointer"
-                      >
-                        <MapPin className="w-4 h-4 text-[#0066FF]" />
-                        <span>
-                          {isBangla
-                            ? "👆 ক্লিক করে ম্যাপ নেভিগেট ও জুম করুন"
-                            : "👆 Click to activate map navigation"}
-                        </span>
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setMapInteractive(false)}
-                      className="absolute top-3 right-3 px-3 py-1.5 rounded-xl bg-slate-900/85 hover:bg-slate-900 text-white text-[11px] font-bold backdrop-blur-md shadow-md flex items-center gap-1.5 transition-all cursor-pointer z-10"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>{isBangla ? "স্ক্রোল লক করুন" : "Lock map scroll"}</span>
-                    </button>
-                  )}
-                </>
+                <iframe
+                  title="Project Location Map"
+                  src={googleMapsEmbedUrl}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               ) : (
                 <div className="relative w-full h-full flex items-center justify-center bg-slate-50 p-2">
                   <img
