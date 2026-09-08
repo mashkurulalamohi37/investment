@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   Settings,
@@ -14,6 +15,8 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
 export default function AdminSettingsPage() {
@@ -117,6 +120,33 @@ export default function AdminSettingsPage() {
           <span>{toast}</span>
         </div>
       )}
+
+      {/* 0. Quick Access to Our Story Media CMS */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#0066FF] text-white flex items-center justify-center shrink-0 shadow-sm">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-slate-900 text-sm">
+              {isBangla ? "আমাদের গল্প ও দর্শন (About Page) ছবি ও মিডিয়া CMS" : "Our Story & Media CMS Manager"}
+            </h3>
+            <p className="text-[11px] text-slate-600">
+              {isBangla
+                ? "/about পেজের প্রধান হিরো ছবি, সাইট ফটো অ্যালবাম ও ক্যাপশন নিয়ন্ত্রণ করুন"
+                : "Manage featured story visuals, project site photo albums, and captions for the public /about page"}
+            </p>
+          </div>
+        </div>
+
+        <Link
+          href="/admin/cms"
+          className="px-4 py-2 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all shrink-0 cursor-pointer"
+        >
+          <span>{isBangla ? "মিডিয়া CMS খুলুন" : "Open Media CMS"}</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
 
       {/* 1. Admin Password Change Section */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">

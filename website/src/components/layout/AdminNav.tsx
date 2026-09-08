@@ -13,6 +13,7 @@ import {
   TrendingUp,
   FileText,
   Settings,
+  Image as ImageIcon,
   LogOut,
   Home,
   ChevronRight,
@@ -77,6 +78,11 @@ export default function AdminNav() {
       href: "/admin/reports",
       label: isBangla ? "অডিট রিপোর্ট ও স্টেটমেন্ট" : "Audit Reports & Exports",
       icon: FileText,
+    },
+    {
+      href: "/admin/cms",
+      label: isBangla ? "স্টোরি ও ইমেজ CMS" : "Our Story Media CMS",
+      icon: ImageIcon,
     },
     {
       href: "/admin/settings",

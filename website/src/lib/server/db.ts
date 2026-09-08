@@ -1,6 +1,7 @@
 // Server-side State Store for Swapnojatri API (cPanel compatible)
 import { SWAPNOJATRI_PROJECTS } from "../api/projects";
 import { Project } from "@/types/api";
+import { AboutPageCmsConfig, DEFAULT_ABOUT_CMS } from "@/types/cms";
 
 export interface ServerInvestment {
   id: string;
@@ -239,6 +240,8 @@ class DataStore {
     totalDistributedProfit: 3420000,
     cityBankEscrowBalance: 12850000,
   };
+
+  aboutCms: AboutPageCmsConfig = { ...DEFAULT_ABOUT_CMS };
 }
 
 // Global singleton instance for server execution
