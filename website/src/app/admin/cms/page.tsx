@@ -43,6 +43,8 @@ import {
   ToggleRight,
   X,
   Upload,
+  Info,
+  CheckSquare,
 } from "lucide-react";
 
 type CmsTab =
@@ -64,6 +66,7 @@ export default function MasterCmsAdminPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [mediaCategory, setMediaCategory] = useState<string>("ALL");
 
   // Edit Modals / Form States
   const [editingProject, setEditingProject] = useState<HomeLiveProjectCard | null>(null);
@@ -245,7 +248,7 @@ export default function MasterCmsAdminPage() {
     { id: "global", label: isBangla ? "ব্র্যান্ডিং ও ফুটার" : "Branding & Global", icon: Globe },
     {
       id: "about",
-      label: isBangla ? "আমাদের গল্প" : "Our Story (/about)",
+      label: isBangla ? "আমাদের গল্প (/about)" : "Our Story (/about)",
       icon: BookOpen,
       count: cms.about.storyImages.length,
     },
@@ -253,13 +256,17 @@ export default function MasterCmsAdminPage() {
     { id: "faq", label: isBangla ? "প্রশ্নোত্তর" : "FAQ Manager", icon: HelpCircle, count: cms.faq.items.length },
     {
       id: "documents",
-      label: isBangla ? "ডকুমেন্টস ভল্ট" : "Legal Vault",
+      label: isBangla ? "আইনি ডকুমেন্টস ভল্ট" : "Legal Vault",
       icon: FileText,
       count: cms.documents.documents.length,
     },
-    { id: "contact", label: isBangla ? "যোগাযোগ ও এসক্রো" : "Contact & Escrow", icon: PhoneCall },
-    { id: "media", label: isBangla ? "মিডিয়া লাইব্রেরি" : "Media Presets", icon: ImageIcon, count: PLATFORM_ASSET_PRESETS.length },
+    { id: "contact", label: isBangla ? "যোগাযোগ ও এসক্রো ব্যাংক" : "Contact & Escrow", icon: PhoneCall },
+    { id: "media", label: isBangla ? "মিডিয়া প্রিসেটস" : "Media Presets", icon: ImageIcon, count: PLATFORM_ASSET_PRESETS.length },
   ];
+
+  const filteredMedia = mediaCategory === "ALL"
+    ? PLATFORM_ASSET_PRESETS
+    : PLATFORM_ASSET_PRESETS.filter((p) => p.category === mediaCategory);
 
   return (
     <div className="space-y-6">
@@ -302,7 +309,7 @@ export default function MasterCmsAdminPage() {
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
                   {isBangla
-                    ? "জিরো-কোড অ্যাডমিন কন্ট্রোল: হোমপেজ শোকেস, ব্র্যান্ডিং, স্টোরি, ডকুমেন্টস ও সিটি ব্যাংক এসক্রো কনফিগারেশন"
+                    ? "জিরো-কোড অ্যাডমিন স্টুডিও: হোমপেজ শোকেস, ব্র্যান্ডিং, স্টোরি, ডকুমেন্টস ও সিটি ব্যাংক এসক্রো কনফিগারেশন"
                     : "Zero-code admin studio: control homepage cards, branding, legal vault, FAQs, and live escrow parameters"}
                 </p>
               </div>
@@ -837,6 +844,33 @@ export default function MasterCmsAdminPage() {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Hero Highlight Quote (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.quote || ""}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, quote: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      Hero Highlight Quote (বাংলা)
+                    </label>
+                    <input
+                      type="text"
+                      value={cms.home.hero.quoteBn || ""}
+                      onChange={(e) =>
+                        updateHome((prev) => ({ ...prev, hero: { ...prev.hero, quoteBn: e.target.value } }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+
                   <div className="md:col-span-2">
                     <label className="block text-xs font-semibold text-slate-300 mb-1">
                       Hero Background Image URL
@@ -847,7 +881,7 @@ export default function MasterCmsAdminPage() {
                       onChange={(e) =>
                         updateHome((prev) => ({ ...prev, hero: { ...prev.hero, bgImageUrl: e.target.value } }))
                       }
-                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
                     />
                   </div>
 
@@ -870,7 +904,7 @@ export default function MasterCmsAdminPage() {
                       onChange={(e) =>
                         updateHome((prev) => ({ ...prev, hero: { ...prev.hero, primaryCtaUrl: e.target.value } }))
                       }
-                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
                     />
                   </div>
                 </div>
@@ -1525,10 +1559,11 @@ export default function MasterCmsAdminPage() {
           {/* ========================================================================= */}
           {activeTab === "about" && (
             <div className="space-y-8 animate-fadeIn">
+              {/* Hero Visual */}
               <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
                   <ImageIcon className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">Our Story Hero Visual</h3>
+                  <h3 className="text-base font-bold text-white">1. Our Story Hero Visual</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1546,13 +1581,140 @@ export default function MasterCmsAdminPage() {
                       className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
                     />
                   </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Hero Badge (English)</label>
+                    <input
+                      type="text"
+                      value={cms.about.heroImage.badge || ""}
+                      onChange={(e) =>
+                        updateAbout((prev) => ({
+                          ...prev,
+                          heroImage: { ...prev.heroImage, badge: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Hero Badge (বাংলা)</label>
+                    <input
+                      type="text"
+                      value={cms.about.heroImage.badgeBn || ""}
+                      onChange={(e) =>
+                        updateAbout((prev) => ({
+                          ...prev,
+                          heroImage: { ...prev.heroImage, badgeBn: e.target.value },
+                        }))
+                      }
+                      className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                    />
+                  </div>
                 </div>
               </div>
+
+              {/* Story Narrative Paragraphs */}
+              {cms.about.storyParagraphs && (
+                <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                    <BookOpen className="w-5 h-5 text-amber-400" />
+                    <h3 className="text-base font-bold text-white">2. Narrative Story Paragraphs</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Paragraph 1 (English)</label>
+                      <textarea
+                        rows={3}
+                        value={cms.about.storyParagraphs.p1}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, p1: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Paragraph 1 (বাংলা)</label>
+                      <textarea
+                        rows={3}
+                        value={cms.about.storyParagraphs.p1Bn}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, p1Bn: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Paragraph 2 (English)</label>
+                      <textarea
+                        rows={3}
+                        value={cms.about.storyParagraphs.p2}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, p2: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Paragraph 2 (বাংলা)</label>
+                      <textarea
+                        rows={3}
+                        value={cms.about.storyParagraphs.p2Bn}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, p2Bn: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Highlight Quote (English)</label>
+                      <input
+                        type="text"
+                        value={cms.about.storyParagraphs.quote}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, quote: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Highlight Quote (বাংলা)</label>
+                      <input
+                        type="text"
+                        value={cms.about.storyParagraphs.quoteBn}
+                        onChange={(e) =>
+                          updateAbout((prev) => ({
+                            ...prev,
+                            storyParagraphs: { ...prev.storyParagraphs, quoteBn: e.target.value },
+                          }))
+                        }
+                        className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Gallery Images List */}
               <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                  <h3 className="text-base font-bold text-white">Gallery Photos</h3>
+                  <h3 className="text-base font-bold text-white">3. Field Visit Photo Gallery</h3>
                   <button
                     type="button"
                     onClick={() => {
@@ -2056,7 +2218,7 @@ export default function MasterCmsAdminPage() {
           {activeTab === "media" && (
             <div className="space-y-6 animate-fadeIn">
               <div className="p-6 rounded-2xl bg-[#061529] border border-slate-800 shadow-xl">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                   <div className="flex items-center gap-3">
                     <ImageIcon className="w-5 h-5 text-cyan-400" />
                     <div>
@@ -2066,10 +2228,28 @@ export default function MasterCmsAdminPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Category filter tabs */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {["ALL", "AERIAL", "SITE", "AGRO", "LAND", "INFRASTRUCTURE", "VISION"].map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setMediaCategory(cat)}
+                        className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all ${
+                          mediaCategory === cat
+                            ? "bg-cyan-500 text-black shadow-md"
+                            : "bg-slate-800 text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-                  {PLATFORM_ASSET_PRESETS.map((asset, i) => {
+                  {filteredMedia.map((asset, i) => {
                     const isCopied = copiedUrl === asset.url;
                     return (
                       <div
@@ -2364,6 +2544,42 @@ export default function MasterCmsAdminPage() {
                   />
                 </div>
               </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Category (EN)</label>
+                <input
+                  type="text"
+                  value={editingImage.category}
+                  onChange={(e) => setEditingImage({ ...editingImage, category: e.target.value })}
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Category (বাংলা)</label>
+                <input
+                  type="text"
+                  value={editingImage.categoryBn}
+                  onChange={(e) => setEditingImage({ ...editingImage, categoryBn: e.target.value })}
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Caption (EN)</label>
+                <input
+                  type="text"
+                  value={editingImage.caption}
+                  onChange={(e) => setEditingImage({ ...editingImage, caption: e.target.value })}
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Caption (বাংলা)</label>
+                <input
+                  type="text"
+                  value={editingImage.captionBn}
+                  onChange={(e) => setEditingImage({ ...editingImage, captionBn: e.target.value })}
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-700">
@@ -2541,11 +2757,20 @@ export default function MasterCmsAdminPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Document Title</label>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Document Title (EN)</label>
                 <input
                   type="text"
                   value={editingDoc.title}
                   onChange={(e) => setEditingDoc({ ...editingDoc, title: e.target.value })}
+                  className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Document Title (বাংলা)</label>
+                <input
+                  type="text"
+                  value={editingDoc.titleBn || ""}
+                  onChange={(e) => setEditingDoc({ ...editingDoc, titleBn: e.target.value })}
                   className="w-full bg-[#051120] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
