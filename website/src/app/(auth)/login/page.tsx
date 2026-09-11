@@ -4,7 +4,7 @@ import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { Lock, Phone, ShieldCheck, Eye, EyeOff, Sparkles, ArrowRight, UserCheck } from "lucide-react";
+import { Lock, Phone, ShieldCheck, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 function LoginForm() {
   const { login, isBangla } = useAuth();
@@ -19,28 +19,6 @@ function LoginForm() {
   const [authMode, setAuthMode] = useState<"PASSWORD" | "OTP">("PASSWORD");
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
-
-  const handleQuickAdmin = async () => {
-    setPhone("admin@swapnojatri.com");
-    setPassword("admin123");
-    setLoading(true);
-    const success = await login("admin@swapnojatri.com", "admin123");
-    setLoading(false);
-    if (success) {
-      router.push("/admin");
-    }
-  };
-
-  const handleQuickInvestor = async () => {
-    setPhone("+880 1711-000000");
-    setPassword("investor123");
-    setLoading(true);
-    const success = await login("+880 1711-000000", "investor123");
-    setLoading(false);
-    if (success) {
-      router.push(redirect !== "/admin" ? redirect : "/dashboard");
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,34 +153,6 @@ function LoginForm() {
           </button>
         </form>
 
-        {/* Quick Demo Credentials Box */}
-        <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2.5">
-          <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
-            <span>{isBangla ? "⚡ দ্রুত লগইন (ডেমো অ্যাকাউন্ট):" : "⚡ Quick Demo 1-Click Access:"}</span>
-            <span className="text-[10px] font-mono text-slate-400">INSTANT</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={handleQuickAdmin}
-              disabled={loading}
-              className="py-2 px-3 rounded-xl bg-white border border-slate-200 hover:border-[#0066FF] hover:bg-blue-50/60 text-slate-800 hover:text-[#0066FF] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-            >
-              <span>👑 {isBangla ? "অ্যাডমিন প্যানেল" : "Admin Panel"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleQuickInvestor}
-              disabled={loading}
-              className="py-2 px-3 rounded-xl bg-white border border-slate-200 hover:border-[#0066FF] hover:bg-blue-50/60 text-slate-800 hover:text-[#0066FF] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
-            >
-              <span>💼 {isBangla ? "বিনিয়োগকারী" : "Investor"}</span>
-            </button>
-          </div>
-          <div className="text-[10px] text-slate-400 text-center font-mono">
-            {isBangla ? "অথবা লিখুন: admin@swapnojatri.com / admin123" : "Or manual: admin@swapnojatri.com / admin123"}
-          </div>
-        </div>
 
         {/* Real Registration & Support Links */}
         <div className="pt-4 border-t border-slate-100 space-y-2 text-center">
