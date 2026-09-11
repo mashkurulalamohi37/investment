@@ -1,27 +1,6 @@
 import type { Metadata } from "next";
-import { Hind_Siliguri, Noto_Sans_Bengali, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-
-const hindSiliguri = Hind_Siliguri({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["bengali", "latin"],
-  variable: "--font-hind",
-  display: "swap",
-});
-
-const notoSansBengali = Noto_Sans_Bengali({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["bengali", "latin"],
-  variable: "--font-noto-bengali",
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-jakarta",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Swapnojatri — Transparent Asset-Backed Land & Agro Crowdfunding",
@@ -67,11 +46,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn" className={`${hindSiliguri.variable} ${notoSansBengali.variable} ${plusJakarta.variable}`}>
+    <html lang="bn">
       <head>
         <link rel="icon" type="image/svg+xml" href="/swapnojatri_logo.svg" />
         <link rel="shortcut icon" href="/swapnojatri_logo.svg" />
         <link rel="apple-touch-icon" href="/swapnojatri_logo.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="antialiased bg-[#F8FAFC] text-slate-900 min-h-screen flex flex-col font-sans">
         <Providers>{children}</Providers>
@@ -79,4 +64,3 @@ export default function RootLayout({
     </html>
   );
 }
-

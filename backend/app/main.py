@@ -53,7 +53,19 @@ app.add_middleware(SecurityAndCorrelationMiddleware)
 app.include_router(api_router)
 
 
-# 4. Health Check Endpoints
+# 4. Root & Health Check Endpoints
+@app.get("/", tags=["Root"])
+async def root():
+    return StandardResponse.ok({
+        "message": f"Welcome to {settings.APP_NAME}",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "api_v1": "/api/v1",
+        "health": "/health"
+    })
+
+
 @app.get("/health", tags=["Health"])
 @app.get("/health/live", tags=["Health"])
 async def health_check():

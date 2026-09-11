@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 
 /// Application & Network Configuration for Swapnojatri
 class AppConfig {
-  /// Base domain of the deployed live website & CMS
-  static const String siteBaseUrl = 'https://investment-alpha-smoky.vercel.app';
+  /// Base domain of the deployed live server & Ingress (Port 8083)
+  static const String siteBaseUrl = 'http://118.179.223.42:8083';
 
   /// Local development Next.js server endpoint
   /// For Android emulator, 10.0.2.2 can be used; for web/desktop, localhost:3000.
@@ -11,10 +11,13 @@ class AppConfig {
       ? 'http://localhost:3000/api'
       : 'http://127.0.0.1:3000/api';
 
-  /// Production online Next.js API & CMS URL deployed on Vercel
-  static String productionApiBaseUrl = 'https://investment-alpha-smoky.vercel.app/api';
+  /// Live Cloud/Dedicated Server Backend API URL (Port 9003)
+  static String productionApiBaseUrl = 'http://118.179.223.42:9003/api/v1';
 
-  /// Dynamic API Base URL switcher - Defaulting to TRUE for online live Vercel backend
+  /// Fallback / Alternative Vercel API endpoint
+  static const String vercelApiBaseUrl = 'https://investment-alpha-smoky.vercel.app/api';
+
+  /// Dynamic API Base URL switcher - Defaulting to TRUE for live server backend
   static bool useProduction = true;
 
   /// Active Base URL
