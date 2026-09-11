@@ -5,6 +5,9 @@ import 'package:swapnojatri/core/widgets/project_card.dart';
 import 'package:swapnojatri/data/state/app_state.dart';
 import 'package:swapnojatri/features/investor/project_detail/project_detail_screen.dart';
 import 'package:swapnojatri/features/investor/notifications/notifications_screen.dart';
+import 'package:swapnojatri/features/investor/portfolio/withdrawals_history_screen.dart';
+import 'package:swapnojatri/features/investor/document_vault/document_vault_screen.dart';
+import 'package:swapnojatri/features/investor/profit_distribution/profit_distribution_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final AppState state;
@@ -171,32 +174,79 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // "আমার পোর্টফোলিও" Pill Button
-                        InkWell(
-                          onTap: () => onNavigateTab(2),
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // "আমার পোর্টফোলিও" Pill Button
+                            InkWell(
+                              onTap: () => onNavigateTab(2),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.15),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Text(
-                              isBangla ? 'আমার পোর্টফোলিও' : 'My Portfolio',
-                              style: GoogleFonts.hindSiliguri(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF0066FF),
+                                child: Text(
+                                  isBangla ? 'আমার পোর্টফোলিও' : 'My Portfolio',
+                                  style: GoogleFonts.hindSiliguri(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF0066FF),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            // Direct "উত্তোলন / Withdraw" Pill Button
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WithdrawalsHistoryScreen(state: state),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.arrow_upward_rounded, size: 13, color: Colors.white),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isBangla ? 'টাকা উত্তোলন' : 'Withdraw',
+                                      style: GoogleFonts.hindSiliguri(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -275,6 +325,94 @@ class HomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              // 1.5 Quick Actions Row
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: palette.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.rule, width: 1.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isBangla ? 'প্রয়োজনীয় সেবা ও অ্যাকশন' : 'Quick Actions & Services',
+                      style: GoogleFonts.hindSiliguri(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: palette.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // 1. Payment Withdraw
+                        _buildQuickAction(
+                          context,
+                          icon: Icons.account_balance_wallet_rounded,
+                          color: const Color(0xFF10B981),
+                          label: isBangla ? 'টাকা উত্তোলন' : 'Withdraw',
+                          palette: palette,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WithdrawalsHistoryScreen(state: state),
+                              ),
+                            );
+                          },
+                        ),
+                        // 2. Explore Projects
+                        _buildQuickAction(
+                          context,
+                          icon: Icons.explore_rounded,
+                          color: const Color(0xFF0066FF),
+                          label: isBangla ? 'প্রকল্পসমূহ' : 'Projects',
+                          palette: palette,
+                          onTap: () => onNavigateTab(1),
+                        ),
+                        // 3. Document Vault
+                        _buildQuickAction(
+                          context,
+                          icon: Icons.folder_special_rounded,
+                          color: const Color(0xFF8B5CF6),
+                          label: isBangla ? 'দলিল ভল্ট' : 'Documents',
+                          palette: palette,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DocumentVaultScreen(state: state),
+                              ),
+                            );
+                          },
+                        ),
+                        // 4. Profit Distribution
+                        _buildQuickAction(
+                          context,
+                          icon: Icons.payments_rounded,
+                          color: const Color(0xFFF59E0B),
+                          label: isBangla ? 'লভ্যাংশ' : 'Payouts',
+                          palette: palette,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfitDistributionScreen(state: state),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -508,6 +646,47 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildQuickAction(
+    BuildContext context, {
+    required IconData icon,
+    required Color color,
+    required String label,
+    required AppPalette palette,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        child: Column(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+                border: Border.all(color: color.withValues(alpha: 0.25), width: 1.0),
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: GoogleFonts.hindSiliguri(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: palette.ink,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

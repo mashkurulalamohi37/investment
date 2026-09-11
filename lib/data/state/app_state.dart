@@ -150,6 +150,13 @@ class AppState extends ChangeNotifier {
           _cmsData = liveCms;
         }
 
+        // 6. Fetch live withdrawals
+        final liveWithdrawals = await api.getWithdrawals();
+        if (liveWithdrawals.isNotEmpty) {
+          _withdrawals.clear();
+          _withdrawals.addAll(liveWithdrawals);
+        }
+
         _lastSyncedAt = DateTime.now();
         debugPrint('[AppState] Successfully synced state with live Vercel backend at ${AppConfig.activeApiUrl}');
       }
@@ -953,6 +960,38 @@ class AppState extends ChangeNotifier {
     );
 
     _withdrawals.insert(0, newWithdrawal);
+
+    // Asynchronously sync with live website backend API
+    () async {
+      try {
+        final serverResult = await ApiService().createWithdrawal(
+          type: type,
+          amount: amount,
+          payoutChannel: payoutChannel,
+          userId: _currentUser.id,
+          userName: _currentUser.name,
+          projectId: projectId ?? _landVest100.id,
+          projectName: projectName ?? _landVest100.name,
+          projectNameBn: projectNameBn ?? _landVest100.nameBn,
+          bankName: newWithdrawal.bankName,
+          accountHolderName: newWithdrawal.accountHolderName,
+          accountNumber: newWithdrawal.accountNumber,
+          branchName: newWithdrawal.branchName,
+          routingNumber: newWithdrawal.routingNumber,
+          mfsNumber: newWithdrawal.mfsNumber,
+          userNote: userNote,
+        );
+        if (serverResult != null) {
+          final idx = _withdrawals.indexWhere((w) => w.id == newWithdrawal.id);
+          if (idx != -1) {
+            _withdrawals[idx] = serverResult;
+            notifyListeners();
+          }
+        }
+      } catch (e) {
+        debugPrint('[AppState] Error sending withdrawal to server: $e');
+      }
+    }();
 
     final typeBn = type == WithdrawalType.dividend ? 'লভ্যাংশ' : 'মূলধন';
     final typeEn = type == WithdrawalType.dividend ? 'Dividend' : 'Capital';

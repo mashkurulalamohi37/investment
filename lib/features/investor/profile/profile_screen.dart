@@ -11,6 +11,8 @@ import 'package:swapnojatri/features/investor/kyc/kyc_screen.dart';
 import 'package:swapnojatri/features/investor/document_vault/document_vault_screen.dart';
 import 'package:swapnojatri/features/investor/support/support_screen.dart';
 import 'package:swapnojatri/features/investor/transparency/transparency_screen.dart';
+import 'package:swapnojatri/features/investor/portfolio/withdrawals_history_screen.dart';
+import 'package:swapnojatri/features/investor/profit_distribution/profit_distribution_screen.dart';
 import 'package:swapnojatri/core/constants/app_config.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -181,6 +183,24 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     _profileNavRow(
                       icon: Icons.account_balance_wallet_outlined,
+                      title: isBangla ? 'তহবিল উত্তোলন ও প্রস্থান অনুরোধ' : 'Payment Withdrawals & Settlements',
+                      palette: palette,
+                      isDark: isDark,
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => WithdrawalsHistoryScreen(state: state)));
+                      },
+                    ),
+                    _profileNavRow(
+                      icon: Icons.payments_outlined,
+                      title: isBangla ? 'লভ্যাংশ বণ্টন ও নিষ্পত্তি' : 'Profit Distribution History',
+                      palette: palette,
+                      isDark: isDark,
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ProfitDistributionScreen(state: state)));
+                      },
+                    ),
+                    _profileNavRow(
+                      icon: Icons.receipt_long_outlined,
                       title: isBangla ? 'তহবিল স্বচ্ছতা ও ব্যয়ের হিসাব' : 'Fund Transparency Ledger',
                       palette: palette,
                       isDark: isDark,

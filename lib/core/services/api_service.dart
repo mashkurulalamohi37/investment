@@ -6,6 +6,7 @@ import 'package:swapnojatri/data/models/project_model.dart';
 import 'package:swapnojatri/data/models/investment_model.dart';
 import 'package:swapnojatri/data/models/distribution_model.dart';
 import 'package:swapnojatri/data/models/kyc_model.dart';
+import 'package:swapnojatri/data/models/withdrawal_model.dart';
 
 /// Central API Service for connecting Flutter to Next.js cPanel Website Backend
 class ApiService {
@@ -183,6 +184,98 @@ class ApiService {
       }
     } catch (e) {
       debugPrint('[ApiService] Error fetching CMS data: $e');
+    }
+    return null;
+  }
+
+  /// 9. Fetch Withdrawals History from Website Backend
+  Future<List<WithdrawalModel>> getWithdrawals({String? userId}) async {
+    try {
+      final url = userId != null
+          ? '${AppConfig.activeApiUrl}/withdrawals?userId=$userId'
+          : '${AppConfig.activeApiUrl}/withdrawals';
+      final uri = Uri.parse(url);
+      final response = await _client.get(uri, headers: _headers).timeout(_timeout);
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        final List list = decoded['data'] ?? [];
+        return list.map((json) => WithdrawalModel.fromJson(json)).toList();
+      }
+    } catch (e) {
+      debugPrint('[ApiService] Error fetching withdrawals: $e');
+    }
+    return [];
+  }
+
+  /// 10. Submit New Withdrawal Request to Website Backend
+  Future<WithdrawalModel?> createWithdrawal({
+    required WithdrawalType type,
+    required double amount,
+    required PayoutChannel payoutChannel,
+    String? userId,
+    String? userName,
+    String? projectId,
+    String? projectName,
+    String? projectNameBn,
+    String? bankName,
+    String? accountHolderName,
+    String? accountNumber,
+    String? branchName,
+    String? routingNumber,
+    String? mfsNumber,
+    String? userNote,
+  }) async {
+    try {
+      final uri = Uri.parse('${AppConfig.activeApiUrl}/withdrawals');
+      String typeStr = type == WithdrawalType.capitalExit ? 'CAPITAL_EXIT' : 'DIVIDEND';
+      String channelStr = 'BANK_TRANSFER';
+      switch (payoutChannel) {
+        case PayoutChannel.bankTransfer:
+          channelStr = 'BANK_TRANSFER';
+          break;
+        case PayoutChannel.bkash:
+          channelStr = 'BKASH';
+          break;
+        case PayoutChannel.nagad:
+          channelStr = 'NAGAD';
+          break;
+        case PayoutChannel.rocket:
+          channelStr = 'ROCKET';
+          break;
+      }
+
+      final body = {
+        'userId': userId ?? 'usr-inv-001',
+        'userName': userName,
+        'projectId': projectId,
+        'projectName': projectName,
+        'projectNameBn': projectNameBn,
+        'type': typeStr,
+        'amount': amount,
+        'payoutChannel': channelStr,
+        'bankName': bankName,
+        'accountHolderName': accountHolderName,
+        'accountNumber': accountNumber,
+        'branchName': branchName,
+        'routingNumber': routingNumber,
+        'mfsNumber': mfsNumber,
+        'userNote': userNote,
+      };
+
+      final response = await _client
+          .post(uri, headers: _headers, body: jsonEncode(body))
+          .timeout(_timeout);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['success'] == true && decoded['data'] != null) {
+          return WithdrawalModel.fromJson(decoded['data']);
+        }
+      } else {
+        debugPrint('[ApiService] createWithdrawal failed (${response.statusCode}): ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('[ApiService] Error creating withdrawal: $e');
     }
     return null;
   }
